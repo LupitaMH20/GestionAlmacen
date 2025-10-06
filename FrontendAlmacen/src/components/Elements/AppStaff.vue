@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail, useSidebar } from "@/components/ui/sidebar"
-import type { SidebarProps } from "@/components/ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail, useSidebar } from "../ui/sidebar"
+import type { SidebarProps } from "../ui/sidebar"
 import { navMainS } from "../data/TypeNavMainS.ts"
 import NavMain from "./NavMain.vue"
 import NavUser from "./NavUser.vue"

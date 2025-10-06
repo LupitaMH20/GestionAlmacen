@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ShieldUser, LogOut, ChevronsUpDown } from 'lucide-vue-next'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar"
 import { Avatar, AvatarFallback } from '../ui/avatar'
 
 defineProps<{
@@ -26,7 +26,7 @@ const { isMobile } = useSidebar()
           >
             <Avatar class="h-8 w-8 rounded-lg">
               <AvatarFallback class="rounded-lg">
-                <ShieldUser class="size-4" />
+                <ShieldUser class="size-10" />
               </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
@@ -47,7 +47,7 @@ const { isMobile } = useSidebar()
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
                 <AvatarFallback class="rounded-lg">
-                  <ShieldUser class="size-4" />
+                  <ShieldUser class="size-6" />
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">

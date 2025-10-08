@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { LucideIcon } from "lucide-vue-next"
 import { ChevronRight } from "lucide-vue-next"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger} from "../ui/collapsible"
-import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem} from "../ui/sidebar"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
+import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "../ui/sidebar"
+import { navMainA } from '../data/TypeNavMainA';
 
 defineProps<{
     items: {
@@ -35,10 +36,11 @@ defineProps<{
                         <SidebarMenuSub>
                             <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
                                 <SidebarMenuSubButton as-child>
-                                    <a :href="subItem.url">
-                                        <component :is="subItem.icon" v-if="subItem.icon" />
-                                        <span>{{ subItem.title }}</span>
-                                    </a>
+                                    <router-link v-for="item in navMainA" :key="item.title" :to="item.url"
+                                        class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                                        <component :is="item.icon" class="w-5 h-5 mr-3" />
+                                        <span>{{ item.title }}</span>
+                                    </router-link>
                                 </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                         </SidebarMenuSub>

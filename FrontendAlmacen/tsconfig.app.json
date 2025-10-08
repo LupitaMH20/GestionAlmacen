@@ -9,5 +9,8 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "types": [
+      "vue-router"
+    ]
 }

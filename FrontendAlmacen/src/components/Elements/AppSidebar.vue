@@ -25,7 +25,6 @@ const showHeaderText = computed(() => sidebar.state.value !== 'collapsed')
 <template>
   <Sidebar v-bind="props">
     <SidebarHeader>
-      <!-- Aquí usamos la computed -->
       <label v-show="showHeaderText" class="text-[16px] font-sans">Administrador</label>
     </SidebarHeader>
 

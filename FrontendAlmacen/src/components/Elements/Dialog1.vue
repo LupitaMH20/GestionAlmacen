@@ -32,7 +32,7 @@ const slots = useSlots();
                     <div >
                         <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title}}</label>
                     </div>
-                    <div>
+                    <div>               
                         <slot name="forms"></slot>
                     </div>
                 </div>

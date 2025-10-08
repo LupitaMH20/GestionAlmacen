@@ -4,57 +4,57 @@ import { House, NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck,
 export const navMainA = [
     {
         title: "Inicio",
-        url: "#",
+        url: "/start",
         icon: House,
         isActive: true,
     },
     {
-        title: "Soliciitudes",
-        url: "#",
+        title: "Solicitudes",
+        url: "/application",
         icon: NotebookPen
     },
     {
         title: "Autorizadas",
-        url: "#",
+        url: "/authorize",
         icon: BookCheck
     },
     {
         title: "Surtir",
-        url: "#",
+        url: "/supply",
         icon: BookOpenCheck
     },
     {
         title: "Entregas",
-        url: "#",
+        url: "/deliveries",
         icon: BookmarkCheck
     },
     {
         title: "Usuarios",
-        url: "#",
+        url: "/user",
         icon: User,
         isActive: true,
     },
     {
         title: "Empresa",
-        url: "#",
+        url: "/Company",
         icon: Building2,
         isActive: true,
     },
     {
         title: "Colaboradores",
-        url: "#",
+        url: "/collaborator",
         icon: UserCog,
         isActive: true,
     },
     {
         title: "Reportes",
-        url: "#",
+        url: "/report",
         icon: ChartNoAxesCombined,
         isActive: true,
     },
     {
         title: "Historial",
-        url: "#",
+        url: "/record",
         icon: FileChartColumnIncreasing,
         isActive: true,
     },

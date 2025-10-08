@@ -39,11 +39,11 @@ const slots = useSlots();
                         <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title.split('')[0] }}</label>
                         <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title.split('').slice(1).join('')
                             }}</label>
-                        <TabsList class="grid grid-cols-1 grid-rows-2">
-                            <TabsTrigger class=" font-sans text-[16px]" value="article">
+                        <TabsList class="grid grid-cols-1 grid-rows-2 space-y-4 items-start">
+                            <TabsTrigger class="font-sans text-[16px] p-0" value="article">
                                 <component :is="IconComponent(props.IconOf)" class="w-10 h-10 gap-3" />{{ recordof }}
                             </TabsTrigger>
-                            <TabsTrigger class=" font-sans text-[16px]" value="description">
+                            <TabsTrigger class="font-sans text-[16px] p-0" value="description">
                                 <component :is="IconComponent(props.IconD)" class="w-10 h-10 gap-3" />{{ description }}
                             </TabsTrigger>
                         </TabsList>

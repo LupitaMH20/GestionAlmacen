@@ -3,28 +3,28 @@ import { House, NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck} from "luci
 export const navMainS = [
     {
         title: "Inicio",
-        url: "#",
+        url: "/start",
         icon: House,
         isActive: true,
     },
     {
-        title: "Soliciitudes",
-        url: "#",
+        title: "Solicitudes",
+        url: "/application",
         icon: NotebookPen
     },
     {
         title: "Autorizadas",
-        url: "#",
+        url: "/authorize",
         icon: BookCheck
     },
     {
         title: "Surtir",
-        url: "#",
+        url: "/supply",
         icon: BookOpenCheck
     },
     {
         title: "Entregas",
-        url: "#",
+        url: "/deliveries",
         icon: BookmarkCheck
     },
 ]

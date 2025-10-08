@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Dialog1 from '../../Elements/Dialog1.vue';
-import FormCollaboratorC from './FormCollaboratorC.vue';
-import { Users } from 'lucide-vue-next';
+import FormDecline from './FormDecline.vue';
+import { BookX } from 'lucide-vue-next';
 
 const handleCancel = () => {
     console.log("Acción de Cancelar");
@@ -14,14 +14,14 @@ const handleSave = () => {
 
 <template>
     <Dialog1 
-        title="Registro del Colaborador" 
-        :iconP="Users" 
-        :iconT="Users"
+        title="Rechaza" 
+        :iconP="BookX" 
+        :iconT="BookX"
         @cancel="handleCancel"
         @save="handleSave">
         
         <template #forms>
-            <FormCollaboratorC />
+            <FormDecline />
         </template>
     </Dialog1>
 </template>

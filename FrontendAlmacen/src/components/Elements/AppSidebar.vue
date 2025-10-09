@@ -29,7 +29,7 @@ const showHeaderText = computed(() => sidebar.state.value !== 'collapsed')
     </SidebarHeader>
 
     <SidebarContent>
-      <NavMain class="font-sans text-[12px]" :items="navMainA" />
+      <NavMain class="font-sans font-light text-[12px]" :items="navMainA" />
     </SidebarContent>
 
     <SidebarFooter>

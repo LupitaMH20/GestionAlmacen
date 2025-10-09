@@ -40,16 +40,16 @@ const slots = useSlots();
                     <Tabs default-value="account">
                         <div class="grid grid-cols-2 grid-rows-1 gap-4">
                             <div>
-                                <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title.split('')[0] }}</label>
-                                <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title.split('').slice(1).join('') }}</label>
-                                <TabsList class="grid grid-cols-1 grid-rows-3">
-                                    <TabsTrigger class="font-sans text-[12px]" value="article">
+                                <label class="text-[24px] font-sans font-bold p-0 text-center text-black">{{ title.split('')[0] }}</label>
+                                <label class="text-[24px] font-sans font-bold p-0 text-center  text-black">{{ title.split('').slice(1).join('') }}</label>
+                                <TabsList class="h-45 flex flex-col space-y-3 items-start  mt-3">
+                                    <TabsTrigger class="  w-full justify-start font-sans text-[14px] py-3 px-4 text-black" value="article">
                                         <component :is="IconComponent(props.iconOf)" class="w-10 h-10 gap-3" />{{ recordof }}
                                     </TabsTrigger>
-                                    <TabsTrigger class="font-sans text-[12px]" value="existence">
+                                    <TabsTrigger class="w-full justify-start font-sans text-[14px] py-3 px-4" value="existence">
                                         <component :is="IconComponent(props.iconE)" class="w-10 h-10 gap-3" />{{ existence }}
                                     </TabsTrigger>
-                                    <TabsTrigger class="font-sans text-[12px]" value="description">
+                                    <TabsTrigger class="w-full justify-start font-sans text-[14px] py-3 px-4" value="description">
                                         <component :is="IconComponent(props.iconD)" class="w-10 h-10 gap-3" />{{ description }}
                                     </TabsTrigger>
                                 </TabsList>

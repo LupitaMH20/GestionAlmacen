@@ -11,6 +11,7 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/user', name: 'user', component: () => import('../views/User.vue') },
   { path: '/company', name: 'company', component: () => import('../views/Company.vue') },
   { path: '/collaborator', name: 'collaborator', component: () => import('../views/Collaborator.vue') },
+  { path: '/articles', name: 'articles', component: () => import('../views/Articles.vue') },
   { path: '/report', name: 'report', component: () => import('../views/Reports.vue') },
   { path: '/record', name: 'record', component: () => import('../views/Record.vue') },
 ];

@@ -1,6 +1,5 @@
 import { House, NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck,
-    User, UserCog, Building2, FileChartColumnIncreasing, ChartNoAxesCombined} from "lucide-vue-next"
-    // HardHat, ToolCase, PencilRuler
+    User, UserCog, Building2, FileChartColumnIncreasing, ChartNoAxesCombined, Hammer} from "lucide-vue-next"
 export const navMainA = [
     {
         title: "Inicio",
@@ -11,39 +10,50 @@ export const navMainA = [
     {
         title: "Solicitudes",
         url: "/application",
-        icon: NotebookPen
+        icon: NotebookPen,
+        isActive: true,
     },
     {
         title: "Autorizadas",
         url: "/authorize",
-        icon: BookCheck
+        icon: BookCheck,
+        isActive: true,
     },
     {
         title: "Surtir",
         url: "/supply",
-        icon: BookOpenCheck
+        icon: BookOpenCheck,
+        isActive: true,
     },
     {
         title: "Entregas",
         url: "/deliveries",
-        icon: BookmarkCheck
+        icon: BookmarkCheck,
+        isActive: true,
     },
     {
         title: "Usuarios",
         url: "/user",
         icon: User,
         isActive: true,
-    },
-    {
-        title: "Empresa",
-        url: "/Company",
-        icon: Building2,
-        isActive: true,
+        
     },
     {
         title: "Colaboradores",
         url: "/collaborator",
         icon: UserCog,
+        isActive: true,
+    },
+    {
+        title: "Empresa",
+        url: "/company",
+        icon: Building2,
+        isActive: true,
+    },
+    {
+        title: "Articulos",
+        url: "/articles",
+        icon: Hammer,
         isActive: true,
     },
     {

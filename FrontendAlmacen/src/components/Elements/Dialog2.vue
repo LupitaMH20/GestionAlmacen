@@ -39,12 +39,14 @@ const slots = useSlots();
                         <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title.split('')[0] }}</label>
                         <label class="text-[24px] font-sans font-bold p-0 text-center">{{ title.split('').slice(1).join('')
                             }}</label>
-                        <TabsList class="grid grid-cols-1 grid-rows-2 space-y-4 items-start">
-                            <TabsTrigger class="font-sans text-[16px] p-0" value="article">
-                                <component :is="IconComponent(props.IconOf)" class="w-10 h-10 gap-3" />{{ recordof }}
+                        <TabsList class="h-30 flex flex-col space-y-3 items-start mt-4">
+                            <TabsTrigger class="w-full justify-start font-sans text-[16px] py-3 px-4" value="article">
+                                <component :is="IconComponent(props.IconOf)" class="w-6 h-6 mr-3" />{{ recordof }}
                             </TabsTrigger>
-                            <TabsTrigger class="font-sans text-[16px] p-0" value="description">
-                                <component :is="IconComponent(props.IconD)" class="w-10 h-10 gap-3" />{{ description }}
+
+                            <TabsTrigger class="w-full justify-start font-sans text-[16px] py-3 px-4"
+                                value="description">
+                                <component :is="IconComponent(props.IconD)" class="w-6 h-6 mr-3" />{{ description }}
                             </TabsTrigger>
                         </TabsList>
                     </div>
@@ -59,10 +61,12 @@ const slots = useSlots();
                 </div>
             </Tabs>
             <DialogFooter class="flex justify-self-center gap-20">
-                <Button @click="$emit('cancel')" class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
+                <Button @click="$emit('cancel')"
+                    class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
                     <Ban class="w-4 h-4 mr-3 " /> Cancelar
                 </Button>
-                <Button type="submit" @click="$emit('save')" class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
+                <Button type="submit" @click="$emit('save')"
+                    class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
                     <Save class="w-4 h-4 mr-3" /> Guardar
                 </Button>
             </DialogFooter>

@@ -1,5 +1,5 @@
 """
-WSGI config for BackendAlmacen project.
+WSGI config for ConsumoInterno project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BackendAlmacen.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ConsumoInterno.settings')
 
 application = get_wsgi_application()

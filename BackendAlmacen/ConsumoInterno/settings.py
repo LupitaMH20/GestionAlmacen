@@ -44,11 +44,14 @@ INSTALLED_APPS = [
     'corsheaders',
     #app del backend
     'users',
+    'collaborator',
+    'company',
+    'article',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     #Ruta del frontend
-    'http://localhost:5173/' 
+    'http://localhost:5173' 
 ]
 
 MIDDLEWARE = [

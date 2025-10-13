@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import Dialog2 from '../../../Elements/Dialog2.vue';
 import FormApplicationU from '../../../Elements/FormAppicationU.vue';
-import FormCollaboratorC from './FormCollaboratorC.vue';
-import FormCollaboratorU from './FormCollaboratorU.vue';
+import FormPersonalConsumptionU from './FormPersonalConsumptionU.vue';
 import {Users, Building2, Hammer, Notebook} from 'lucide-vue-next';
 
 const handleCancel = () => {
@@ -16,7 +15,7 @@ const handleSave = () => {
 
 <template>
     <Dialog2 
-        title="Actualizar la solicitud colaboradores"
+        title="Actualizar la solicitud de Consumo Personal"
         :iconP="Users" 
         :iconT="Users" 
         recordof="Producto"
@@ -30,7 +29,7 @@ const handleSave = () => {
             <FormApplicationU />
         </template>
         <template #form2>
-            <FormCollaboratorU />
+            <FormPersonalConsumptionU />
         </template>
     </Dialog2>
 </template>

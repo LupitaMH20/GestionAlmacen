@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSlots, defineEmits } from 'vue';
+import { useSlots, defineEmits, defineModel} from 'vue';
 import { Dialog, DialogContent, DialogFooter, DialogTrigger, DialogTitle } from '../ui/dialog';
 import Button from '../ui/button/Button.vue';
 import { LucideIcon } from 'lucide-vue-next';
@@ -11,14 +11,14 @@ const props = defineProps<{
     iconT: LucideIcon;
 }>();
 
+const open = defineModel<boolean>()
 const emit = defineEmits(['save', 'cancel']);
 
 const IconComponent = (icon: LucideIcon) => icon;
-const slots = useSlots();
 </script>
 
 <template>
-    <Dialog>
+    <Dialog v-model:open="open">
         <DialogTrigger>
             <Button variant="outline">
                 <component :is="IconComponent(props.iconP)" class="w-10 h-10 " />

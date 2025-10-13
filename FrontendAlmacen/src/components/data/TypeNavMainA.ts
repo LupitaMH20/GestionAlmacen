@@ -1,5 +1,5 @@
 import { House, NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck,
-    User, UserCog, Building2, FileChartColumnIncreasing, ChartNoAxesCombined, Hammer} from "lucide-vue-next"
+    User, UserCog, Building2, FileChartColumnIncreasing, ChartNoAxesCombined, Hammer, ArrowLeftRight} from "lucide-vue-next"
 export const navMainA = [
     {
         title: "Inicio",
@@ -26,9 +26,15 @@ export const navMainA = [
         isActive: true,
     },
     {
-        title: "Entregas",
-        url: "/deliveries",
+        title: "Terminadas",
+        url: "/finished",
         icon: BookmarkCheck,
+        isActive: true,
+    },
+    {
+        title: "Devoluciones",
+        url: "/returns",
+        icon: ArrowLeftRight,
         isActive: true,
     },
     {

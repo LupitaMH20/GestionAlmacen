@@ -18,7 +18,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger} from "../../components/u
                         <BreadcrumbList>
                             <BreadcrumbItem class="hidden md:block">
                                 <BreadcrumbLink href="/">
-                                    Traspasos Especiales
+                                    Consumo Interno
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator class="hidden md:block" />

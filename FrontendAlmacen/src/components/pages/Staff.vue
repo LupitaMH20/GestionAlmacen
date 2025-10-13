@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AppStaff from "@/components/Elements/AppStaff.vue"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
+import AppStaff from "../Elements/AppStaff.vue"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator} from "../ui/breadcrumb"
+import { Separator } from "../ui/separator"
+import { SidebarInset, SidebarProvider, SidebarTrigger} from "../ui/sidebar"
 </script>
 
 <template>
@@ -18,7 +18,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/si
                         <BreadcrumbList>
                             <BreadcrumbItem class="hidden md:block">
                                 <BreadcrumbLink href="#">
-                                    Traspasos Especiales
+                                    Consumo Interno
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator class="hidden md:block" />

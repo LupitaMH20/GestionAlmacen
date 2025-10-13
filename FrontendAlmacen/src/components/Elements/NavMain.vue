@@ -19,7 +19,7 @@ defineProps<{
         <SidebarMenu>
                 <SidebarMenuItem v-for="item in items" :key="item.title">
                     <router-link :to="item.url" as-child>
-                        <SidebarMenuButton :tooltip="item.title" :data-active="item.isActive" undefined>
+                        <SidebarMenuButton :tooltip="item.title" :data-active="item.isActive" undefined >
                         <component :is="item.icon" v-if="item.icon"/>
                         <span class="font-lingh">{{ item.title }}</span>   
                         <ChevronRight class="ml-auto w-4 h-4" /> 

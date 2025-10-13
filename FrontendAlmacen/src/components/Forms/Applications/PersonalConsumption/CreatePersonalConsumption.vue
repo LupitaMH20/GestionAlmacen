@@ -2,7 +2,7 @@
 import Dialog3 from '../../../Elements/Dialog3.vue';
 import FormApplicationC from '../../../Elements/FormApplicationC.vue';
 import FormExistence from '../../../Elements/FormExistence.vue';
-import FormCollaboratorC from './FormCollaboratorC.vue';
+import FormPersonalConsumptionC from './FormPersonalConsumptionC.vue';
 import { Building2, Hammer, Notebook, Users2} from 'lucide-vue-next';
 
 const handleCancel = () => {
@@ -16,7 +16,7 @@ const handleSave = () => {
 
 <template>
     <Dialog3 
-        title="Solicitud Colaboradores" 
+        title="Solicitud de Consumo Personal" 
         :iconP="Users2" 
         :iconT="Users2"
         recordof="Registro"
@@ -35,7 +35,7 @@ const handleSave = () => {
             <FormExistence />
         </template>
         <template #form3>
-            <FormCollaboratorC />
+            <FormPersonalConsumptionC />
         </template>
     </Dialog3>
 </template>

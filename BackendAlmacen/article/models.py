@@ -6,7 +6,8 @@ class Articles(models.Model):
     name = models.CharField(max_length=50)
     stock = models.IntegerField()
     money = models.DecimalField(max_digits=10, decimal_places=2)
-    description =models.TextField()
+    description = models.TextField()
+    active = models.BooleanField(default=True)
     create_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

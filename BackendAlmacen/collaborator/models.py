@@ -5,6 +5,7 @@ class Collaborators(models.Model):
     name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     position = models.CharField(max_length=50)
+    active = models.BooleanField(default=True)
     create_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

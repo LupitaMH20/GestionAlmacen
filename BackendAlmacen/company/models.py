@@ -1,7 +1,7 @@
 from django.db import models
 
 class Companies(models.Model):
-    id_Company = models.AutoField(max_length=20, primary_key=True)
+    id_Company = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=200)
     active =models.BooleanField(default=True)

@@ -19,7 +19,7 @@ const allProcesses = ref<ProcessData[]>([
 ]);
 const filterByTypeAndStatus = (type: ProcessData['type']) => {
     return allProcesses.value.filter(p => 
-        (p.currentStatus === 'Presolicitud' || p.currentStatus === 'Solicitud') &&
+        (p.currentStatus === 'Terminada') &&
         p.type === type
     );
 };

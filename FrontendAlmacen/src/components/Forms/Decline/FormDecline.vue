@@ -14,9 +14,9 @@ const selectedmanager = ref<string>('');
 
 const loadmanagers = async () => {
     managers.value = [
-        { value: 'USR001', label: 'Rocio Pérez (Producción)' },
-        { value: 'USR002', label: 'María Gómez (Almacén)' },
-        { value: 'USR003', label: 'Luis Castro (Ventas)' },
+        { value: 'USR001', label: 'Rocio Pérez ' },
+        { value: 'USR002', label: 'María Gómez ' },
+        { value: 'USR003', label: 'Luis Castro ' },
     ];
 };
 </script>

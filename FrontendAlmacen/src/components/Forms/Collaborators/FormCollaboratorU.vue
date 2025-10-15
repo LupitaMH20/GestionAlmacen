@@ -1,10 +1,46 @@
 <script setup lang="ts">
+import {ref, watch, defineExpose} from 'vue'
+import axios from 'axios'
 import { FormField, FormItem, FormLabel, FormControl } from '../../ui/form'
 import Input from '../../ui/input/Input.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
 import { TypePositionC } from '../../data/TypePositionC'
-import { TypeCompany } from '../../data/TypeCompany'
 
+const props = defineProps<{
+    collaborator:{
+        name: string,
+        last_name: string,
+        position: string,
+        company: string
+    },
+    company:Array<{
+        id_Company: string,
+        name: string
+    }>
+}>()
+
+const name = ref(props.collaborator.name || '')
+const last_name = ref(props.collaborator.last_name || '')
+const position = ref(props.collaborator.position || '')
+const company = ref(props.collaborator.company || '')
+
+watch(() => props.collaborator,(newCollaborator)=>{
+    name.value = newCollaborator.name
+    last_name.value = newCollaborator.last_name
+    position.value = newCollaborator.position
+    company.value = newCollaborator.company
+}, {immediate:true})
+
+const submitForm = () =>{
+    const data: any ={
+        name:name.value,
+        last_name: last_name.value,
+        position: position.value,
+        company: company.value
+    }
+    return data
+}
+defineExpose({submitForm})
 </script>
 
 <template>
@@ -14,18 +50,18 @@ import { TypeCompany } from '../../data/TypeCompany'
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Nombre *</FormLabel>
                     <FormControl>
-                        <Input placeholder="nombre" class="w-75 text-12 font-sans font-light" />
+                        <Input v-model="name" placeholder="nombre" class="w-75 text-12 font-sans font-light" disabled/>
                     </FormControl>
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Apellido *</FormLabel>
                     <FormControl>
-                        <Input placeholder="apellido" class="w-75 text-12 font-sans font-light" />
+                        <Input v-model="last_name" placeholder="apellido" class="w-75 text-12 font-sans font-light" disabled/>
                     </FormControl>
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Puesto *</FormLabel>
-                    <Select>
+                    <Select v-model="position">
                         <SelectTrigger class="w-75">
                             <SelectValue placeholder="Seleccione el puesto" class="text-12 font-sans font-light" />
                         </SelectTrigger>
@@ -39,14 +75,14 @@ import { TypeCompany } from '../../data/TypeCompany'
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa *</FormLabel>
-                    <Select>
+                    <Select v-model="company">
                         <SelectTrigger class="w-75">
-                            <SelectValue placeholder="Seleccione el puesto" class="text-12 font-sans font-light" />
+                            <SelectValue placeholder="Seleccione el empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="company in TypeCompany" :key="company.value" :value="company.value"
+                            <SelectItem v-for="company in props.company" :key="company.id_Company" :value="company.id_Company"
                                 class="w-75">
-                                {{ company.label }}
+                                {{ company.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>

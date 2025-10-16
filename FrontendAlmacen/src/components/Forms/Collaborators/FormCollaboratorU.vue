@@ -22,7 +22,7 @@ const props = defineProps<{
 const name = ref(props.collaborator.name || '')
 const last_name = ref(props.collaborator.last_name || '')
 const position = ref(props.collaborator.position || '')
-const company = ref(props.collaborator.company || '')
+const company = ref(props.collaborator.company || props.company)
 
 watch(() => props.collaborator,(newCollaborator)=>{
     name.value = newCollaborator.name
@@ -75,7 +75,7 @@ defineExpose({submitForm})
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa *</FormLabel>
-                    <Select v-model="company">
+                    <Select v-model="props.company">
                         <SelectTrigger class="w-75">
                             <SelectValue placeholder="Seleccione el empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>

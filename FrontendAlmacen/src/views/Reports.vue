@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import CreateApplicationC from '../components/Forms/Applications/PersonalConsumption/CreatePersonalConsumption.vue';
+
 import UpdateApplicationC from '../components/Forms/Applications/PersonalConsumption/UpdatePersonalConsumption.vue';
 import DeleteApplicationC from '../components/Forms/Applications/PersonalConsumption/DeletePersonal consumption.vue'
-import CreateApplicationCO from '../components/Forms/Applications/Consumables/CreateConsumable.vue';
+
 import UpdateApplicationCO from '../components/Forms/Applications/Consumables/UpdateConsumable.vue';
 import DeleteApplicationCO from '../components/Forms/Applications/Consumables/DeleteConsumable.vue';
-import CreateApplicationT from '../components/Forms/Applications/Tools/CreateTools.vue';
+
 import UpdateApplicationT from '../components/Forms/Applications/Tools/UpdateTools.vue';
 import DeleteApplicationT from '../components/Forms/Applications/Tools/DeleteTools.vue';
 import CreateAuthorize from '../components/Forms/Authorize/CreateAuthorize.vue'
@@ -14,7 +14,7 @@ import CreateDecline from '../components/Forms/Decline/CreateDecline.vue';
 </script>
 
 <template>
-    <label>Colaboradores solicitud</label>
+    <label>Consumo Personal solicitud</label>
     <div class="grid grid-cols-3 grid-rows-1 gap-1">
         <div>
             <CreateApplicationC/>

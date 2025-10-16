@@ -11,7 +11,7 @@ class ArticleSerializers(serializers.ModelSerializer):
         
     def get_company_name(self, obj):
         try:
-            relation = obj.ArticleCompany_set.first()
+            relation = obj.articlecompany_set.first()
             if relation and relation.company:
                 return relation.company.name
             return "Sin empresa"
@@ -25,7 +25,7 @@ class ArticleSerializers(serializers.ModelSerializer):
         try:
             company_instance = Companies.objects.get(id_Company=company_id)
             ArticleCompany.objects.create(
-                collaborator = article__instance,
+                article = article__instance,
                 company = company_instance
             )
         except Companies.DoesNotExist:

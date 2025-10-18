@@ -17,6 +17,7 @@ const handleSave = () => {
 <template>
     <Dialog3 
         title="Solicitud de Consumo Personal" 
+        titleButton="Consumo Personal"
         :iconP="Users2" 
         :iconT="Users2"
         recordof="Registro"

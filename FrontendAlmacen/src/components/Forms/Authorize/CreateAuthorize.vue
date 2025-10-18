@@ -15,6 +15,7 @@ const handleSave = () => {
 <template>
     <Dialog1 
         title="Autorizar" 
+        titleButton="Autorizar"
         :iconP="BookCheck" 
         :iconT="BookCheck"
         @cancel="handleCancel"

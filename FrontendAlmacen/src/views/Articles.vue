@@ -3,6 +3,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import ArticleCreate from '../components/Forms/Articles/CreateArticle.vue';
 import ArticleUpdate from '../components/Forms/Articles/UpdateArticle.vue';
 import DeleteArticle from '../components/Forms/Articles/DeleteArticle.vue';
+import Category from '../components/Forms/Articles/Category.vue';
 import Input from '../components/ui/input/Input.vue';
 import Button from '../components/ui/button/Button.vue';
 import { Search } from 'lucide-vue-next';
@@ -53,10 +54,10 @@ const loadCompany = async () => {
 
 const searchArticle = () => {
     const query = searchQuery.value.toLowerCase()
-    displayedArticles.value = articles.value.filter(collaborator =>
-        collaborator.id_Collaborator.toLowerCase().includes(query) ||
-        collaborator.name.toLowerCase().includes(query) ||
-        collaborator.last_name.toLowerCase().includes(query)
+    displayedArticles.value = articles.value.filter(article =>
+        article.id_mainarticle.toLowerCase().includes(query) ||
+        article.id_alternativearticle.toLowerCase().includes(query) ||
+        article.name.toLowerCase().includes(query)
     )
 }
 
@@ -89,7 +90,11 @@ onMounted(() => {
     </div>
     <div class="flex justify-between items-center w-full text-black font-sans font-bold text-3xl">
         Articulos
-        <ArticleCreate @creatArticle="loadArticle"/>
+        <div class="flex items-center gap-2">
+            <ArticleCreate @creatArticle="loadArticle"/>
+            <Category @createCategory="loadArticle"/>
+        </div>
+
     </div>
     <Table>
         <TableCaption>Articulos registrados.</TableCaption>

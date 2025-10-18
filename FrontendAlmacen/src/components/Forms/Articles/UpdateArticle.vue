@@ -6,9 +6,11 @@ import { NotebookPen, FileSpreadsheet, PackageOpen } from 'lucide-vue-next';
 import FormArticleU1 from './FormArticleU1.vue';
 import FormArticleU2 from './FormArticleU2.vue';
 
+const category = ref<any[]>([]);
+const companies = ref<any[]>([]);
+
 const props = defineProps<{ 
-    id_mainarticle: string | number,
-    companies: any[]
+    id_mainarticle: string | number,    
 }>()
 
 const isDialogOpen = ref(false)
@@ -31,6 +33,23 @@ const data = reactive({
     company: ''
 });
 
+onMounted(async () => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/companies/');
+        companies.value = response.data;
+        console.log('Categorías cargadas:', companies.value);
+    } catch (error) {
+        console.error('No se pudieron cargar las empresas', error);
+    }
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/category/');
+        category.value = response.data;
+        console.log('Categorías cargadas:', category.value);
+    } catch (error) {
+        console.error('No se pudieron cargar las categorías', error);
+    }
+});
+
 const loadata = async (id: string | number) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/api/article/${id}/`);
@@ -43,7 +62,7 @@ const loadata = async (id: string | number) => {
             stock: apiData.stock,
             price: apiData.price,
             description: apiData.description || '',
-            category: apiData.category || '',
+            category: apiData.category || apiData.category,
             company: apiData.companyId || apiData.company
         });
         
@@ -73,6 +92,7 @@ const handleSave = async() => {
 <template>
     <Dialog2 
         title="Actualizar producto" 
+        titleButton="Actualizar"
         :iconP="NotebookPen" 
         :iconT="NotebookPen" 
         recordof="Producto"
@@ -87,7 +107,7 @@ const handleSave = async() => {
             <FormArticleU1 v-model:props="data"/>
         </template>
         <template #form2>
-            <FormArticleU2 v-model:props="data" :companies="companies"/>
+            <FormArticleU2 v-model:props="data" :companies="companies" :category="category"/>
         </template>
     </Dialog2>
 </template>

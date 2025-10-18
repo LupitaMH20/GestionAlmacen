@@ -16,6 +16,7 @@ const handleSave = () => {
 <template>
     <Dialog2 
         title="Actualizar la solicitud de Consumo Personal"
+        titleButton="Actualizar"
         :iconP="Users" 
         :iconT="Users" 
         recordof="Producto"

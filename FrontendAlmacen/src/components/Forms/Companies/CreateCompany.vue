@@ -40,6 +40,7 @@ const handleSave=()=>{
 <template>
     <Dialog1
         title="Registro de empresa"
+        titleButton="Empresa"
         :iconP="Building2"
         :iconT="Building"
         @cancel="handleCancel"

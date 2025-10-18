@@ -17,6 +17,7 @@ const handleSave = () => {
 
         <Dialog2 
         title="Actualizar la solicitud Consumibles" 
+        titleButton="Actualizar"
         :iconP="FilePlus2" 
         :iconT="FilePlus2" 
         recordof="Producto"

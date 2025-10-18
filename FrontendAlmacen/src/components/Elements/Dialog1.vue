@@ -7,6 +7,7 @@ import { Ban, Save } from 'lucide-vue-next';
 
 const props = defineProps<{
     title: string;
+    titleButton: string;
     iconP: LucideIcon;
     iconT: LucideIcon;
 }>();
@@ -20,8 +21,9 @@ const IconComponent = (icon: LucideIcon) => icon;
 <template>
     <Dialog v-model:open="open">
         <DialogTrigger>
-            <Button variant="outline">
+            <Button variant="outline" class="flex items-center gap-2">
                 <component :is="IconComponent(props.iconP)" class="w-10 h-10 " />
+                <span>{{ titleButton }}</span>
             </Button>
         </DialogTrigger>
         <DialogContent class="sm:max-w-[370px]">

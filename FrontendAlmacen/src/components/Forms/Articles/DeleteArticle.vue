@@ -1,47 +1,54 @@
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref } from 'vue'
 import axios from 'axios';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
-        AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from '../../ui/alert-dialog'
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from '../../ui/alert-dialog'
 import { Trash, Trash2, Ban } from 'lucide-vue-next';
 
-const props = defineProps<{id_mainarticle:string}>()
-const emit =defineEmits(['disableArticle'])
+const props = defineProps<{ id_mainarticle: string }>()
+const emit = defineEmits(['disableArticle'])
 const isLoading = ref(false)
 
-const ArticleDisabled = async(data: any) =>{
-  try{
-    isLoading.value=true
+const ArticleDisabled = async (data: any) => {
+  try {
+    isLoading.value = true
     await axios.patch(`http://127.0.0.1:8000/api/article/${props.id_mainarticle}/`, {
       active: false
     })
     emit('disableArticle', props.id_mainarticle)
-  }catch(error){
+  } catch (error) {
     console.log('No se deshabilito el colaborador')
-  } finally{
-    isLoading.value = false 
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
 
 <template>
   <AlertDialog>
-    <AlertDialogTrigger><Trash class="w-6 h-6"/></AlertDialogTrigger>
+    <AlertDialogTrigger>
+      <div class="flex items-center gap-2">
+        <Trash class="w-6 h-6" />
+        <span>Ocultar</span>
+      </div>
+    </AlertDialogTrigger>
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Ocultar Articulo</AlertDialogTitle>
-        <AlertDialogDescription> 
-            ¿Realmente desea ocultar este articulo? 
-            Una vez desactivado, no se encontrara en la lista de activos 
+        <AlertDialogDescription>
+          ¿Realmente desea ocultar este articulo?
+          Una vez desactivado, no se encontrara en la lista de activos
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
-          <Ban class="w-6 h-6"/>Cancel
+          <Ban class="w-6 h-6" />Cancel
         </AlertDialogCancel>
         <AlertDialogAction class="bg-whiite text-black hover:bg-black hover:text-white border border-write"
           @click.prevent="ArticleDisabled">
-          <Trash2 class="w-6 h-6"/> Desactivar
+          <Trash2 class="w-6 h-6" /> Desactivar
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

@@ -8,6 +8,7 @@ import Button from '../ui/button/Button.vue';
 
 const props = defineProps<{
     title: string;
+    titleButton: string;
     iconP: LucideIcon;
     iconT: LucideIcon;
     recordof: string;

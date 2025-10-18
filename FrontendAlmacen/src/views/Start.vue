@@ -51,7 +51,7 @@ const SurtirsTerminadas = computed(() =>
                 class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
                 <option>Consumo Personal</option>
                 <option>Consumibles</option>
-                <option>Herramientass</option>
+                <option>Herramientas</option>
             </select>
         </div>
         <div class="grid grid-cols-4 gap-6 pt-5">

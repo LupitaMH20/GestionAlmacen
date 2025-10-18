@@ -39,7 +39,8 @@ const searchCollaborator = () => {
     displayedCollaborator.value = collaborator.value.filter(collaborator =>
         collaborator.id_Collaborator.toLowerCase().includes(query) || 
         collaborator.name.toLowerCase().includes(query) ||
-        collaborator.last_name.toLowerCase().includes(query)
+        collaborator.last_name.toLowerCase().includes(query) ||
+        collaborator.company_name.toLowerCase().includes(query)
     )
 }
 

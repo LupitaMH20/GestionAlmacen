@@ -40,11 +40,13 @@ const handleSave = () => {
 <template>
   <Dialog1 
       title="Registro de Usuario" 
+      titleButton="Usuario"
       :iconP="UserPlus" 
       :iconT="UserPlus"
       @cancel="handleCancel"
       @save="handleSave"
       v-model:open="isDialogisOpen">
+      
       <template #forms>
           <FormUserC ref="formRef" />
       </template>

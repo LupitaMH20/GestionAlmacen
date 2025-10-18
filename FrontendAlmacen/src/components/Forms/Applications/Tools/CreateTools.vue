@@ -17,6 +17,7 @@ const handleSave = () => {
 <template>
     <Dialog3 
         title="Solicitud Herramienta" 
+        titleButton="Herramienta"
         :iconP="Hammer" 
         :iconT="Hammer"
         recordof="Registro"

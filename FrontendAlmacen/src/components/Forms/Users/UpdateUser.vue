@@ -51,6 +51,7 @@ const handleSave = () => {
 <template>
     <Dialog1
         title="Actualizar usuario"
+        titleButton="Actualizar"
         :iconP="NotebookPen"
         :iconT="UserPen"
         @cancel="handleCancel"

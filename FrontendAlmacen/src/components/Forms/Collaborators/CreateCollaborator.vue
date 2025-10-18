@@ -53,7 +53,8 @@ onMounted(()=>{
 
 <template>
     <Dialog1 
-        title="Registro del Colaborador" 
+        title="Registro del Colaborador"
+        titleButton="Colaborador" 
         :iconP="Users" 
         :iconT="Users"
         @cancel="handleCancel"

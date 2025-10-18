@@ -16,6 +16,7 @@ const handleSave = () => {
 <template>
     <Dialog2 
         title="Actualizar la solicitud herramientas" 
+        titleButton="Actualizar"
         :iconP="Hammer" 
         :iconT="Hammer" 
         recordof="Producto"

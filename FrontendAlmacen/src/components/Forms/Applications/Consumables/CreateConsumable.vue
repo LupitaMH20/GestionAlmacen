@@ -16,7 +16,8 @@ const handleSave = () => {
 
 <template>
     <Dialog3 
-        title="Solicitud Consumibles" 
+        title="Solicitud Consumibles"
+        titleButton="Consumible"
         :iconP="FilePlus2" 
         :iconT="FilePlus2"
         recordof="Registro"

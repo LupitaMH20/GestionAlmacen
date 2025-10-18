@@ -6,7 +6,12 @@ import { Trash, Trash2, Ban } from 'lucide-vue-next';
 
 <template>
   <AlertDialog>
-    <AlertDialogTrigger><Trash class="w-6 h-6"/></AlertDialogTrigger>
+    <AlertDialogTrigger>
+      <div class="flex items-center gap-2">
+        <Trash class="w-6 h-6"/>
+        <span>Ocultar</span>
+      </div>
+    </AlertDialogTrigger>
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Desea Cancelar la solicitud</AlertDialogTitle>

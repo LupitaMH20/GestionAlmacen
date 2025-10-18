@@ -46,7 +46,7 @@ const handleSave = () => {
         if (data) {
             apiUpdateCollaborator(data)
         }else {
-            console.log("Advertencia: submitForm() devolvió datos nulos/vacíos.");
+            console.log("Basio el formulario");
         }
     } else {
         console.log('No continen nada el formulario')
@@ -55,8 +55,14 @@ const handleSave = () => {
 </script>
 
 <template>
-    <Dialog1 title="Actualizar colaborador" :iconP="NotebookPen" :iconT="UserPen" @cancel="handleCancel"
-        @save="handleSave" v-model:open="isDialogisOpen">
+    <Dialog1 
+        title="Actualizar colaborador" 
+        titleButton="Actualizar"
+        :iconP="NotebookPen" 
+        :iconT="UserPen" 
+        @cancel="handleCancel"
+        @save="handleSave" 
+        v-model:open="isDialogisOpen">
 
         <template #forms>
             <FormCollaboratorU ref="formRef" :collaborator="props.collaborator" :company="props.company" />

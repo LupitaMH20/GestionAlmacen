@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'collaborator',
     'company',
     'article',
+    'category'
 ]
 
 CORS_ALLOWED_ORIGINS = [

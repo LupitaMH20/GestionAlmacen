@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '../../../ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select'
-import Input from '../../../ui/input/Input.vue';
 import { TypeCompany } from '../../../data/TypeCompany';
 
 import { ref, onMounted } from 'vue';
@@ -13,16 +12,9 @@ interface applicant {
 const applicants = ref<applicant[]>([]);
 const selectedApplicant = ref<string>('');
 
-const loadApplicants = async () => {
-    applicants.value = [
-        { value: 'USR001', label: 'Rocio Pérez (Producción)' },
-        { value: 'USR002', label: 'María Gómez (Almacén)' },
-        { value: 'USR003', label: 'Luis Castro (Ventas)' },
-    ];
-};
 
 onMounted(() => {
-    loadApplicants();
+    // loadApplicants();
 });
 
 </script>

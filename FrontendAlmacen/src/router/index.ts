@@ -4,6 +4,7 @@ const routes: Array<RouteRecordRaw> = [
   {path: '/', 
     redirect: '/start'},
   { path: '/start', name: 'start', component: () => import('../views/Start.vue') },
+  { path: '/preApplication', name:'preApplication', component: () => import("../views/PreApplication.vue") },
   { path: '/application', name: 'application', component: () => import('../views/Application.vue') },
   { path: '/authorize', name: 'authorize', component: () => import('../views/Authorize.vue') },
   { path: '/supply', name: 'supply', component: () => import('../views/Supply.vue') },

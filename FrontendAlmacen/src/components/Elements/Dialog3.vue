@@ -30,6 +30,7 @@ const slots = useSlots();
         <DialogTrigger>
             <Button variant="outline">
                 <component :is="IconComponent(props.iconP)" />
+                <span>{{ titleButton }}</span>
             </Button>
         </DialogTrigger>
         <DialogContent class="sm-max-w-[500px]">

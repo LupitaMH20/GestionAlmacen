@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import ProcessCard from '../components/Elements/Card.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 import Input from '../components/ui/input/Input.vue'
 import Button from '../components/ui/button/Button.vue'
 import { Search } from 'lucide-vue-next'
 import CreateApplicationC from '../components/Forms/Applications/PersonalConsumption/CreatePersonalConsumption.vue';
 import CreateApplicationCO from '../components/Forms/Applications/Consumables/CreateConsumable.vue';
 import CreateApplicationT from '../components/Forms/Applications/Tools/CreateTools.vue';
+import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest.vue'
+import PreRequestCo from '../components/Forms/Applications/PersonalConsumption/PreRequest.vue'
+import PreRequestT from '../components/Forms/Applications/Tools/PreRequest.vue'
 
 interface ProcessData {
     id: number;
@@ -16,17 +20,33 @@ interface ProcessData {
     detailsUrl: string;
 }
 
-const allProcesses = ref<ProcessData[]>([
-    { id: 101, title: 'Consumo personal', currentStatus: 'Autorizada', date: '2025-10-10', detailsUrl: '/process/101', },
-    { id: 102, title: 'Herramienta', currentStatus: 'Presolicitud', date: '2025-10-12', detailsUrl: '/process/102', },
-    { id: 103, title: 'Consumibles', currentStatus: 'Surtir', date: '2025-10-05', detailsUrl: '/process/103', },
-    { id: 104, title: 'Consumo personal', currentStatus: 'Presolicitud', date: '2025-10-01', detailsUrl: '/process/104' },
-    { id: 105, title: 'Herramienta', currentStatus: 'Autorizada', date: '2025-10-02', detailsUrl: '/process/105' },
-    { id: 106, title: 'Consumible', currentStatus: 'Surtir', date: '2025-10-03', detailsUrl: '/process/106' },
-]);
+const allProcesses = ref<ProcessData[]>([]);
 
-const presolicitud = computed(() =>
-    allProcesses.value.filter(p => p.currentStatus === 'Presolicitud' || p.currentStatus === 'Solicitud')
+const loadProcesses = async () => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/prerequest/');
+        allProcesses.value = response.data.map((item: any) => ({
+            id: item.id,
+            title: item.type || 'Sin tipo',
+            currentStatus: item.status === 'prerequest' ? 'Presolicitud' :
+                item.status === 'request' ? 'Solicitud' :
+                    item.status === 'authorized' ? 'Autorizada' :
+                        item.status === 'supply' ? 'Surtir' : 'Terminada',
+            date: item.created_at || 'Sin fecha',
+            detailsUrl: `/process/${item.id}`,
+        }));
+        console.log('Procesos cargados:', allProcesses.value);
+    } catch (error) {
+        console.error('Error al cargar procesos:', error);
+    }
+};
+
+const prerequest = computed(() =>
+    allProcesses.value.filter(p => p.currentStatus === 'Presolicitud')
+);
+
+const applicant  = computed(() =>
+    allProcesses.value.filter(p => p.currentStatus === 'Solicitud')
 );
 
 const autorizadas = computed(() =>
@@ -36,6 +56,9 @@ const autorizadas = computed(() =>
 const SurtirsTerminadas = computed(() =>
     allProcesses.value.filter(p => p.currentStatus === 'Surtir' || p.currentStatus === 'Terminada')
 );
+onMounted(() => {
+    loadProcesses();
+});
 </script>
 
 <template>
@@ -54,16 +77,38 @@ const SurtirsTerminadas = computed(() =>
                 <option>Herramientas</option>
             </select>
         </div>
-        <div class="grid grid-cols-4 gap-6 pt-5">
+        <div class="flex justify-between items-center w-full mb-2 ">
+            <label>Pre Solicitudes</label>
+            <div class="flex justify-between items-center p-5 gap-4 ">
+                <PreRequestC @createPreRequest="loadProcesses"/>
+                <PreRequestCo @createPreRequest="loadProcesses"/>
+                <PreRequestT @createPreRequest="loadProcesses"/>
+            </div>
+
+        </div>
+        <div class="grid grid-cols-5 gap-6 pt-5">
 
             <section class="bg-gray-50 p-3 rounded-lg min-h-[500px]">
                 <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-700 whitespace-nowrap">
-                    Presolicitudes / Solicitud ({{ presolicitud.length }})
+                    Presolicitudes ({{ prerequest.length }})
                 </h2>
-
                 <div class="flex flex-col space-y-3">
-                    <ProcessCard v-for="proc in presolicitud" :key="proc.id" :process="proc" />
-                    <p v-if="!presolicitud.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                    <ProcessCard v-for="proc in prerequest" :key="proc.id" :process="proc" />
+                    <p v-if="!prerequest.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                        etapa.</p>
+                </div>
+            </section>
+
+            <section class="bg-gray-50 p-3 rounded-lg min-h-[500px]">
+                <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-700 whitespace-nowrap">
+                    Solicitud ({{ applicant.length }})
+                </h2>
+                <CreateApplicationC />
+                <CreateApplicationCO />
+                <CreateApplicationT />
+                <div class="flex flex-col space-y-3">
+                    <ProcessCard v-for="proc in applicant" :key="proc.id" :process="proc" />
+                    <p v-if="!applicant.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                         etapa.</p>
                 </div>
             </section>

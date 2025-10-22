@@ -33,7 +33,7 @@ const handleCancel = () => {
         money: 0,
         description: '',
         caategory: '',
-        comapy: ''
+        company: ''
     })
 };
 

@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import {watch} from 'vue'
-import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '../ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '../../../ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select'
 
 const props = defineModel('props', { type: Object, required: true })
 const props2 = defineProps<{
     companies: Array<{ id_Company: string, name: string }>
-    users: Array<{ id_user: string, name: string, position: string }>
-    collaborator: Array<{ id_Collaborator: string, name: string }>
+    users: Array<{ id_user: string, name: string }>
 }>()
 
-
-
 </script>
-
 <template>
     <form>
         <FormField name="Consumablename1">
@@ -47,36 +42,17 @@ const props2 = defineProps<{
                     </Select>
                 </div>
                 <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Colaborator *</FormLabel>
-                    <Select v-model="props.collaborator">
-                        <SelectTrigger class="w-50">
-                            <SelectValue placeholder="Seleccionar empresa" class="text-12 font-sans font-light" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="collaborator in props2.collaborator" :key="collaborator.id_Collaborator"
-                                :value="collaborator.id_Collaborator">
-                                {{ collaborator.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Encargado *</FormLabel>
-                    <Select v-model="props.request.applicant">
+                    <FormLabel class="text-24 font-sans font-bold p-1.5">Solicitante *</FormLabel>
+                    <Select v-model="props.applicant">
                         <SelectTrigger class="w-50">
                             <SelectValue placeholder="Seleccionar solicitante" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem v-for="user in props2.users" :key="user.id_user" :value="user.id_user">
-                                {{ user.name }} ({{ user.position }})
+                                {{ user.name }} ({{ user.id_user }})
                             </SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
-                <div>
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Puesto *</FormLabel>
-                    <FormControl :model-value="props.request.position" readonly
-                        placeholder="Puesto asignado" class="bg-gray-100 cursor-default" />
                 </div>
             </FormItem>
         </FormField>

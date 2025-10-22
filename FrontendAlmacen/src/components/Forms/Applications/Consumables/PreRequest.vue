@@ -1,37 +1,33 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import Dialog2 from '../../../Elements/Dialog2.vue';
-import FormApplicationC from '../../../Elements/FormApplicationC.vue';
-import FormPersonalConsumptionC from './FormPersonalConsumptionC.vue';
-import { Building2, Notebook } from 'lucide-vue-next';
+import FormPrerequestC1 from './FormPrerequestC1.vue';
+import FormPreRequestC2 from './FormPreRequestC2.vue';
+import { FilePlus2, Building2, Hammer, Notebook } from 'lucide-vue-next';
 import axios from 'axios';
-import { User2 } from 'lucide-vue-next';
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['createrequest'])
+const emit = defineEmits(['createPreRequest'])
 const company = ref<any[]>([])
 const userRequest = ref<any[]>([])
-const collaborator = ref<any[]>([])
 
-const request = reactive({
-    request:'',
+const preRequest = reactive({
     applicant: '',
     collaborator: '',
-    type: 'ConsumoPersonal',
+    type: 'Consumible',
     article: '',
     description: '',
     amount: 0,
-    status: 'request',
+    status: 'prerequest',
     order_workshop: '',
     store: '',
     requestingCompany: '',
     supplierCompany: '',
-    position:''
 });
 
 const handleCancel = () => {
     isDialogOpen.value = false
-    Object.assign(request, {
+    Object.assign(preRequest, {
         applicant: '',
         collaborator: '',
         type: '',
@@ -43,7 +39,7 @@ const handleCancel = () => {
         store: '',
         requestingCompany: '',
         supplierCompany: '',
-    })
+})
 }
 
 const loadCompanies = async () => {
@@ -51,68 +47,58 @@ const loadCompanies = async () => {
         const response = await axios.get('http://127.0.0.1:8000/api/companies/')
         company.value = response.data
     } catch (error) {
-        console.log('Sin Empresas mostradas')
+        console.log('Empresas mostradas')
     }
 }
 
-const loadUser = async () => {
+const loadUser = async (position: string) => {
     try {
-
-        const response = await axios.get('http://127.0.0.1:8000/api/users/')
+        const response = await axios.get('http://127.0.0.1:8000/api/users/', {
+            params: { position: position }
+        })
         userRequest.value = response.data
-        console.log('Usuarios filtrados por posiciones:')
+        console.log('Usuarios filtrados por posición:', position)
     } catch (error) {
         console.error('Error al mostrar usuarios', error)
     }
 }
 
-const loadCollaboartor = async () => {
-    try{
-        const response =await axios.get('http://127.0.0.1:8000/api/collaborator/')
-        collaborator.value = response.data
-    }catch(error){
-        console.log('Sin colaboradores')
-    }
-}
-
 const handleSave = async () => {
     try {
-        console.log('datos', request)
-        await axios.post('http://127.0.0.1:8000/api/request/', request)
+        console.log('data', preRequest)
+        await axios.post('http://127.0.0.1:8000/api/prerequest/', preRequest)
         console.log('se registro la presolicitud')
         isDialogOpen.value = false
-        emit('createrequest')
+        emit('createPreRequest')
     } catch (error) {
-        console.log('Seguardo lasolicitud')
+        console.log('No se guardo la solicitud', error)
     }
 }
 
 onMounted(() => {
-    loadCompanies();
-    loadUser();
-    loadCollaboartor()
+    loadCompanies(), loadUser('applicant')
 })
 </script>
 
 <template>
     <Dialog2 
-    title="Registro Solicitud" 
-    titleButton="Consumo Personal" 
-    :iconP="User2" 
-    :iconT="User2"
+        title="Registro PreSolicitud" 
+        titleButton="Consumible" 
+        :iconP="FilePlus2" 
+        :iconT="FilePlus2"
         recordof="Registro" 
         :IconOf="Building2" 
         description="Descripción" 
         :IconD="Notebook" 
         @save="handleSave"
-        @cancel="handleCancel"
+        @cancel="handleCancel" 
         v-model:open="isDialogOpen">
 
         <template #form1>
-            <FormApplicationC v-model:props="request" :companies="company" :users="userRequest" :collaborator="collaborator" />
+            <FormPrerequestC1 v-model:props="preRequest" :companies="company" :users="userRequest" />
         </template>
         <template #form2>
-            <FormPersonalConsumptionC v-model:props="request"/>
+            <FormPreRequestC2 v-model:props="preRequest" />
         </template>
     </Dialog2>
 </template>

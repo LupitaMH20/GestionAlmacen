@@ -3,6 +3,7 @@ import { defineProps } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Button from '../ui/button/Button.vue';
 import { ArrowRight, FileText, CheckCircle, Clock } from 'lucide-vue-next';
+import Dialog from './Dialog.vue';
 
 interface ProcessData {
     id: number;
@@ -21,11 +22,11 @@ const getStatusColor = (status: string) => {
         case 'Presolicitud':
             return 'bg-blue-100 text-blue-800';
         case 'Solicitud':
-            return 'bg-yellow-100 text-yellow-800'; 
+            return 'bg-yellow-100 text-yellow-800';
         case 'Autorizada':
-            return 'bg-indigo-100 text-indigo-800'; 
+            return 'bg-indigo-100 text-indigo-800';
         case 'Entregada':
-            return 'bg-green-100 text-green-800'; 
+            return 'bg-green-100 text-green-800';
         case 'Terminada':
             return 'bg-gray-100 text-gray-800';
         default:
@@ -49,31 +50,27 @@ const getStatusIcon = (status: string) => {
 </script>
 
 <template>
-    <Card  class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
             <CardTitle class="text-xl font-bold">{{ process.title }} (ID: {{ process.id }})</CardTitle>
         </CardHeader>
 
         <CardContent class="flex flex-col space-y-3 flex-grow">
-            
-            <div :class="['p-2 rounded-lg font-semibold text-sm inline-flex items-center', getStatusColor(process.currentStatus)]">
+
+            <div
+                :class="['p-2 rounded-lg font-semibold text-sm inline-flex items-center', getStatusColor(process.currentStatus)]">
                 <component :is="getStatusIcon(process.currentStatus)" class="w-4 h-4 mr-2" />
                 <span>Estatus: {{ process.currentStatus }}</span>
             </div>
 
             <div class="border-t pt-2 mt-2">
                 <p class="text-sm text-gray-500">Fecha de Creación: {{ process.date }}</p>
-                <p class="text-sm text-gray-500 mt-1">Siguiente paso: ...</p>
             </div>
         </CardContent>
 
         <CardFooter class="pt-4">
-            <router-link :to="process.detailsUrl" class="w-full">
-                 <Button class="w-full" variant="default">
-                    Ver Detalles
-                    <ArrowRight class="w-4 h-4 ml-2" />
-                </Button>
-            </router-link>
+            <!-- <Dialog></Dialog> -->
+             
         </CardFooter>
     </Card>
 </template>

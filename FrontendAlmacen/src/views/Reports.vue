@@ -10,15 +10,13 @@ import UpdateApplicationT from '../components/Forms/Applications/Tools/UpdateToo
 import DeleteApplicationT from '../components/Forms/Applications/Tools/DeleteTools.vue';
 import CreateAuthorize from '../components/Forms/Authorize/CreateAuthorize.vue'
 import CreateDecline from '../components/Forms/Decline/CreateDecline.vue';
+import PreRequest from '../components/Forms/Applications/Consumables/PreRequest.vue';
 
 </script>
 
 <template>
     <label>Consumo Personal solicitud</label>
     <div class="grid grid-cols-3 grid-rows-1 gap-1">
-        <div>
-            <CreateApplicationC/>
-        </div>
         <div>
             <UpdateApplicationC />
         </div>

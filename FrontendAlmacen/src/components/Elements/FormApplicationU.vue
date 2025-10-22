@@ -4,42 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import Input from '../ui/input/Input.vue';
 import { TypeCompany } from '../data/TypeCompany';
 
-import { ref, onMounted } from 'vue';
-interface manager {
-    value: string;
-    label: string;
-}
-
-const managers = ref<manager[]>([]);
-const selectedmanager = ref<string>('');
-
-const loadmanagers = async () => {
-    managers.value = [
-        { value: 'USR001', label: 'Rocio Pérez (Producción)' },
-        { value: 'USR002', label: 'María Gómez (Almacén)' },
-        { value: 'USR003', label: 'Luis Castro (Ventas)' },
-    ];
-};
-
-interface collaborator {
-    value: string;
-    label: string;
-}
-
-const collaborators = ref<collaborator[]>([]);
-const selectedcollaborator = ref<string>('');
-
-const loadcollaborators = async () => {
-    collaborators.value = [
-        { value: 'USR001', label: 'Rocio Pérez (Producción)' },
-        { value: 'USR002', label: 'María Gómez (Almacén)' },
-        { value: 'USR003', label: 'Luis Castro (Ventas)' },
-    ];
-};
-
-onMounted(() => {
-    loadmanagers();
-});
+const props = defineModel('props', { type: Object, required: true })
+const props2 = defineProps<{
+    companies: Array<{ id_Company: string, name: string }>
+    users: Array<{ id_user: string, name: string, position:string }>
+    collaborator: Array<{id_Collaborator:string, name:string}>
+}>()
 
 </script>
 
@@ -49,56 +19,67 @@ onMounted(() => {
             <FormItem>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa Solicitante *</FormLabel>
-                    <Select>
+                    <Select v-model="props.requestingCompany">
                         <SelectTrigger class="w-50">
                             <SelectValue placeholder="Seleccionar empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="company in TypeCompany" :key="company.value" :value="company.value"
-                                class="w-50">
-                                {{ company.label }}
+                            <SelectItem v-for="company in props2.companies" :key="company.id_Company"
+                                :value="company.id_Company">
+                                {{ company.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa Proveedora *</FormLabel>
-                    <Select>
+                    <Select v-model="props.supplierCompany">
                         <SelectTrigger class="w-50">
                             <SelectValue placeholder="Seleccionar empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="company in TypeCompany" :key="company.value" :value="company.value"
-                                class="w-50">
-                                {{ company.label }}
+                            <SelectItem v-for="company in props2.companies" :key="company.id_Company"
+                                :value="company.id_Company">
+                                {{ company.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
                 <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Colaborador *</FormLabel>
-                    <Select v-model="selectedcollaborator">
+                    <FormLabel class="text-24 font-sans font-bold p-1.5">Colaborator *</FormLabel>
+                    <Select v-model="props.collaborator">
                         <SelectTrigger class="w-50">
-                            <SelectValue placeholder="Seleccionar " class="text-12 font-sans font-light" />
+                            <SelectValue placeholder="Seleccionar empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="collaborator in collaborators" :key="collaborator.value" :value="collaborator.value"
-                                class="w-50">
-                                {{ collaborator.label }}
+                            <SelectItem v-for="collaborator in props2.collaborator" :key="collaborator.id_Collaborator" :value="collaborator.id_Collaborator">
+                                {{ collaborator.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Encargado *</FormLabel>
-                    <Select v-model="selectedmanager">
+                    <Select v-model="props.applicant">
                         <SelectTrigger class="w-50">
                             <SelectValue placeholder="Seleccionar solicitante" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="manager in managers" :key="manager.value" :value="manager.value"
-                                class="w-50">
-                                {{ manager.label }}
+                            <SelectItem v-for="user in props2.users" :key="user.id_user" :value="user.id_user">
+                                {{ user.name }} ({{ user.id_user }})
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div class="p-1.5">
+                    <FormLabel class="text-24 font-sans font-bold p-1.5">Puesto *</FormLabel>
+                    <Select v-model="props.position">
+                        <SelectTrigger class="w-50">
+                            <SelectValue placeholder="Seleccionar solicitante" class="text-12 font-sans font-light" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="user in props2.users" :key="user.id_user" :value="user.id_user">
+                                {{ user.position }}
                             </SelectItem>
                         </SelectContent>
                     </Select>

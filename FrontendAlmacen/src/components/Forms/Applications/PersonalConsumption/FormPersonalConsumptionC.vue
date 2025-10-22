@@ -2,23 +2,33 @@
 import { FormField, FormItem, FormLabel, FormControl } from '../../../ui/form/index.ts'
 import Input from '../../../ui/input/Input.vue'
 import Textarea from '../../../ui/textarea/Textarea.vue'
+const props = defineModel('props', { type: Object, required: true })
 
 </script>
 
 <template>
     <form>
-        <FormField name="Username">
+        <FormField name="Consumablename3">
             <FormItem>
                 <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Nombre ó ID *</FormLabel>
+                    <Label class="text-24 font-sans font-bold p-1.5">Nombre ó ID *</Label>
                     <FormControl>
-                        <Input placeholder="Nombre o el ID" class="w-50 text-12 font-sans font-light" />
+                        <Input v-model="props.article" type="text" placeholder="Nombre ó ID"
+                            class="w-50 font-sans text-12 font-light" />
+                    </FormControl>
+                </div>
+                <div class="p-1.5">
+                    <FormLabel class="text-24 font-sans font-bold p-1.5">Cantidad *</FormLabel>
+                    <FormControl>
+                        <Input v-model="props.amount" type="number" placeholder="Ingrese la cantidad"
+                            class="w-50 font-sans text-12 font-light" />
                     </FormControl>
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5"> Descripción</FormLabel>
                     <FormControl>
-                        <Textarea type="text" placeholder="Descripción" class="w-50 font-sans text-12 font-light"></Textarea>
+                        <Textarea v-model="props.description" type="text" placeholder="Ingrese una descripción"
+                            class="w-50 font-sans text-12 font-light"></Textarea>
                     </FormControl>
                 </div>
             </FormItem>

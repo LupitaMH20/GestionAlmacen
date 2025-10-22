@@ -14,11 +14,7 @@ const Managers = ref<Manager[]>([]);
 const selectedManager = ref<string>('');
 
 const loadManagers = async () => {
-    Managers.value = [
-        { value: 'USR001', label: 'Rocio Pérez (Producción)' },
-        { value: 'USR002', label: 'María Gómez (Almacén)' },
-        { value: 'USR003', label: 'Luis Castro (Ventas)' },
-    ];
+    
 };
 
 onMounted(() => {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Dialog3 from '../../../Elements/Dialog3.vue';
+import Dialog2 from '../../../Elements/Dialog2.vue';
 import FormConsumablesC1 from './FormConsumablesC1.vue';
 import FormExistence from '../../../Elements/FormExistence.vue';
-import FormConsumablesC3 from './FormConsumablesC3.vue';
+import FormConsumablesC2 from './FormConsumablesC2.vue';
 import {FilePlus2, Building2, Hammer, Notebook} from 'lucide-vue-next';
 
 const handleCancel = () => {
@@ -15,28 +15,23 @@ const handleSave = () => {
 </script>
 
 <template>
-    <Dialog3 
-        title="Solicitud Consumibles"
+    <Dialog2
+        title="Registro de Consumibles"
         titleButton="Consumible"
-        :iconP="FilePlus2" 
+        :iconP="FilePlus2"
         :iconT="FilePlus2"
         recordof="Registro"
-        :iconOf="Building2"
-        existence = "Producto"
-        :iconE="Hammer"
+        :IconOf="Building2"
         description="Descripción"
-        :iconD="Notebook"
-        @cancel="handleCancel"
-        @save="handleSave">
-        
+        :IconD="Notebook"
+        @save="handleSave"
+        @cancel="handleCancel">
+
         <template #form1>
-            <FormConsumablesC1 />
+            <FormConsumablesC1/>
         </template>
         <template #form2>
-            <FormExistence />
+            <FormConsumablesC2/>
         </template>
-        <template #form3>
-            <FormConsumablesC3 />
-        </template>
-    </Dialog3>
+    </Dialog2>
 </template>

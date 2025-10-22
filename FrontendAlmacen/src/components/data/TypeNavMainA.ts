@@ -8,6 +8,12 @@ export const navMainA = [
         isActive: true,
     },
     {
+        title: "PreSolicitudes",
+        url: "/preApplication",
+        icon: NotebookPen,
+        isActive: true,
+    },
+    {
         title: "Solicitudes",
         url: "/application",
         icon: NotebookPen,

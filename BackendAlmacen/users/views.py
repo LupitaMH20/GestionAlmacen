@@ -7,7 +7,13 @@ class UserViewSets(viewsets.ModelViewSet):
     lookup_field = 'id_user'
 
     def get_queryset(self):
+        queryset = Users.objects.all()
+        position = self.request.query_params.get('position', None)
+        if position:
+            queryset = queryset.filter(position=position)
         show_inactive = self.request.query_params.get('inactive', 'false').lower() == 'true'
         if show_inactive:
-            return Users.objects.filter(active=False)
-        return Users.objects.filter(active=True)
+            queryset = queryset.filter(active=False)
+        else:
+            queryset = queryset.filter(active=True)
+        return queryset

@@ -6,10 +6,9 @@ import { Plus, ArchiveRestore, FileSpreadsheet, PackageOpen } from 'lucide-vue-n
 import FormArticleC1 from './FormArticleC1.vue';
 import FormArticleC2 from './FormArticleC2.vue'
 
+const prop = defineProps<{ companies: any[], categories: any[] }>()
 const isDialogOpen = ref(false)
 const emit = defineEmits(['creatArticle'])
-const company = ref<any[]>([])
-const category = ref<any[]>([])
 
 const articleData = reactive({
     id_mainarticle: '',
@@ -37,24 +36,6 @@ const handleCancel = () => {
     })
 };
 
-const loadCompanies = async () => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/api/companies/')
-        company.value = response.data
-    } catch (error) {
-        console.log('Empresa no encontrada', error)
-    }
-}
-
-const loadCategories = async () => {
-    try{
-        const response = await axios.get('http://127.0.0.1:8000/api/category/')
-        category.value = response.data
-    } catch(error) {
-        console.log('No se encontraron categorias')
-    }
-}
-
 const handleSave = async () => {
     try {
         console.log('datos', articleData)
@@ -66,8 +47,6 @@ const handleSave = async () => {
         console.log('No se realizo el registro de los aticulos', error)
     }
 };
-
-onMounted(() => { loadCompanies(), loadCategories() })
 </script>
 
 <template>
@@ -88,7 +67,7 @@ onMounted(() => { loadCompanies(), loadCategories() })
             <FormArticleC1 v-model:props="articleData" />
         </template>
         <template #form2>
-            <FormArticleC2 v-model:props="articleData" :companies="company" :category="category"/>
+            <FormArticleC2 v-model:props="articleData" :companies="prop.companies" :category="prop.categories"/>
         </template>
     </Dialog2>
 </template>

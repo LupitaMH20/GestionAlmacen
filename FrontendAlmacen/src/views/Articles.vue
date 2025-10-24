@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import ArticleCreate from '../components/Forms/Articles/CreateArticle.vue';
+import CreateArticle from '../components/Forms/Articles/CreateArticle.vue';
 import ArticleUpdate from '../components/Forms/Articles/UpdateArticle.vue';
 import DeleteArticle from '../components/Forms/Articles/DeleteArticle.vue';
 import Category from '../components/Forms/Articles/Category.vue';
@@ -9,7 +9,7 @@ import Button from '../components/ui/button/Button.vue';
 import { Search } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
-import { loadavg } from 'os';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 
 const props = defineProps<{
     article: {
@@ -25,6 +25,7 @@ const openEditModal = () => {
 
 const companies = ref<any[]>([])
 const articles = ref<any[]>([])
+const category = ref<any[]>([])
 const displayedArticles = ref<any[]>([])
 const searchQuery = ref('')
 const filter = ref<'active' | 'inactive'>('active')
@@ -52,6 +53,15 @@ const loadCompany = async () => {
     }
 }
 
+const loadCategory = async () => {
+    try{
+        const response = await axios.get('http://127.0.0.1:8000/api/category/')
+        category.value = response.data
+    } catch (error) {
+        console.log('NO se encuantran categorias')
+    }
+}
+
 const searchArticle = () => {
     const query = searchQuery.value.toLowerCase()
     displayedArticles.value = articles.value.filter(article =>
@@ -68,7 +78,8 @@ const handleArticleDisabled = (id: string) => {
 
 onMounted(() => {
     loadArticle(),
-    loadCompany()
+    loadCompany(),
+    loadCategory()
 })
 
 </script>
@@ -88,46 +99,54 @@ onMounted(() => {
             <option value="inactive">Desactiva</option>
         </select>
     </div>
-    <div class="flex justify-between items-center w-full text-black font-sans font-bold text-3xl">
-        Articulos
-        <div class="flex items-center gap-2">
-            <ArticleCreate @creatArticle="loadArticle"/>
-            <Category @createCategory="loadArticle"/>
-        </div>
+    <Card class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader>
+            <div class="flex justify-between items-center w-full text-black font-sans font-bold text-3xl pt-5">
+                <CardTitle> Articulos </CardTitle>
+                <div class="flex items-center gap-2">
+                    <CreateArticle @creatArticle="loadArticle" :companies="companies" :categories="category"/>
+                    <Category @createCategory="loadCategory" />
+                </div>
 
-    </div>
-    <Table>
-        <TableCaption>Articulos registrados.</TableCaption>
-        <TableHeader>
-            <TableRow>
-                <TableHead class="w-[100px]"> ID Principal</TableHead>
-                <TableHead class="w-[100px]"> ID Alternativo</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Cantidad</TableHead>
-                <TableHead>Precio</TableHead>
-                <TableHead>Descripción</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Empresa</TableHead>
-                <TableHead class="text-right"> Opciones </TableHead>
-            </TableRow>
-        </TableHeader>
-        <TableBody>
-            <TableRow v-for="article in displayedArticles" :key="article.id_mainarticle">
-                <TableCell class="font-medium">{{ article.id_mainarticle }} </TableCell>
-                <TableCell class="font-medium">{{ article.id_alternativearticle }}</TableCell>
-                <TableCell>{{ article.name }}</TableCell>
-                <TableCell>{{ article.stock }}</TableCell>
-                <TableCell>{{ article.price }}</TableCell>
-                <TableCell>{{ article.description }}</TableCell>
-                <TableCell>{{ article.category }}</TableCell>
-                <TableCell>{{ article.company_name }}</TableCell>
-                <TableCell v-if="article.active" class="text-right">
-                    <div class="flex justify-end item-center gap-10">
-                        <ArticleUpdate :id_mainarticle="article.id_mainarticle" :companies="companies" @updateArticle="loadArticle"/>
-                        <DeleteArticle :id_mainarticle="article.id_mainarticle" @disableArticle="handleArticleDisabled"/>
-                    </div>
-                </TableCell>
-            </TableRow>
-        </TableBody>
-    </Table>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <Table>
+                <TableCaption>Articulos registrados.</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead class="w-[100px]"> ID Principal</TableHead>
+                        <TableHead class="w-[100px]"> ID Alternativo</TableHead>
+                        <TableHead>Nombre</TableHead>
+                        <TableHead>Cantidad</TableHead>
+                        <TableHead>Precio</TableHead>
+                        <TableHead>Descripción</TableHead>
+                        <TableHead>Categoria</TableHead>
+                        <TableHead>Empresa</TableHead>
+                        <TableHead class="text-right"> Opciones </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow v-for="article in displayedArticles" :key="article.id_mainarticle">
+                        <TableCell class="font-medium">{{ article.id_mainarticle }} </TableCell>
+                        <TableCell class="font-medium">{{ article.id_alternativearticle }}</TableCell>
+                        <TableCell>{{ article.name }}</TableCell>
+                        <TableCell>{{ article.stock }}</TableCell>
+                        <TableCell>{{ article.price }}</TableCell>
+                        <TableCell>{{ article.description }}</TableCell>
+                        <TableCell>{{ article.category_name }}</TableCell>
+                        <TableCell>{{ article.company_name }}</TableCell>
+                        <TableCell v-if="article.active" class="text-right">
+                            <div class="flex justify-end item-center gap-10">
+                                <ArticleUpdate :id_mainarticle="article.id_mainarticle" :companies="companies"
+                                    @updateArticle="loadArticle" />
+                                <DeleteArticle :id_mainarticle="article.id_mainarticle"
+                                    @disableArticle="handleArticleDisabled" />
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </CardContent>
+    </Card>
 </template>

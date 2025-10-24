@@ -8,6 +8,7 @@ import DisableUser from '../components/Forms/Users/DisableUser.vue'
 import Input from '../components/ui/input/Input.vue'
 import Button from '../components/ui/button/Button.vue'
 import { Search } from 'lucide-vue-next'
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 
 const users = ref<any[]>([])
 const displayedUsers = ref<any[]>([])
@@ -47,7 +48,8 @@ onMounted(() => {
     <div class="flex justify-between items-center w-full mb-2">
         <div class="flex gap-2">
             <Input v-model="searchQuery" placeholder="Buscar usuario" class="w-75 text-12 font-sans font-light" />
-            <Button @click="searchUsers" class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
+            <Button @click="searchUsers"
+                class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
                 <Search /> Buscar
             </Button>
         </div>
@@ -57,34 +59,41 @@ onMounted(() => {
             <option value="inactive">Desactivados</option>
         </select>
     </div>
-    <div class="flex justify-between items-center w-full text-black font-sans font-bold text-3xl pt-5">
-        Usuarios
-        <CreateUser @user-created="loadUsers" />
-    </div>
-    <Table>
-        <TableCaption>Usuarios registrados.</TableCaption>
-        <TableHeader>
-            <TableRow>
-                <TableHead class="w-[100px]">ID</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Apellido</TableHead>
-                <TableHead>Puesto</TableHead>
-                <TableHead class="text-right">Opciones</TableHead>
-            </TableRow>
-        </TableHeader>
-        <TableBody>
-            <TableRow v-for="user in displayedUsers" :key="user.id_user">
-                <TableCell class="font-medium">{{ user.id_user }}</TableCell>
-                <TableCell>{{ user.name }}</TableCell>
-                <TableCell>{{ user.last_name }}</TableCell>
-                <TableCell>{{ user.position }}</TableCell>
-                <TableCell v-if="user.active" class="text-right">
-                    <div class="flex justify-end items-center gap-4">
-                        <UpdateUser :user="user" @update-user="loadUsers" />
-                        <DisableUser :id_user="user.id_user" @userDisabled="handleUserDisabled" />
-                    </div>
-                </TableCell>
-            </TableRow>
-        </TableBody>
-    </Table>
+
+    <Card class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader>
+            <div class="flex justify-between items-center w-full text-black font-sans font-bold text-3xl pt-5">
+                <CardTitle> Usuarios </CardTitle>
+                <CreateUser @user-created="loadUsers" />
+            </div>
+        </CardHeader>
+        <CardContent>
+            <Table>
+                <TableCaption>Usuarios registrados.</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead class="w-[100px]">ID</TableHead>
+                        <TableHead>Nombre</TableHead>
+                        <TableHead>Apellido</TableHead>
+                        <TableHead>Puesto</TableHead>
+                        <TableHead class="text-right">Opciones</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow v-for="user in displayedUsers" :key="user.id_user">
+                        <TableCell class="font-medium">{{ user.id_user }}</TableCell>
+                        <TableCell>{{ user.name }}</TableCell>
+                        <TableCell>{{ user.last_name }}</TableCell>
+                        <TableCell>{{ user.position }}</TableCell>
+                        <TableCell v-if="user.active" class="text-right">
+                            <div class="flex justify-end items-center gap-4">
+                                <UpdateUser :user="user" @update-user="loadUsers" />
+                                <DisableUser :id_user="user.id_user" @userDisabled="handleUserDisabled" />
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </CardContent>
+    </Card>
 </template>

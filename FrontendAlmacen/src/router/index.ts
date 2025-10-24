@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 const routes: Array<RouteRecordRaw> = [
-  {path: '/', 
-    redirect: '/start'},
+  {path: '/', redirect: '/start'},
   { path: '/start', name: 'start', component: () => import('../views/Start.vue') },
   { path: '/preApplication', name:'preApplication', component: () => import("../views/PreApplication.vue") },
   { path: '/application', name: 'application', component: () => import('../views/Application.vue') },
@@ -14,7 +13,7 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/collaborator', name: 'collaborator', component: () => import('../views/Collaborator.vue') },
   { path: '/articles', name: 'articles', component: () => import('../views/Articles.vue') },
   { path: '/report', name: 'report', component: () => import('../views/Reports.vue') },
-  { path: '/record', name: 'record', component: () => import('../views/Record.vue') },
+  { path: '/history', name: 'history', component:() => import('../views/History.vue') }
 ];
 
 const router = createRouter({

@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from .models import PreRequest, Request, Authorize, Decline, Deliverie, ReturnExchange
+from company.serializers import CompanySerializer
 
 class PreRequestSerializer(serializers.ModelSerializer):
+    supplierCompany = CompanySerializer(read_only=True)
+    requestingCompany = CompanySerializer(read_only=True)
     class Meta: 
         model = PreRequest
         fields = '__all__'

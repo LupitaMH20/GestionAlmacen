@@ -9,7 +9,6 @@ import { Trash, Trash2, Ban } from 'lucide-vue-next';
     <AlertDialogTrigger>
       <div class="flex items-center gap-2">
         <Trash class="w-6 h-6"/>
-        <span>Ocultar</span>
       </div>
     </AlertDialogTrigger>
     <AlertDialogContent>

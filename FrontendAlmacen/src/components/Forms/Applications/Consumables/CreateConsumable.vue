@@ -25,7 +25,8 @@ const handleSave = () => {
         description="Descripción"
         :IconD="Notebook"
         @save="handleSave"
-        @cancel="handleCancel">
+        @cancel="handleCancel"
+        >
 
         <template #form1>
             <FormConsumablesC1/>

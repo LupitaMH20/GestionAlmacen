@@ -8,9 +8,25 @@ class PreRequestViewSet(viewsets.ModelViewSet):
     queryset = PreRequest.objects.all().order_by('-requested_datetime')
     serializer_class = PreRequestSerializer
 
+# En views.py
 class RequestViewSet(viewsets.ModelViewSet):
     queryset = Request.objects.all().order_by('-request_datetime')
     serializer_class = RequestSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            print("Errores de validación:", serializer.errors)
+            raise e
+        self.perform_create(serializer)
+        prerequest = serializer.instance.prerequest
+        prerequest.status = 'request'
+        prerequest.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class AuthorizeViewSet(viewsets.ModelViewSet):
     queryset = Authorize.objects.all().order_by('-authorized_datetime')

@@ -9,8 +9,8 @@ class PreRequest(models.Model):
     id_PreRequest = models.AutoField(primary_key=True)
     supplierCompany = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='prerequests_as_supplier', null=True)
     requestingCompany = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='prerequests_as_requester', null=True)
-    applicant = models.ForeignKey(Users, on_delete=models.CASCADE)
-    collaborator = models.ForeignKey(Collaborators, on_delete=models.CASCADE, null=True, blank=True)
+    applicant = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='prerequests_as_applicant')
+    collaborator = models.ForeignKey(Collaborators, on_delete=models.CASCADE, null=True, related_name='prerequests_as_collaborator', blank=True)
     type = models.CharField(max_length=20, null=True)
     article = models.CharField()
     description = models.TextField()
@@ -21,7 +21,7 @@ class PreRequest(models.Model):
     requested_datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.id_prerRequest}- {self.status}"
+        return f"{self.id_PreRequest}- {self.status}"
 
 # Solicitudes
 class Request(models.Model):

@@ -1,10 +1,15 @@
 <script setup lang="ts">
 interface Companies { id_Company: string; name: string };
+interface Users { id_user: string; name: string; last_name: string };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 const props = defineProps<{
     preRequest: {
+        id_PreRequest: string | number;
         applicant?: string;
+        applicantName?: Users;
         collaborator?: string;
+        collaboratorName?: Collaborators;
         type?: string;
         article?: string;
         description?: string;
@@ -20,6 +25,7 @@ const props = defineProps<{
         time?: string;
 
         request?: {
+            id_Request?: string | number;
             position?: string;
             request_datetime?: string;
         }
@@ -48,9 +54,9 @@ const formatStore = (store: string) => {
 <template>
     <div class="space-y-2 text-sm">
         <h4 class="flex justify-center text-[24px] font-bold">PreSolicitud</h4>
-        <div><strong>Solicitante:</strong> {{ props.preRequest.applicant || '—' }}</div>
-        <div v-if="props.preRequest.collaborator || props.preRequest.collaborator"><strong>Colaborador:</strong> {{
-            props.preRequest.collaborator || '—' }}</div>
+        <div><strong>ID de la PreSolicitud</strong> {{ props.preRequest.id_PreRequest }} </div>
+        <div><strong>Solicitante:</strong> ID: {{ props.preRequest.applicant || '—' }} Nombre: {{ props.preRequest.applicantName?.name || '—' }} {{ props.preRequest.applicantName?.last_name || '' }} </div>
+        <div v-if="props.preRequest.collaborator"><strong>Colaborador:</strong> ID: {{ props.preRequest.collaborator || '—' }} Nombre: {{ props.preRequest.collaboratorName?.name || '—' }} {{ props.preRequest.collaboratorName?.last_name || '' }} </div>
         <div><strong>Tipo:</strong> {{ props.preRequest.type || '—' }}</div>
         <div><strong>Artículo:</strong> {{ props.preRequest.article || '—' }}</div>
         <div><strong>Descripción:</strong> {{ props.preRequest.description || '—' }}</div>
@@ -73,6 +79,7 @@ const formatStore = (store: string) => {
     <template v-if="props.preRequest.request">
         <div class="pt-4 space-y-2 text-sm border-t">
             <h4 class="flex justify-center text-[24px] font-bold">Solicitud</h4>
+            <div><strong>ID de la Solicitud:</strong> {{ props.preRequest.request.id_Request || '—' }}</div>
             <div><strong>Cargo:</strong> {{ props.preRequest.request.position || '—' }}</div>
             <div><strong>Fecha de Solicitud:</strong> {{ props.preRequest.request.request_datetime || '—' }}</div>
         </div>

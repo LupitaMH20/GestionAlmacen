@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { compile, defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted, ref } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Dialog from './Dialog.vue';
 import { Eye, FileText } from 'lucide-vue-next'
 
 interface Companies{id_Company: string; name: string };
+interface Users { id_user: string; name: string; last_name: string };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 const process = defineProps <{
-    id: number
+    id_PreRequest: number | string
+    id_Request?: number | string
+    position?: string
     title: string
     article: string
     currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada' | 'Cambios_Devoluciones'
@@ -14,7 +18,9 @@ const process = defineProps <{
     time: string
     type?: string
     applicant?: string
+    applicantName?: Users
     collaborator?: string
+    collaboratorName?: Collaborators
     description?: string
     amount?: number
     status?: string
@@ -27,12 +33,13 @@ const process = defineProps <{
 }>();
 
 const isDialogOpen = ref(false)
+const emit = defineEmits(['updatePreRequest']);
 </script>
 
 <template>
     <Card class="flex flex-col h-[35vh] w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
-            <CardTitle class="text-24 font-lingh">{{ process.title }} (ID: {{ process.id }})</CardTitle>
+            <CardTitle class="text-24 font-lingh">{{ process.title }} (ID: {{ process.id_PreRequest }})</CardTitle>
             <p>Producto: {{ process.article }}</p>
         </CardHeader>
 
@@ -46,9 +53,8 @@ const isDialogOpen = ref(false)
 
         <CardFooter class="flex justify-end ">
             <Dialog v-model="isDialogOpen" :title="`Detalles de ${process.title}`" titleButton="Detalles" :iconP="Eye"
-                :iconT="FileText" :preRequest="process">
+                :iconT="FileText" :preRequest="process" @updatePreRequest="emit('updatePreRequest')">
             </Dialog>
-
         </CardFooter>
     </Card>
 </template>

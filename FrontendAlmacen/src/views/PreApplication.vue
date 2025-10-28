@@ -4,9 +4,12 @@ import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 
-interface Companies { id_Company: string; name: string }
+interface Companies { id_Company: string; name: string };
+interface Users { id_user: string; name: string; last_name: string };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+
 interface ProcessData {
-    id: number;
+    id_PreRequest: number;
     title: string;
     article: string;
     currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada';
@@ -15,6 +18,8 @@ interface ProcessData {
     type?: string;
     applicant?: string
     collaborator?: string
+    applicantName?: Users;
+    collaboratorName?: Collaborators;
     description?: string
     amount?: number
     status?: string
@@ -50,17 +55,21 @@ const loadProcesses = async () => {
         processes.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
+            const userObj = item.applicant;
+            const collabObj = item.collaborator;
 
             return {
-                id: item.id_PreRequest,
+                id_PreRequest: item.id_PreRequest,
                 title: item.type || 'Sin tipo',
                 article: item.article || 'Sin producto',
                 currentStatus: statusMap[item.status] || 'Presolicitud',
                 date: formatDate(item.requested_datetime),
                 time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: item.type,
-                applicant: item.applicant,
-                collaborator: item.collaborator,
+                applicant: userObj?.id_user,
+                applicantName: userObj,
+                collaborator: collabObj?.id_Collaborator,
+                collaboratorName: collabObj,
                 description: item.description,
                 amount: item.amount,
                 status: item.status,
@@ -106,7 +115,7 @@ onMounted(() => { loadProcesses() });
                             Consumible ({{ Consumables.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Consumables" :key="proc.id" v-bind="proc" />
+                            <ProcessCard v-for="proc in Consumables" :key="proc.id_PreRequest" v-bind="proc" @updatePreRequest="loadProcesses"/>
                             <p v-if="!Consumables.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Consumible.
                             </p>
@@ -118,7 +127,7 @@ onMounted(() => { loadProcesses() });
                             Herramienta ({{ Tools.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Tools" :key="proc.id" v-bind="proc" />
+                            <ProcessCard v-for="proc in Tools" :key="proc.id_PreRequest" v-bind="proc" @updatePreRequest="loadProcesses"/>
                             <p v-if="!Tools.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Herramienta.
                             </p>
@@ -130,7 +139,7 @@ onMounted(() => { loadProcesses() });
                             ConsumoPersonal ({{ PersonalConsumption.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id" v-bind="proc" />
+                            <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id_PreRequest" v-bind="proc" @updatePreRequest="loadProcesses"/>
                             <p v-if="!PersonalConsumption.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de ConsumoPersonal.
                             </p>

@@ -5,23 +5,30 @@ import axios from 'axios';
 import Input from '../components/ui/input/Input.vue'
 import Button from '../components/ui/button/Button.vue'
 import { Search } from 'lucide-vue-next'
-import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest.vue'
-import PreRequestCo from '../components/Forms/Applications/PersonalConsumption/PreRequest.vue'
-import PreRequestT from '../components/Forms/Applications/Tools/PreRequest.vue'
+import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest/PreRequest.vue'
+import PreRequestCo from '../components/Forms/Applications/PersonalConsumption/PreRequest/PreRequest.vue'
+import PreRequestT from '../components/Forms/Applications/Tools/PreRequest/PreRequest.vue'
 import { Card, CardContent } from '../components/ui/card';
 
 interface Companies { id_Company: string; name: string }
+interface Users { id_user: string; name: string; last_name: string };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+const searchQuery = ref('');
+const selectedType = ref('All')
+const displayedProcesses = ref<any[]>([]);
 
 interface ProcessData {
-    id: number;
+    id_PreRequest: number | string;
     title: string;
     article: string;
-    currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada' | 'Cambios_Devoluciones' ;
+    currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada' | 'Cambios_Devoluciones';
     date: string;
     time: string;
-    type?: string
-    applicant?: string
-    collaborator?: string
+    type?: string;
+    applicant?: string;
+    collaborator?: string;
+    applicantName?: Users;
+    collaboratorName?: Collaborators;
     description?: string
     amount?: number
     status?: string
@@ -31,6 +38,8 @@ interface ProcessData {
     supplierCompany?: string
     requestingCompanyName?: Companies
     supplierCompanyName?: Companies
+
+    position?: string;
 }
 
 const allProcesses = ref<ProcessData[]>([]);
@@ -51,23 +60,28 @@ const loadProcesses = async () => {
         allProcesses.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
+            const userObj = item.applicant;
+            const collabObj = item.collaborator;
 
+            console.log('Procesando item:', userObj);
             return {
-                id: item.id_PreRequest,
+                id_PreRequest: item.id_PreRequest,
                 title: item.type || 'Sin tipo',
                 article: item.article || 'Sin producto',
                 currentStatus: item.status === 'prerequest' ? 'Presolicitud' :
                     item.status === 'request' ? 'Solicitud' :
                         item.status === 'authorization' ? 'Autorizada' :
                             item.status === 'deliverie' ? 'Surtir' :
-                            item.status === 'deliverie' ?  'Terminada' :
-                                item.status === 'return_exchange' ? 'Cambios_Devoluciones':
-                                'decline',
+                                item.status === 'deliverie' ? 'Terminada' :
+                                    item.status === 'return_exchange' ? 'Cambios_Devoluciones' :
+                                        'decline',
                 date: formatDate(item.requested_datetime),
                 time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: item.type,
-                applicant: item.applicant,
-                collaborator: item.collaborator,
+                applicant: userObj?.id_user,
+                applicantName: userObj,
+                collaborator: collabObj?.id_Collaborator,
+                collaboratorName: collabObj,
                 description: item.description,
                 amount: item.amount,
                 status: item.status,
@@ -77,9 +91,10 @@ const loadProcesses = async () => {
                 supplierCompany: supCompanyObj?.id_Company,
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
-                request: item.request
+                position: item.request?.position,
             };
         });
+        displayedProcesses.value = [...allProcesses.value];
         console.log('Procesos cargados:', allProcesses.value);
     } catch (error) {
         console.error('Error al cargar procesos:', error);
@@ -87,20 +102,49 @@ const loadProcesses = async () => {
 };
 
 const prerequest = computed(() =>
-    allProcesses.value.filter(p => p.currentStatus === 'Presolicitud')
+    displayedProcesses.value.filter(p => p.currentStatus === 'Presolicitud')
 );
 
 const applicant = computed(() =>
-    allProcesses.value.filter(p => p.currentStatus === 'Solicitud')
+    displayedProcesses.value.filter(p => p.currentStatus === 'Solicitud')
 );
 
 const autorizadas = computed(() =>
-    allProcesses.value.filter(p => p.currentStatus === 'Autorizada')
+    displayedProcesses.value.filter(p => p.currentStatus === 'Autorizada')
 );
 
 const SurtirsTerminadas = computed(() =>
-    allProcesses.value.filter(p => p.currentStatus === 'Surtir' || p.currentStatus === 'Terminada')
+    displayedProcesses.value.filter(p => p.currentStatus === 'Surtir' || p.currentStatus === 'Terminada')
 );
+
+const searchProcess = () => {
+    const query = searchQuery.value.toLowerCase().trim();
+    const type = selectedType.value;
+    
+    let filteredByType = [];
+    if (type === 'All') {
+        filteredByType = [...allProcesses.value];
+    } else {
+        filteredByType = allProcesses.value.filter(proc => proc.title === type);
+    }
+    
+    if (!query) {
+        displayedProcesses.value = filteredByType;
+        return;
+    }
+    
+    displayedProcesses.value = filteredByType.filter(proc => {
+        const inId = proc.id_PreRequest.toString().includes(query);
+        const inTitle = proc.title.toLowerCase().includes(query);
+        const inArticle = proc.article.toLowerCase().includes(query);
+        const inApplicant = (
+            proc.applicantName?.name.toLowerCase() + ' ' + 
+            proc.applicantName?.last_name.toLowerCase()
+        ).includes(query);
+        const inDescription = proc.description?.toLowerCase().includes(query) || false;
+        return inId || inTitle || inArticle || inApplicant || inDescription;
+    });
+}
 onMounted(() => {
     loadProcesses();
 });
@@ -110,18 +154,21 @@ onMounted(() => {
     <div class="p-6">
         <div class="flex justify-between items-center w-full mb-2">
             <div class="flex gap-2">
-                <Input placeholder="Buscar" class="w-75 text-12 font-sans font-light" />
-                <Button class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
+                <Input v-model="searchQuery" placeholder="Buscar" class="w-75 text-12 font-sans font-light"
+                    @input="searchProcess" />
+                <Button @click="searchProcess"
+                    class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
                     <Search /> Buscar
                 </Button>
             </div>
             <div class="flex gap-5 text-{12px}">
                 <p>Buscar por: </p>
-                <select
+                <select v-model="selectedType" @change="searchProcess"
                     class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
-                    <option>Consumo Personal</option>
-                    <option>Consumibles</option>
-                    <option>Herramientas</option>
+                    <option value="All"> Todos </option>
+                    <option value="ConsumoPersonal"> Consumo Personal </option>
+                    <option value="Consumible"> Consumibles </option>
+                    <option value="Herramienta"> Herramientas </option>
                 </select>
             </div>
         </div>
@@ -146,7 +193,8 @@ onMounted(() => {
                             Presolicitudes ({{ prerequest.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in prerequest" :key="proc.id" v-bind="proc" />
+                            <ProcessCard v-for="proc in prerequest" :key="proc.id_PreRequest" v-bind="proc"
+                                @updatePreRequest="loadProcesses" />
                             <p v-if="!prerequest.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -157,7 +205,7 @@ onMounted(() => {
                             Solicitud ({{ applicant.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in applicant" :key="proc.id" v-bind="proc" />
+                            <ProcessCard v-for="proc in applicant" :key="proc.id_PreRequest" v-bind="proc" />
                             <p v-if="!applicant.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -169,7 +217,7 @@ onMounted(() => {
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in autorizadas" :key="proc.id" v-bind="proc" />
+                            <ProcessCard v-for="proc in autorizadas" :key="proc.id_PreRequest" v-bind="proc" />
                             <p v-if="!autorizadas.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en
                                 esta etapa.
                             </p>
@@ -183,7 +231,7 @@ onMounted(() => {
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir')"
-                                :key="proc.id" v-bind="proc" />
+                                :key="proc.id_PreRequest" v-bind="proc" />
                             <p v-if="!SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir').length"
                                 class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
                         </div>
@@ -196,7 +244,7 @@ onMounted(() => {
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in SurtirsTerminadas.filter(p => p.currentStatus === 'Terminada')"
-                                :key="proc.id" v-bind="proc" />
+                                :key="proc.id_PreRequest" v-bind="proc" />
                             <p v-if="!SurtirsTerminadas.filter(p => p.currentStatus === 'Terminada').length"
                                 class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
                         </div>
@@ -209,7 +257,7 @@ onMounted(() => {
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir')"
-                                :key="proc.id" v-bind="proc" />
+                                :key="proc.id_PreRequest" v-bind="proc" />
                             <p v-if="!SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir').length"
                                 class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
                         </div>

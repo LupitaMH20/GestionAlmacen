@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineEmits, defineModel, onMounted } from 'vue';
+import { defineEmits, defineModel } from 'vue';
 import { Dialog, DialogContent, DialogFooter, DialogTrigger, DialogTitle } from '../ui/dialog';
 import Button from '../ui/button/Button.vue';
 import { LucideIcon, Ban, Save } from 'lucide-vue-next';
@@ -12,15 +12,16 @@ import DialogDeliverie from './ComponentsDialog/DialogDeliverie.vue';
 import DialogReturnExchange from './ComponentsDialog/DialogReturnExchange.vue';
 
 // rutas para crear una soliciud
-import CreateApplicationC from '../Forms/Applications/PersonalConsumption/CreatePersonalConsumption.vue';
-import CreateApplicationCO from '../Forms/Applications/Consumables/CreateConsumable.vue';
-import CreateApplicationT from '../Forms/Applications/Tools/CreateTools.vue';
+import CreateApplicationC from '../Forms/Applications/PersonalConsumption/Request/CreatePersonalConsumption.vue';
+import CreateApplicationCO from '../Forms/Applications/Consumables/Request/CreateConsumable.vue';
+import CreateApplicationT from '../Forms/Applications/Tools/Request/CreateTools.vue';
 
-// rutas para editar y eliminar la presolicitud
-import UpdatePreRequest from '../Forms/Applications/Consumables/UpdatePreRequest.vue'
-import DeletePreRequest from '../Forms/Applications/Consumables/DeletePreRequest.vue'
+//rutas para editar y eliminar los procesos de la solicitud
+import UpdateDelete from './ComponentsDialog/UpdateDelete.vue';
 
 interface Companies { id_Company: string; name: string };
+interface Users { id_user: string; name: string; last_name: string };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 const props = defineProps<{
   title: string;
@@ -28,8 +29,11 @@ const props = defineProps<{
   iconP: LucideIcon;
   iconT: LucideIcon;
   preRequest: {
+    id_PreRequest: string | number;
     applicant?: string;
+    applicantName?: Users;
     collaborator?: string;
+    collaboratorName?: Collaborators;
     type?: string;
     article?: string;
     description?: string;
@@ -45,6 +49,7 @@ const props = defineProps<{
     time?: string;
 
     request?: {
+      id_Request?: string | number;
       position?: string;
       request_datetime?: string;
 
@@ -84,12 +89,9 @@ const props = defineProps<{
 }>();
 
 const open = defineModel<boolean>();
-const emit = defineEmits(['request']);
+const emit = defineEmits(['updatePreRequest']);
 
 const IconComponent = (icon: LucideIcon) => icon;
-onMounted(() => {
-  console.log("Datos recibidos", props.preRequest)
-})
 </script>
 
 <template>
@@ -108,40 +110,11 @@ onMounted(() => {
         </div>
 
         <div>
-          <!-- Para editar o eliminar la prerequest -->
-          <div v-if="props.preRequest?.status === 'prerequest'" class="flex justify-end gap-2">
-            <UpdatePreRequest :preRequest="props.preRequest" />
-            <DeletePreRequest :preRequest="props.preRequest" />
-          </div>
-          <!-- Para editar o eliminar la request -->
-          <div v-if="props.preRequest?.status === 'request'" class="flex justify-end gap-2">
-            <UpdatePreRequest :preRequest="props.preRequest" />
-            <DeletePreRequest :preRequest="props.preRequest" />
-          </div>
-          <!-- Para editar o eliminar la authorization -->
-          <div v-if="props.preRequest?.status === 'authorization'" class="flex justify-end gap-2">
-            <UpdatePreRequest :preRequest="props.preRequest" />
-            <DeletePreRequest :preRequest="props.preRequest" />
-          </div>
-          <!-- Para editar o eliminar la rechazar -->
-          <div v-if="props.preRequest?.status === 'decline'" class="flex justify-end gap-2">
-            <UpdatePreRequest :preRequest="props.preRequest" />
-            <DeletePreRequest :preRequest="props.preRequest" />
-          </div>
-          <!-- Para editar o eliminar la deliverie -->
-          <div v-if="props.preRequest?.status === 'deliverie'" class="flex justify-end gap-2">
-            <UpdatePreRequest :preRequest="props.preRequest" />
-            <DeletePreRequest :preRequest="props.preRequest" />
-          </div>
-          <!-- Para editar o eliminar la return_change -->
-          <div v-if="props.preRequest?.status === 'return_exchange'" class="flex justify-end gap-2">
-            <UpdatePreRequest :preRequest="props.preRequest" />
-            <DeletePreRequest :preRequest="props.preRequest" />
-          </div>
+          <UpdateDelete :preRequest="props.preRequest" @updatePreRequest="emit('updatePreRequest')" />
         </div>
       </DialogTitle>
 
-      <DialogPreRequestandRequest v-if="props.preRequest" :preRequest="props.preRequest" />
+      <DialogPreRequestandRequest v-if="props.preRequest" :preRequest="props.preRequest"/>
       <DialogAuthorize v-if="props.preRequest.request?.authorization" :authorization="props.preRequest.request.authorization" />
       <DialogDecline v-if="props.preRequest.request?.decline" :decline="props.preRequest.request.decline" />
       <DialogDeliverie v-if="props.preRequest.request?.deliverie" :deliverie="props.preRequest.request.deliverie" />
@@ -152,10 +125,13 @@ onMounted(() => {
           <Ban class="w-4 h-4" />Cancelar
         </Button>
 
-        <component :is="props.preRequest.type === 'Consumible' ? CreateApplicationCO
+        
+        <component :is="props.preRequest.type === 'Consumible' ? CreateApplicationCO 
           : props.preRequest.type === 'Herramienta' ? CreateApplicationT
             : props.preRequest.type === 'ConsumoPersonal' ? CreateApplicationC
-              : null" />
+              : null" 
+              :preRequest="props.preRequest"
+              :@updatePreRequest="emit('updatePreRequest')"/>
       </DialogFooter>
     </DialogContent>
   </Dialog>

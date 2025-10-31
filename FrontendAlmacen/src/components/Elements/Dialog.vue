@@ -20,7 +20,7 @@ import CreateApplicationT from '../Forms/Applications/Tools/Request/CreateTools.
 import UpdateDelete from './ComponentsDialog/UpdateDelete.vue';
 
 interface Companies { id_Company: string; name: string };
-interface Users { id_user: string; name: string; last_name: string };
+interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 const props = defineProps<{

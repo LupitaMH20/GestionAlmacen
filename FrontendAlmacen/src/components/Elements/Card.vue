@@ -5,7 +5,7 @@ import Dialog from './Dialog.vue';
 import { Eye, FileText } from 'lucide-vue-next'
 
 interface Companies{id_Company: string; name: string };
-interface Users { id_user: string; name: string; last_name: string };
+interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 const process = defineProps <{
     id_PreRequest: number | string

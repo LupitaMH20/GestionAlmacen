@@ -25,9 +25,9 @@ interface ProcessData {
     date: string;
     time: string;
     type?: string;
-    applicant?: string;
+    request?: string;
     collaborator?: string;
-    applicantName?: Users;
+    requestName?: Users;
     collaboratorName?: Collaborators;
     description?: string
     amount?: number
@@ -60,7 +60,7 @@ const loadProcesses = async () => {
         allProcesses.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
-            const userObj = item.applicant;
+            const userObj = item.request;
             const collabObj = item.collaborator;
 
             console.log('Procesando item:', userObj);
@@ -78,8 +78,8 @@ const loadProcesses = async () => {
                 date: formatDate(item.requested_datetime),
                 time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: item.type,
-                applicant: userObj?.id_user,
-                applicantName: userObj,
+                request: userObj?.id_user,
+                requestName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
                 description: item.description,
@@ -105,7 +105,7 @@ const prerequest = computed(() =>
     displayedProcesses.value.filter(p => p.currentStatus === 'Presolicitud')
 );
 
-const applicant = computed(() =>
+const request = computed(() =>
     displayedProcesses.value.filter(p => p.currentStatus === 'Solicitud')
 );
 
@@ -137,12 +137,12 @@ const searchProcess = () => {
         const inId = proc.id_PreRequest.toString().includes(query);
         const inTitle = proc.title.toLowerCase().includes(query);
         const inArticle = proc.article.toLowerCase().includes(query);
-        const inApplicant = (
-            proc.applicantName?.name.toLowerCase() + ' ' + 
-            proc.applicantName?.last_name.toLowerCase()
+        const inrequest = (
+            proc.requestName?.name.toLowerCase() + ' ' + 
+            proc.requestName?.last_name.toLowerCase()
         ).includes(query);
         const inDescription = proc.description?.toLowerCase().includes(query) || false;
-        return inId || inTitle || inArticle || inApplicant || inDescription;
+        return inId || inTitle || inArticle || inrequest || inDescription;
     });
 }
 onMounted(() => {
@@ -153,13 +153,13 @@ onMounted(() => {
 <template>
     <div class="p-6">
         <div class="flex justify-between items-center w-full mb-2">
-            <div class="flex gap-2">
-                <Input v-model="searchQuery" placeholder="Buscar" class="w-75 text-12 font-sans font-light"
-                    @input="searchProcess" />
-                <Button @click="searchProcess"
-                    class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
-                    <Search /> Buscar
-                </Button>
+            <div class="p-3">
+                <label class="flex text-{14 px}">Registro de nuevas: PreSolicitudes</label>
+                <div class="flex justify-between items-center p-2 gap-4 ">
+                    <PreRequestC @createPreRequest="loadProcesses" />
+                    <PreRequestCo @createPreRequest="loadProcesses" />
+                    <PreRequestT @createPreRequest="loadProcesses" />
+                </div>
             </div>
             <div class="flex gap-5 text-{12px}">
                 <p>Buscar por: </p>
@@ -174,15 +174,7 @@ onMounted(() => {
         </div>
 
         <div class="flex justify-between items-center w-full mb-2 ">
-            <div></div>
-            <div class="p-3">
-                <label class="flex text-{14 px} justify-end">Registro de nuevas: PreSolicitudes</label>
-                <div class="flex justify-between items-center p-2 gap-4 ">
-                    <PreRequestC @createPreRequest="loadProcesses" />
-                    <PreRequestCo @createPreRequest="loadProcesses" />
-                    <PreRequestT @createPreRequest="loadProcesses" />
-                </div>
-            </div>
+            
         </div>
 
         <Card class="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -202,11 +194,11 @@ onMounted(() => {
 
                     <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-500 whitespace-nowrap">
-                            Solicitud ({{ applicant.length }})
+                            Solicitud ({{ request.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in applicant" :key="proc.id_PreRequest" v-bind="proc" />
-                            <p v-if="!applicant.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                            <ProcessCard v-for="proc in request" :key="proc.id_PreRequest" v-bind="proc" />
+                            <p v-if="!request.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
                     </section>

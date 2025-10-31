@@ -62,13 +62,7 @@ defineExpose({ submitForm })
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Nombre *</FormLabel>
                     <FormControl>
-                        <Input v-model="name" class="w-75 text-12 font-sans font-light" disabled/>
-                    </FormControl>
-                </div>
-                <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Apellido *</FormLabel>
-                    <FormControl>
-                        <Input v-model="last_name" class="w-75 text-12 font-sans font-light" disabled/>
+                        <Input v-model="name" class="w-75 text-12 font-sans font-light"/>
                     </FormControl>
                 </div>
                 <div class="p-1.5">

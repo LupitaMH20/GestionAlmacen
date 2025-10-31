@@ -4,7 +4,7 @@ import axios from 'axios';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '../../ui/alert-dialog'
+} from '../../../ui/alert-dialog'
 import { Trash, Trash2, Ban } from 'lucide-vue-next';
 
 const props = defineProps<{ id_mainarticle: string }>()

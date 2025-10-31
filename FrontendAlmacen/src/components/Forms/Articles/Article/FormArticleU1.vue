@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { FormField, FormItem, FormLabel, FormControl } from '../../ui/form'
-import Input from '../../ui/input/Input.vue';
+import { FormField, FormItem, FormLabel, FormControl } from '../../../ui/form'
+import Input from '../../../ui/input/Input.vue';
 
 const props = defineModel('props', { type: Object, required: true })
 </script>

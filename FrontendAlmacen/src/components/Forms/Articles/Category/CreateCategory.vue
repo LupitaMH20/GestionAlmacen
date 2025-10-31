@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import axios from 'axios';
-import Dialog1 from '../../Elements/Dialog1.vue'
-import FormCategory from './FormCategory.vue';
+import Dialog1 from '../../../Elements/Dialog1.vue'
+import FormCategoryC from './FormCategoryC.vue';
 import {PencilLine} from 'lucide-vue-next'
 
 const formRef = ref<any>(null)
@@ -49,7 +49,7 @@ const handleSave = () => {
     v-model="isDialogisOpen">
 
     <template #forms>
-        <FormCategory ref="formRef"/>
+        <FormCategoryC ref="formRef"/>
     </template>
     </Dialog1>
 </template>

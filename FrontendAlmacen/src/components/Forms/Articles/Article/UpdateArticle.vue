@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted } from 'vue'
 import axios from 'axios';
-import Dialog2 from '../../Elements/Dialog2.vue';
+import Dialog2 from '../../../Elements/Dialog2.vue';
 import { NotebookPen, FileSpreadsheet, PackageOpen } from 'lucide-vue-next';
 import FormArticleU1 from './FormArticleU1.vue';
 import FormArticleU2 from './FormArticleU2.vue';
@@ -41,6 +41,7 @@ onMounted(async () => {
     } catch (error) {
         console.error('No se pudieron cargar las empresas', error);
     }
+    
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/category/');
         category.value = response.data;

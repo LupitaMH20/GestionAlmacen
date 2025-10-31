@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import axios from 'axios';
-import Dialog2 from '../../Elements/Dialog2.vue';
+import Dialog2 from '../../../Elements/Dialog2.vue';
 import { Plus, ArchiveRestore, FileSpreadsheet, PackageOpen } from 'lucide-vue-next';
-import FormArticleC1 from './FormArticleC1.vue';
-import FormArticleC2 from './FormArticleC2.vue'
+import FormArticleC1 from '../article/FormArticleC1.vue';
+import FormArticleC2 from '../article/FormArticleC2.vue'
 
 const prop = defineProps<{ companies: any[], categories: any[] }>()
 const isDialogOpen = ref(false)

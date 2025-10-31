@@ -45,12 +45,6 @@ defineExpose({submitForm})
               </FormControl>
             </div>
             <div class="p-1.5">
-              <FormLabel class="text-24 font-sans font-bold p-1.5">Apellido *</FormLabel>
-              <FormControl>
-                <Input v-model="last_name" placeholder="Ingrese el apellido" class="w-75 text-12 font-sans font-light" />
-              </FormControl>
-            </div>
-            <div class="p-1.5">
               <FormLabel class="text-24 font-sans font-bold p-1.5">Puesto *</FormLabel>
               <Select v-model="position">
                 <SelectTrigger class="w-75">

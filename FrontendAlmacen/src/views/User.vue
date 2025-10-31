@@ -74,7 +74,6 @@ onMounted(() => {
                     <TableRow>
                         <TableHead class="w-[100px]">ID</TableHead>
                         <TableHead>Nombre</TableHead>
-                        <TableHead>Apellido</TableHead>
                         <TableHead>Puesto</TableHead>
                         <TableHead class="text-right">Opciones</TableHead>
                     </TableRow>
@@ -83,7 +82,6 @@ onMounted(() => {
                     <TableRow v-for="user in displayedUsers" :key="user.id_user">
                         <TableCell class="font-medium">{{ user.id_user }}</TableCell>
                         <TableCell>{{ user.name }}</TableCell>
-                        <TableCell>{{ user.last_name }}</TableCell>
                         <TableCell>{{ user.position }}</TableCell>
                         <TableCell v-if="user.active" class="text-right">
                             <div class="flex justify-end items-center gap-4">

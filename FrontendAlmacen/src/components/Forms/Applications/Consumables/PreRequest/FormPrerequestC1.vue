@@ -41,7 +41,7 @@ const props2 = defineProps<{
                         </SelectContent>
                     </Select>
                 </div>
-                <div class="p-1.5">
+                <!-- <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Solicitante *</FormLabel>
                     <Select v-model="props.applicant">
                         <SelectTrigger class="w-50">
@@ -53,7 +53,7 @@ const props2 = defineProps<{
                             </SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
+                </div> -->
             </FormItem>
         </FormField>
     </form>

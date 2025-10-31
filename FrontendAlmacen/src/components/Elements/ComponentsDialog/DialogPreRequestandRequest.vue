@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Companies { id_Company: string; name: string };
-interface Users { id_user: string; name: string; last_name: string };
+interface Users { id_user: string; name: string};
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 const props = defineProps<{
@@ -55,7 +55,7 @@ const formatStore = (store: string) => {
     <div class="space-y-2 text-sm">
         <h4 class="flex justify-center text-[24px] font-bold">PreSolicitud</h4>
         <div><strong>ID de la PreSolicitud</strong> {{ props.preRequest.id_PreRequest }} </div>
-        <div><strong>Solicitante:</strong> ID: {{ props.preRequest.applicant || '—' }} Nombre: {{ props.preRequest.applicantName?.name || '—' }} {{ props.preRequest.applicantName?.last_name || '' }} </div>
+        <div><strong>Solicitante:</strong> ID: {{ props.preRequest.applicant || '—' }} Nombre: {{ props.preRequest.applicantName?.name || '—' }} </div>
         <div v-if="props.preRequest.collaborator"><strong>Colaborador:</strong> ID: {{ props.preRequest.collaborator || '—' }} Nombre: {{ props.preRequest.collaboratorName?.name || '—' }} {{ props.preRequest.collaboratorName?.last_name || '' }} </div>
         <div><strong>Tipo:</strong> {{ props.preRequest.type || '—' }}</div>
         <div><strong>Artículo:</strong> {{ props.preRequest.article || '—' }}</div>

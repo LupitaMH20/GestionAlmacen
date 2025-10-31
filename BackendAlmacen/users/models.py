@@ -3,7 +3,6 @@ from django.db import models
 class Users(models.Model):
     id_user = models.CharField(primary_key=True, max_length=20)
     name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
     position = models.CharField(max_length=50)
     admin = models.BooleanField(default=True)
     password = models.CharField(max_length=20)

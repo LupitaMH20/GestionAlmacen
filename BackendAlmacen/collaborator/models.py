@@ -2,7 +2,7 @@ from django.db import models
 from company.models import Companies
 
 class Collaborators(models.Model):
-    id_Collaborator = models.CharField(primary_key=True)
+    id_Collaborator = models.CharField(primary_key=True, max_length=20)
     name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     position = models.CharField(max_length=50)
@@ -10,6 +10,7 @@ class Collaborators(models.Model):
     create_at = models.DateTimeField(auto_now_add=True)
 
 class CollaboratorCompany(models.Model):
+    id_ColabCompany = models.AutoField(primary_key=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     collaborator = models.ForeignKey(Collaborators, on_delete=models.CASCADE)
     create_at = models.DateTimeField(auto_now_add=True)

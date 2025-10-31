@@ -3,7 +3,7 @@ from company.models import Companies
 
 class Articles(models.Model):
     id_mainarticle = models.CharField(primary_key=True)
-    id_alternativearticle = models.CharField(max_length=20)
+    alternativearticle = models.CharField(max_length=20)
     name = models.CharField(max_length=50)
     stock = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -12,6 +12,7 @@ class Articles(models.Model):
     create_at = models.DateTimeField(auto_now_add=True)
 
 class ArticleCompany(models.Model):
+    id_ArtCompany = models.AutoField(primary_key=True)
     article =  models.ForeignKey(Articles, on_delete=models.CASCADE)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     create_at = models.DateTimeField(auto_now_add=True)

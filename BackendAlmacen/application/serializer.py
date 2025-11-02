@@ -1,17 +1,58 @@
 from rest_framework import serializers
-from .models import PreRequest, Request, Authorize, Decline, Deliverie, ReturnExchange
+from .models import Request, Acceptance, RequestActions, Supply, ReturnExchange
 from company.serializers import CompanySerializer
 from company.models import Companies
 from users.models import Users
 from users.serializers import UserSerializer
+from article.models import Articles
+from article.serializer import ArticleSerializers
 from collaborator.models import Collaborators
 from collaborator.serializer import Collaboratorserializers
 
-class PreRequestSerializer(serializers.ModelSerializer):
+class ReturnExchangeSerializer(serializers.ModelSerializer):
+    supply = serializers.PrimaryKeyRelatedField(queryset=Supply.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
+    collaborator = serializers.PrimaryKeyRelatedField(queryset=Collaborators.objects.all())
+
+    class Meta:
+        model = ReturnExchange
+        fields = '__all__'
+
+class SupplySerializer(serializers.ModelSerializer):
+    requestActions = serializers.PrimaryKeyRelatedField(queryset=RequestActions.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
+    collaborator = serializers.PrimaryKeyRelatedField(queryset=Collaborators.objects.all())
+    returnexchange = ReturnExchangeSerializer(read_only=True)
+
+    class Meta:
+        model = Supply
+        fields = '__all__'
+
+class RequestActionsSerializer(serializers.ModelSerializer):
+    acceptance = serializers.PrimaryKeyRelatedField(queryset=Acceptance.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
+    supply = SupplySerializer(read_only=True)
+
+    class Meta:
+        model = RequestActions
+        fields = '__all__'
+
+class AcceptanceSerializer(serializers.ModelSerializer):
+    request = serializers.PrimaryKeyRelatedField(queryset=Request.objects.all())
+    article = serializers.PrimaryKeyRelatedField(queryset=Articles.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
+    requestactions = RequestActionsSerializer(read_only=True)
+
+    class Meta:
+        model = Acceptance
+        fields = '__all__'
+
+class RequestSerializer(serializers.ModelSerializer):
     supplierCompany = CompanySerializer(read_only=True)
     requestingCompany = CompanySerializer(read_only=True)
-    applicant = UserSerializer( read_only= True)
+    user = UserSerializer( read_only= True)
     collaborator = Collaboratorserializers( read_only=True)
+    acceptance = AcceptanceSerializer(read_only=True)
 
     supplierCompany_id = serializers.PrimaryKeyRelatedField(
         queryset=Companies.objects.all(),
@@ -23,9 +64,9 @@ class PreRequestSerializer(serializers.ModelSerializer):
         source = 'requestingCompany',
         write_only = True)
     
-    applicant_id = serializers.PrimaryKeyRelatedField(
+    user_id = serializers.PrimaryKeyRelatedField(
         queryset=Users.objects.all(),
-        source='applicant',
+        source='user',
         write_only=True
     )
 
@@ -37,31 +78,5 @@ class PreRequestSerializer(serializers.ModelSerializer):
     )
     
     class Meta: 
-        model = PreRequest
-        fields = '__all__'
-
-class RequestSerializer(serializers.ModelSerializer):
-    prerequest = serializers.PrimaryKeyRelatedField(queryset=PreRequest.objects.all())
-    class Meta:
         model = Request
-        fields = '__all__'
-
-class AuthorizeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Authorize
-        fields = '__all__'
-
-class DeclineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Decline
-        fields = '__all__'
-
-class DeliverieSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Deliverie
-        fields = '__all__'
-
-class ReturnExchangeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReturnExchange
         fields = '__all__'

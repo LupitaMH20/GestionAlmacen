@@ -7,14 +7,14 @@ from collaborator.models import Collaborators
 class Request(models.Model):
     id_Request = models.AutoField(primary_key=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    article = models.ForeignKey(Articles, on_delete=models.CASCADE)
     collaborator = models.ForeignKey(Collaborators, on_delete=models.SET_NULL, null=True, blank=True, related_name='colaborations')
     supplierCompany = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='supplier')
     requestingCompany = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='requester')
+    article = models.CharField(max_length=100)
     type = models.CharField(max_length=20)
     description = models.TextField()
     amount = models.IntegerField()
-    status = models.CharField(max_length=20, default='request')
+    status = models.CharField(max_length=20, default='prerequest')
     order_workshop = models.TextField(null=True, blank=True)
     store = models.TextField(null=True, blank=True)
     request_datetime = models.DateTimeField(auto_now_add=True)
@@ -24,14 +24,20 @@ class Request(models.Model):
 
 class Acceptance(models.Model):
     id_acceptance = models.AutoField(primary_key=True)
+    article = models.ForeignKey(Articles, on_delete=models.CASCADE)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    request = models.OneToOneField(Request, on_delete=models.CASCADE)
     acceptance_datetime = models.DateTimeField(auto_now_add=True)
 
 class RequestActions(models.Model):
     id_RequestActions = models.AutoField(primary_key=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    request = models.OneToOneField(Request, on_delete=models.CASCADE)
+    acceptance = models.OneToOneField(Acceptance, on_delete=models.CASCADE)
+    ACTION_CHOICES = [
+        ('authorize', 'Autorizado'),
+        ('decline', 'Rechazado'),
+    ]
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
     comment = models.TextField()
     requestactions_datetime = models.DateTimeField(auto_now_add=True)
 
@@ -39,7 +45,7 @@ class Supply(models.Model):
     id_supply = models.AutoField(primary_key=True)
     requestActions = models.OneToOneField(RequestActions, on_delete=models.CASCADE)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    collabortor = models.ForeignKey(Collaborators, on_delete=models.CASCADE)
+    collaborator = models.ForeignKey(Collaborators, on_delete=models.CASCADE)
     comment = models.TextField()
     photo = models.CharField(max_length=255, null=True)
     document = models.CharField(max_length=255, null=True)
@@ -47,8 +53,8 @@ class Supply(models.Model):
 
 class ReturnExchange(models.Model):
     id_returnExchange = models.AutoField(primary_key=True)
-    supply = models.OneToOneField(Supply, on_delete=models.CASCADE)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    collaborator = models.ForeignKey(Collaborators, on_delete=models.CASCADE)
+    supply = models.OneToOneField(Supply, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True)
+    collaborator = models.ForeignKey(Collaborators, on_delete=models.SET_NULL, null=True, blank=True)
     reason = models.TextField()
-    return_datetime = models.DateTimeField(auto_now_add=True)
+    returnE_datetime = models.DateTimeField(auto_now_add=True)

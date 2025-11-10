@@ -1,3 +1,7 @@
+from rest_framework.decorators import action
+from django.contrib.auth.hashers import check_password
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework import viewsets
 from .models import Users
 from .serializers import UserSerializer
@@ -17,3 +21,19 @@ class UserViewSets(viewsets.ModelViewSet):
         else:
             queryset = queryset.filter(active=True)
         return queryset
+    
+    @action(detail=False, methods=['post'], url_path='login')
+    def login(self, request):
+        name = request.data.get('name')
+        password = request.data.get('password')
+        try:
+            user = Users.objects.get(name=name)
+            if not check_password(password, user.password):
+                raise Users.DoesNotExist            
+            if not user.active:
+                return Response({'error': 'Usuario inactiv0.'}, status=status.HTTP_403_FORBIDDEN)
+            
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Users.DoesNotExist:
+            return Response({'error': 'No existe el usuario'}, status=status.HTTP_401_UNAUTHORIZED)

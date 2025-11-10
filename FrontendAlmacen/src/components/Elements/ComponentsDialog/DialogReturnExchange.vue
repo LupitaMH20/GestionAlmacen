@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const props = defineProps<{
     return_exchange?: {
-          returnenby?: string;
-          receivedby?: string;
-          deliverycompany?: string;
-          receivingcompany?: string;
-          reason?: string;
-          type?: string;
-          return_datetime?: string;
-        };
+        returnenby?: string;
+        receivedby?: string;
+        deliverycompany?: string;
+        receivingcompany?: string;
+        reason?: string;
+        type?: string;
+        return_datetime?: string;
+    };
 }>();
 </script>
 

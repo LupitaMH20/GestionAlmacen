@@ -49,7 +49,7 @@ const handleSave = () => {
     v-model="isDialogisOpen">
 
     <template #forms>
-        <FormCategoryC ref="formRef"/>
+        <FormCategoryC class="gap-8" ref="formRef"/>
     </template>
     </Dialog1>
 </template>

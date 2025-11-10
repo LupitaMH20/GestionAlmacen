@@ -41,7 +41,7 @@ const loadCompany = async () => {
 }
 
 const loadCategory = async () => {
-    try{
+    try {
         const response = await axios.get('http://127.0.0.1:8000/api/category/')
         category.value = response.data
     } catch (error) {
@@ -53,7 +53,7 @@ const searchArticle = () => {
     const query = searchQuery.value.toLowerCase()
     displayedArticles.value = articles.value.filter(article =>
         article.id_mainarticle.toLowerCase().includes(query) ||
-        article.id_alternativearticle.toLowerCase().includes(query) ||
+        article.alternativearticle.toLowerCase().includes(query) ||
         article.name.toLowerCase().includes(query)
     )
 }
@@ -72,26 +72,29 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex justify-between items-center w-full mb-2">
-        <div class="flex gap-2">
-            <Input v-model="searchQuery" placeholder="Buscar colaborador" class="w-75 text-12 font-sans font-light" />
-            <Button @click="searchArticle"
-                class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
-                <Search /> Buscar
-            </Button>
-        </div>
-        <select v-model="filter" @change="loadArticle"
-            class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
-            <option value="active">Activa</option>
-            <option value="inactive">Desactiva</option>
-        </select>
-    </div>
     <Card class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
-            <div class="flex justify-between items-center w-full text-black font-sans font-bold text-3xl pt-5">
+            <div class="flex justify-between items-center w-full mb-2">
+                <div class="flex gap-2">
+                    <Input v-model="searchQuery" placeholder="Buscar articulo"
+                        class="w-75 text-12 font-sans font-light" />
+                    <Button @click="searchArticle"
+                        class="bg-white text-black hover:bg-black hover:text-white border border-gray-300">
+                        <Search /> Buscar
+                    </Button>
+                </div>
+                <select v-model="filter" @change="loadArticle"
+                    class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
+                    <option value="active">Activa</option>
+                    <option value="inactive">Desactiva</option>
+                </select>
+            </div>
+
+
+            <div class="flex justify-between items-center h-full w-full text-black font-sans font-bold text-3xl pt-5">
                 <CardTitle> Articulos </CardTitle>
                 <div class="flex items-center gap-2">
-                    <CreateArticle @creatArticle="loadArticle" :companies="companies" :categories="category"/>
+                    <CreateArticle @creatArticle="loadArticle" :companies="companies" :categories="category" />
                 </div>
             </div>
         </CardHeader>
@@ -114,7 +117,7 @@ onMounted(() => {
                 <TableBody>
                     <TableRow v-for="article in displayedArticles" :key="article.id_mainarticle">
                         <TableCell class="font-medium">{{ article.id_mainarticle }} </TableCell>
-                        <TableCell class="font-medium">{{ article.id_alternativearticle }}</TableCell>
+                        <TableCell class="font-medium">{{ article.alternativearticle }}</TableCell>
                         <TableCell>{{ article.name }}</TableCell>
                         <TableCell>{{ article.stock }}</TableCell>
                         <TableCell>{{ article.price }}</TableCell>

@@ -8,7 +8,6 @@ import Checkbox from '../../ui/checkbox/Checkbox.vue'
 
 const id_user = ref('')
 const name = ref('')
-const last_name = ref('')
 const position = ref('')
 const password = ref('')
 const admin = ref(false)
@@ -17,7 +16,6 @@ const submitForm = () => {
   const data = {
     id_user: id_user.value,
     name: name.value,
-    last_name: last_name.value,
     position: position.value,
     password: password.value,
     admin: admin.value

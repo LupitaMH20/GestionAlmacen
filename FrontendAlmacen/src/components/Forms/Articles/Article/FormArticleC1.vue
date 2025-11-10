@@ -18,7 +18,7 @@ const props = defineModel('props', {type: Object, required:true})
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">ID Producto Alternativo *</FormLabel>
                     <FormControl>
-                        <Input v-model="props.id_alternativearticle " type="text" placeholder="Ingrese el idProductoAlternatico" class="w-50 font-sans text-12 font-light" />
+                        <Input v-model="props.alternativearticle " type="text" placeholder="Ingrese el idProductoAlternatico" class="w-50 font-sans text-12 font-light" />
                     </FormControl>
                 </div>
                 <div class="p-1.5">

@@ -24,7 +24,7 @@ watch(isDialogOpen, (newValue) => {
 
 const data = reactive({
     id_mainarticle: '',
-    id_alternativearticle: '',
+    alternativearticle: '',
     name: '',
     stock: 0,
     price: 0,
@@ -58,7 +58,7 @@ const loadata = async (id: string | number) => {
 
         Object.assign(data, {
             id_mainarticle: apiData.id_mainarticle,
-            id_alternativearticle: apiData.id_alternativearticle,
+            alternativearticle: apiData.alternativearticle,
             name: apiData.name,
             stock: apiData.stock,
             price: apiData.price,

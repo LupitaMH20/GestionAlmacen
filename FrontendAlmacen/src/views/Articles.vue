@@ -1,6 +1,3 @@
-
-
-
 <script setup lang="ts">
 import CardArticle from '../components/Elements/CardArticle.vue'
 </script>

@@ -15,14 +15,30 @@ const displayedUsers = ref<any[]>([])
 const filter = ref<'active' | 'inactive'>('active')
 const searchQuery = ref('')
 
+const positionMap: Record<string, string> = {
+    "director": "Director",
+    "counter": "Contador",
+    "managerJom": "Encargado de JOM",
+    "managerNs": "Encargado de NARANJA STORE",
+    "managerPrintek": "Encargado PRINTEK",
+    "managerHefesto": "Encargado HEFESTO",
+    "managerBlackWorkshop": "Encargado BLACK GARAGE",
+    "applicant": "Solicitante",
+    "deliberystaff": "Personal de entrega"
+}
+
 const loadUsers = async () => {
-    const url =
-        filter.value === 'inactive'
-            ? 'http://127.0.0.1:8000/api/users/?inactive=true'
-            : 'http://127.0.0.1:8000/api/users/'
-    const response = await axios.get(url)
-    users.value = response.data
-    displayedUsers.value = [...users.value]
+    try {
+        const url =
+            filter.value === 'inactive'
+                ? 'http://127.0.0.1:8000/api/users/?inactive=true'
+                : 'http://127.0.0.1:8000/api/users/'
+        const response = await axios.get(url)
+        users.value = response.data
+        displayedUsers.value = [...users.value]
+    } catch (eror) {
+
+    }
 }
 
 const searchUsers = () => {
@@ -82,7 +98,7 @@ onMounted(() => {
                     <TableRow v-for="user in displayedUsers" :key="user.id_user">
                         <TableCell class="font-medium">{{ user.id_user }}</TableCell>
                         <TableCell>{{ user.name }}</TableCell>
-                        <TableCell>{{ user.position }}</TableCell>
+                        <TableCell>{{ positionMap[user.position] || user.position}}</TableCell>
                         <TableCell v-if="user.active" class="text-right">
                             <div class="flex justify-end items-center gap-4">
                                 <UpdateUser :user="user" @update-user="loadUsers" />

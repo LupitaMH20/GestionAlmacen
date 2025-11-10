@@ -8,8 +8,8 @@ import ViewsCategory from '../../components/Forms/Articles/Category/ViewsCategor
 </script>
 
 <template>
-    <Tabs default-value="article" class="w-full">
-        <TabsList class="grid w-full grid-cols-2">
+    <Tabs default-value="article" class="w-full h-full">
+        <TabsList class="grid w-full h-full grid-cols-2">
             <TabsTrigger value="article" class="flex items-center gap-2">
                 <Axe class="w-5 h-5" /> Artículos
             </TabsTrigger>

@@ -58,7 +58,7 @@ const handelCancel = () => {
 
 const handleSave = async () => {
     try {
-        await axios.put(`http://127.0.0.1:8000/api/category/${data.id_Category}/`, data)
+        await axios.patch(`http://127.0.0.1:8000/api/category/${data.id_Category}/`, data)
         console.log('Categoria actualizada', data)
         isDialogisOpen.value = false
         emit('updateCategory')

@@ -13,7 +13,7 @@ export const TypePosition = [
     },
     {
         value : "managerNs",
-        label : "Encargado NS"
+        label : "Encargado NARANJA STORE"
     },
     {
         value : "managerPrintek",
@@ -24,7 +24,7 @@ export const TypePosition = [
         label : "Encargado HEFESTO"
     },
     {
-        value : "managerBlackwWorkshop",
+        value : "managerBlackWorkshop",
         label : "Encargado BLACK GARAGE"
     },
     {

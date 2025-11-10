@@ -3,8 +3,8 @@ import { onMounted, reactive, ref } from 'vue'
 import axios from 'axios';
 import Dialog2 from '../../../Elements/Dialog2.vue';
 import { Plus, ArchiveRestore, FileSpreadsheet, PackageOpen } from 'lucide-vue-next';
-import FormArticleC1 from '../article/FormArticleC1.vue';
-import FormArticleC2 from '../article/FormArticleC2.vue'
+import FormArticleC1 from '../Article/FormArticleC1.vue';
+import FormArticleC2 from '../Article/FormArticleC2.vue';
 
 const prop = defineProps<{ companies: any[], categories: any[] }>()
 const isDialogOpen = ref(false)
@@ -12,7 +12,7 @@ const emit = defineEmits(['creatArticle'])
 
 const articleData = reactive({
     id_mainarticle: '',
-    id_alternativearticle: '',
+    alternativearticle: '',
     name: '',
     stock: 0,
     price: 0,
@@ -26,7 +26,7 @@ const handleCancel = () => {
     isDialogOpen.value = false
     Object.assign(articleData, {
         id_mainarticle: '',
-        id_alternativearticle: '',
+        alternativearticle: '',
         name: '',
         stock: 0,
         money: 0,

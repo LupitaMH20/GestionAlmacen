@@ -27,7 +27,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger} from "../../components/u
                 </div>
             </header>
             <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
-                <router-view></router-view>
+                <router-view />
             </div>
         </SidebarInset>
     </SidebarProvider>

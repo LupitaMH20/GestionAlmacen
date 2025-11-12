@@ -5,7 +5,7 @@ import {NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck, User, UserCog, Bui
 export const navMainA = [
     {
         title: "Dashboard",
-        url: "/start",
+        routerName: "start",
         icon: LayoutDashboard,
         isActive: true,
     },
@@ -13,41 +13,40 @@ export const navMainA = [
         title: "Modulos",
         icon: Boxes,
         isActive: true,
-        url: "#",
         items: [
             {
                 title: "PreSolicitudes",
-                url: "/preApplication",
+                routerName: "preApplication",
                 icon: BookOpenText,
                 isActive: true,
             },
             {
                 title: "Solicitudes",
-                url: "/application",
+                routerName: "application",
                 icon: NotebookPen,
                 isActive: true,
             },
             {
                 title: "Autorizadas",
-                url: "/authorize",
+                routerName: "authorize",
                 icon: BookCheck,
                 isActive: true,
             },
             {
                 title: "Surtir",
-                url: "/supply",
+                routerName: "supply",
                 icon: BookOpenCheck,
                 isActive: true,
             },
             {
                 title: "Terminadas",
-                url: "/finished",
+                routerName: "finished",
                 icon: BookmarkCheck,
                 isActive: true,
             },
             {
                 title: "Devoluciones",
-                url: "/returns",
+                routerName: "returns",
                 icon: ArrowLeftRight,
                 isActive: true,
             },
@@ -57,29 +56,28 @@ export const navMainA = [
         title: "Registros",
         icon: PanelLeftOpen,
         isActive: true,
-        url: "#",
         items: [
             {
                 title: "Usuarios",
-                url: "/user",
+                routerName: "user",
                 icon: User,
                 isActive: true
             },
             {
                 title: "Colaboradores",
-                url: "/collaborator",
+                routerName: "collaborator",
                 icon: UserCog,
                 isActive: true,
             },
             {
                 title: "Empresa",
-                url: "/company",
+                routerName: "company",
                 icon: Building2,
                 isActive: true,
             },
             {
                 title: "Articulos",
-                url: "/articles",
+                routerName: "articles",
                 icon: Hammer,
                 isActive: true,
             },
@@ -89,17 +87,16 @@ export const navMainA = [
         title: "Reportes",
         icon: BookOpen,
         isActive: true,
-        url: "#",
         items: [
             {
                 title: "Reportes",
-                url: "/report",
+                routerName: "report",
                 icon: ChartNoAxesCombined,
                 isActive: true,
             },
             {
                 title: "Historial",
-                url: "/history",
+                routerName: "history",
                 icon: FileChartColumnIncreasing,
                 isActive: true,
             }

@@ -8,7 +8,7 @@ import axios from 'axios';
 import { User2 } from 'lucide-vue-next';
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['updatePreRequest'])
+const emit = defineEmits(['updateRequest'])
 const company = ref<any[]>([])
 const userRequest = ref<any[]>([])
 const collaborator = ref<any[]>([])
@@ -102,7 +102,7 @@ const handleSave = async () => {
         await axios.patch(`http://127.0.0.1:8000/api/prerequest/${data.id_PreRequest}/`, data)
         console.log('Solicitud actualizada guardada con éxito')
         isDialogOpen.value = false
-        emit('updatePreRequest')
+        emit('updateRequest')
     } catch (error) {
         console.error('No se guardó la solicitud:', error)
     }

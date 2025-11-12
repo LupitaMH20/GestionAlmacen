@@ -1,143 +1,93 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch } from 'vue'
-import axios from 'axios';
-import Dialog2 from '../../../../Elements/Dialog2.vue';
-import FormConsumablesC1 from '../Request/FormConsumablesC1.vue';
-import FormExistence from '../../../../Elements/FormExistence.vue';
-import FormConsumablesC2 from '../Request/FormConsumablesC2.vue';
-import { FilePlus2, Building2, Hammer, Notebook } from 'lucide-vue-next';
+import { ref, inject, Ref, computed } from 'vue'
+import axios from 'axios'
+import Dialog1 from '../../../../Elements/Dialog1.vue'
+import { FilePlus2, Building2, Notebook } from 'lucide-vue-next'
+
+interface User {
+    id_user: string;
+    name: string;
+    position: string;
+    admin: boolean;
+}
+const loggedInUser = inject<Ref<User | null>>('loggedInUser')
 
 const isDialogOpen = ref(false);
-const emit = defineEmits(['updatePreRequest'])
-const company = ref<any[]>([]);
-const users = ref<any[]>([]);
+const emit = defineEmits(['updateRequest'])
 
 const props = defineProps<{
-    preRequest: {
-        id_PreRequest: string | number;
-        applicant?: string;
-        collaborator?: string;
-        type?: 'Consumible';
+    Request: {
+        id_Request: string | number;
         article?: string;
-        description?: string;
         amount?: number;
-        order_workshop?: string;
-        store?: string;
-        requestingCompany?: string;
-        supplierCompany?: string;
-        request?: {
-            position?: string;
-        }
+        type?: string;
     }
 }>()
 
-const request = reactive({
-    position: '',
-    applicant: '',
-    collaborator: '',
-    type: 'Consumible',
-    article: '',
-    description: '',
-    amount: 0,
-    order_workshop: '',
-    store: '',
-    requestingCompany: '',
-    supplierCompany: '',
+const canAccept = computed(() => {
+    const pos = loggedInUser?.value?.position?.toLowerCase()
+    return pos && pos !== 'applicant' && pos !== 'deliberystaff'
 })
 
-watch(isDialogOpen, (newValue) => {
-  if (newValue) {
-    Object.assign(request, {
-        position: '',
-        applicant: props.preRequest.applicant || '',
-        collaborator: props.preRequest.collaborator || '',
-        type: props.preRequest.type || 'Consumible',
-        article: props.preRequest.article || '',
-        description: props.preRequest.description || '',
-        amount: props.preRequest.amount || 0,
-        order_workshop: props.preRequest.order_workshop || '',
-        store: props.preRequest.store || '',
-        requestingCompany: props.preRequest.requestingCompany || '',
-        supplierCompany: props.preRequest.supplierCompany || '',
-    });
-    console.log("Formulario de Solicitud cargado con datos:", request);
-  }
-});
-
-const loadCompanies = async () => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/api/companies/')
-        company.value = response.data
-    } catch (error) {
-        console.log('Empresas mostradas')
-    }
-}
-
-const loadUser = async () => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/api/users/')
-        users.value = response.data
-    } catch (error) {
-        console.error('Error al mostrar usuarios', error)
-    }
-}
-
 const handleCancel = () => {
-    isDialogOpen.value = false;
-};
+    isDialogOpen.value = false
+}
 
-const handleSave = async() => {
+const handleSave = async () => {
     try {
-        const data = {
-            prerequest: props.preRequest.id_PreRequest,
-            position: request.position,
-            applicant: props.preRequest.applicant,
-            collaborator: props.preRequest.collaborator || null,
-            type: props.preRequest.type,
-            article: props.preRequest.article || null,
-            description: props.preRequest.description,
-            amount: props.preRequest.amount,
-            order_workshop: props.preRequest.order_workshop,
-            store: props.preRequest.store,
-            requestingCompany: props.preRequest.requestingCompany || null,
-            supplierCompany: props.preRequest.supplierCompany || null,
-        };
+        const token = localStorage.getItem('access')
 
-        await axios.post('http://127.0.0.1:8000/api/request/', data);
-        isDialogOpen.value = false;
-        emit('updatePreRequest');
-    } catch (error) {
-        console.error('Error al crear la solicitud:', error);
+        if (!token) {
+            alert("Tu sesión ha expirado o no estás logueado. Por favor, inicia sesión nuevamente.")
+            return
+        }
+
+        const payload = {
+            request_id: props.Request.id_Request,
+        }
+
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }
+
+        const response = await axios.post('http://127.0.0.1:8000/api/acceptance/', payload, config)
+
+        alert('Solicitud Aceptada! El stock ha sido actualizado.')
+        isDialogOpen.value = false
+        emit('updateRequest')
+
+    } catch (error: any) {
+        console.error('Error al aceptar la solicitud:', error)
+
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Detalles del error:", error.response.data);
+            const errorMsg = error.response.data.error || error.response.data.detail || 'No se pudo procesar la solicitud.'
+            alert(`Error: ${errorMsg}`)
+        } else {
+            alert('Error desconocido al procesar la solicitud.')
         }
     }
 }
-
-onMounted(() => {
-    loadCompanies(), loadUser()
-})
 </script>
 
 <template>
-    <Dialog2 
-        title="Registro de Consumibles" 
-        titleButton="Consumible" 
-        :iconP="FilePlus2" 
-        :iconT="FilePlus2"
-        recordof="Registro" 
-        :IconOf="Building2" 
-        description="Descripción" 
-        :IconD="Notebook" 
-        @save="handleSave"
-        @cancel="handleCancel"
-        v-model:open="isDialogOpen">
+    <Dialog1 v-if="canAccept" title="Aceptar Pre-Solicitud" titleButton="Consumible" :iconP="FilePlus2"
+        :iconT="FilePlus2" recordof="Registro" :IconOf="Building2" description="Descripción" :IconD="Notebook"
+        @save="handleSave" @cancel="handleCancel" v-model:open="isDialogOpen">
 
-        <template #form1>
-            <FormConsumablesC1 v-model:props="request" :companies="company" :users="users"/>
+        <template #forms>
+            <div class="space-y-3 p-4">
+                <p>Estás a punto de aceptar la pre-solicitud:</p>
+                <ul class="list-disc pl-5 my-2 p-3 bg-gray-50 rounded-md border">
+                    <li><strong>ID:</strong> {{ props.Request.id_Request }}</li>
+                    <li><strong>Artículo:</strong> {{ props.Request.article }}</li>
+                    <li><strong>Cantidad:</strong> {{ props.Request.amount }}</li>
+                </ul>
+                <p>El sistema verificará que el artículo exista en la base de datos y que haya stock suficiente.</p>
+                <p class="font-semibold text-center mt-4">¿Deseas continuar?</p>
+            </div>
         </template>
-        <template #form2>
-            <FormConsumablesC2 v-model:props="request"/>
-        </template>
-    </Dialog2>
+    </Dialog1>
 </template>

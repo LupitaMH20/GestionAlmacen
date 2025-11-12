@@ -7,18 +7,18 @@ import { Eye, FileText } from 'lucide-vue-next'
 interface Companies{id_Company: string; name: string };
 interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+
 const process = defineProps <{
-    id_PreRequest: number | string
-    id_Request?: number | string
+    id_Request: number | string
     position?: string
     title: string
     article: string
-    currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada' | 'Cambios_Devoluciones'
+    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived' | 'returnExchange';
     date: string
     time: string
     type?: string
-    applicant?: string
-    applicantName?: Users
+    user?: string
+    userName?: Users
     collaborator?: string
     collaboratorName?: Collaborators
     description?: string
@@ -33,13 +33,13 @@ const process = defineProps <{
 }>();
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['updatePreRequest']);
+const emit = defineEmits(['updateRequest']);
 </script>
 
 <template>
     <Card class="flex flex-col h-[35vh] w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
-            <CardTitle class="text-24 font-lingh">{{ process.title }} (ID: {{ process.id_PreRequest }})</CardTitle>
+            <CardTitle class="text-24 font-lingh">{{ process.title }} (ID: {{ process.id_Request }})</CardTitle>
             <p>Producto: {{ process.article }}</p>
         </CardHeader>
 
@@ -53,7 +53,7 @@ const emit = defineEmits(['updatePreRequest']);
 
         <CardFooter class="flex justify-end ">
             <Dialog v-model="isDialogOpen" :title="`Detalles de ${process.title}`" titleButton="Detalles" :iconP="Eye"
-                :iconT="FileText" :preRequest="process" @updatePreRequest="emit('updatePreRequest')">
+                :iconT="FileText" :Request="process" @updateRequest="emit('updateRequest')">
             </Dialog>
         </CardFooter>
     </Card>

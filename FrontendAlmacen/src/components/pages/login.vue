@@ -16,8 +16,10 @@ const loginAction = inject<Function>('loginAction')
 
 const handleLogin = async () => {
     errorMessage.value = ''
+
     if (!name.value || !password.value) {
         errorMessage.value = 'Por favor, complete todos los campos.'
+        alert(errorMessage.value)
         return
     }
 
@@ -26,25 +28,40 @@ const handleLogin = async () => {
             name: name.value,
             password: password.value
         })
-        const user = response.data
 
-        if (loginAction){
-            loginAction(user, null)
-        } else {
-            console.error("Error: loginAction no fue inyectado.")
-            errorMessage.value = "Error al iniciar sesión en la app."
-            return
+        // Esperamos un backend tipo:
+        // { user: {...}, access: "...", refresh: "..." }
+
+        const { user, access, refresh } = response.data
+
+        if (!access || !user) {
+            throw new Error('El servidor no devolvió token o usuario.')
         }
 
+        // Guarda los tokens en localStorage
+        localStorage.setItem('access', access)
+        localStorage.setItem('refresh', refresh)
+        localStorage.setItem('user', JSON.stringify(user))
+
+        // Si tienes un sistema global, actualiza el estado
+        if (loginAction) {
+            loginAction(user, access)
+        }
+
+        // Redirección por rol
         const position = user.position?.toLowerCase()
-        if (['managerJom', 'managerNs', 'managerPrintek', 'managerHefesto', 'managerBlackWorkshop', 'applicant', 'deliberystaff'].includes(position)) {
+        if (['managerjom', 'managerns', 'managerprintek', 'managerhefesto', 'managerblackworkshop', 'applicant', 'deliberystaff'].includes(position)) {
             router.push('/staff')
         } else if (['director', 'counter'].includes(position)) {
             router.push('/admin')
         } else {
-            errorMessage.value = 'Posición de usuario no reconocida.'
+            router.push('/home')
         }
+
+        alert(`Bienvenido ${user.name}`)
+
     } catch (error: any) {
+        console.error('Error de login:', error)
         if (error.response?.status === 401) {
             errorMessage.value = 'Usuario o contraseña incorrectos'
         } else if (error.response?.status === 403) {
@@ -52,31 +69,33 @@ const handleLogin = async () => {
         } else {
             errorMessage.value = 'Error en el servidor. Intenta más tarde.'
         }
+        alert(errorMessage.value)
     }
 }
 </script>
 
 <template>
     <div class="flex items-center justify-center min-h-screen bg-gradient-to-br">
-        <Card class="w-[350px] bg-white/10 backdrop-blur-lg text-white rounded-2xl shadow-xl border border-white/20">
+        <Card
+            class="w-[350px] h-[350px] bg-white/10 backdrop-blur-lg text-white rounded-2xl shadow-xl border border-white/20">
             <CardHeader class="text-center">
                 <CardTitle class="flex flex-col items-center justify-center text-2xl font-semibold mb-2">
                     <div class="bg-black/20 rounded-full p-4 mb-2">
                         <User class="w-10 h-10 text-black" />
                     </div>
+                    Iniciar Sesión
                 </CardTitle>
             </CardHeader>
 
             <CardContent class="space-y-4">
                 <div class="relative">
                     <User class="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                    <Input v-model="name" placeholder="name"
+                    <Input v-model="name" placeholder="Usuario"
                         class="pl-10 bg-white/20 border border-white/30 text-black placeholder-gray-300" />
                 </div>
-
                 <div class="relative">
                     <Lock class="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                    <Input type="password" v-model="password" placeholder="Password"
+                    <Input type="password" v-model="password" placeholder="Contraseña"
                         class="pl-10 bg-white/20 border border-white/30 text-black placeholder-gray-300" />
                 </div>
             </CardContent>
@@ -84,7 +103,7 @@ const handleLogin = async () => {
             <CardFooter>
                 <Button @click="handleLogin"
                     class="w-full bg-gray-100 text-black font-semibold py-2 rounded-lg transition-all">
-                    Iniciar Sesión
+                    Iniciar sesión
                 </Button>
             </CardFooter>
         </Card>

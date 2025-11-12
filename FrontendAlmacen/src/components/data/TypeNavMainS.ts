@@ -1,30 +1,53 @@
-import { House, NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck} from "lucide-vue-next"
+import { NotebookPen, BookCheck, BookmarkCheck, BookOpenCheck, ArrowLeftRight, Boxes, LayoutDashboard, BookOpenText} from "lucide-vue-next"
     
 export const navMainS = [
     {
-        title: "Inicio",
-        url: "/start",
-        icon: House,
+        title: "Dashboard",
+        routerName: "start",
+        icon: LayoutDashboard,
         isActive: true,
     },
     {
-        title: "Solicitudes",
-        url: "/application",
-        icon: NotebookPen
-    },
-    {
-        title: "Autorizadas",
-        url: "/authorize",
-        icon: BookCheck
-    },
-    {
-        title: "Surtir",
-        url: "/supply",
-        icon: BookOpenCheck
-    },
-    {
-        title: "Entregas",
-        url: "/deliveries",
-        icon: BookmarkCheck
+        title: "Modulos",
+        icon: Boxes,
+        isActive: true,
+        items: [
+            {
+                title: "PreSolicitudes",
+                routerName: "preApplication",
+                icon: BookOpenText,
+                isActive: true,
+            },
+            {
+                title: "Solicitudes",
+                routerName: "application",
+                icon: NotebookPen,
+                isActive: true,
+            },
+            {
+                title: "Autorizadas",
+                routerName: "authorize",
+                icon: BookCheck,
+                isActive: true,
+            },
+            {
+                title: "Surtir",
+                routerName: "supply",
+                icon: BookOpenCheck,
+                isActive: true,
+            },
+            {
+                title: "Terminadas",
+                routerName: "finished",
+                icon: BookmarkCheck,
+                isActive: true,
+            },
+            {
+                title: "Devoluciones",
+                routerName: "returns",
+                icon: ArrowLeftRight,
+                isActive: true,
+            },
+        ]
     },
 ]

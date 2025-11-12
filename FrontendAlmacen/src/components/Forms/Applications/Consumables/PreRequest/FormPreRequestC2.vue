@@ -13,7 +13,7 @@ const props = defineModel('props', { type: Object, required: true })
                 <div class="p-1.5">
                     <Label class="text-24 font-sans font-bold p-1.5">ID del producto*</Label>
                     <FormControl>
-                        <Input v-model="props.article" type="text" placeholder="Nombre ó ID"
+                        <Input v-model="props.article" type="text" placeholder="ID de producto"
                             class="w-50 font-sans text-12 font-light" />
                     </FormControl>
                 </div>

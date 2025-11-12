@@ -6,6 +6,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "../
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { inject } from 'vue'
 import { useRouter } from 'vue-router'
+
 interface User {
   id_user: string;
   name: string;

@@ -18,16 +18,16 @@ const selectedType = ref('All')
 const displayedProcesses = ref<any[]>([]);
 
 interface ProcessData {
-    id_PreRequest: number | string;
+    id_Request: number | string;
     title: string;
     article: string;
-    currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada' | 'Cambios_Devoluciones';
+    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
     date: string;
     time: string;
     type?: string;
-    request?: string;
+    user?: string;
     collaborator?: string;
-    requestName?: Users;
+    userName?: Users;
     collaboratorName?: Collaborators;
     description?: string
     amount?: number
@@ -38,15 +38,13 @@ interface ProcessData {
     supplierCompany?: string
     requestingCompanyName?: Companies
     supplierCompanyName?: Companies
-
-    position?: string;
 }
 
 const allProcesses = ref<ProcessData[]>([]);
 
 const loadProcesses = async () => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/api/prerequest/');
+        const response = await axios.get('http://127.0.0.1:8000/api/request/');
 
         const formatDate = (datetime: string) => {
             if (!datetime) return 'Sin fecha';
@@ -57,29 +55,33 @@ const loadProcesses = async () => {
             const año = date.getFullYear();
             return `${dia}/${mes}/${año}`;
         };
+
+        const typeMap: Record<string, string> = {
+            "Consumable": 'Consumibles',
+            "Tool": 'Herramientas',
+            "PersonalConsumption": 'ConsumoPersonal',
+        };
+
         allProcesses.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
-            const userObj = item.request;
+            const userObj = item.user;
             const collabObj = item.collaborator;
+
+            const originalType = item.type;
+            const translatedTitle = typeMap[originalType] || originalType || 'Sin tipo'; 
 
             console.log('Procesando item:', userObj);
             return {
-                id_PreRequest: item.id_PreRequest,
-                title: item.type || 'Sin tipo',
+                id_Request: item.id_Request,
+                title: translatedTitle,
                 article: item.article || 'Sin producto',
-                currentStatus: item.status === 'prerequest' ? 'Presolicitud' :
-                    item.status === 'request' ? 'Solicitud' :
-                        item.status === 'authorization' ? 'Autorizada' :
-                            item.status === 'deliverie' ? 'Surtir' :
-                                item.status === 'deliverie' ? 'Terminada' :
-                                    item.status === 'return_exchange' ? 'Cambios_Devoluciones' :
-                                        'decline',
-                date: formatDate(item.requested_datetime),
-                time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                type: item.type,
-                request: userObj?.id_user,
-                requestName: userObj,
+                currentStatus: item.status,
+                date: formatDate(item.request_datetime),
+                time: new Date(item.request_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                type: originalType,
+                user: userObj?.id_user,
+                userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
                 description: item.description,
@@ -91,7 +93,6 @@ const loadProcesses = async () => {
                 supplierCompany: supCompanyObj?.id_Company,
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
-                position: item.request?.position,
             };
         });
         displayedProcesses.value = [...allProcesses.value];
@@ -102,44 +103,52 @@ const loadProcesses = async () => {
 };
 
 const prerequest = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'Presolicitud')
+    displayedProcesses.value.filter(p => p.currentStatus === 'prerequest')
 );
 
 const request = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'Solicitud')
+    displayedProcesses.value.filter(p => p.currentStatus === 'request')
 );
 
-const autorizadas = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'Autorizada')
+const authorized = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'authorized')
 );
 
-const SurtirsTerminadas = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'Surtir' || p.currentStatus === 'Terminada')
+const declined = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'declined')
+);
+
+const supplyFinished = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'supply' || p.currentStatus === 'finished')
+);
+
+const archived = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'archived')
 );
 
 const searchProcess = () => {
     const query = searchQuery.value.toLowerCase().trim();
     const type = selectedType.value;
-    
+
     let filteredByType = [];
     if (type === 'All') {
         filteredByType = [...allProcesses.value];
     } else {
         filteredByType = allProcesses.value.filter(proc => proc.title === type);
     }
-    
+
     if (!query) {
         displayedProcesses.value = filteredByType;
         return;
     }
-    
+
     displayedProcesses.value = filteredByType.filter(proc => {
-        const inId = proc.id_PreRequest.toString().includes(query);
+        const inId = proc.id_Request.toString().includes(query);
         const inTitle = proc.title.toLowerCase().includes(query);
         const inArticle = proc.article.toLowerCase().includes(query);
         const inrequest = (
-            proc.requestName?.name.toLowerCase() + ' ' + 
-            proc.requestName?.last_name.toLowerCase()
+            proc.userName?.name.toLowerCase() + ' ' +
+            proc.userName?.last_name.toLowerCase()
         ).includes(query);
         const inDescription = proc.description?.toLowerCase().includes(query) || false;
         return inId || inTitle || inArticle || inrequest || inDescription;
@@ -167,14 +176,14 @@ onMounted(() => {
                     class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
                     <option value="All"> Todos </option>
                     <option value="ConsumoPersonal"> Consumo Personal </option>
-                    <option value="Consumible"> Consumibles </option>
-                    <option value="Herramienta"> Herramientas </option>
+                    <option value="Consumibles"> Consumibles </option>
+                    <option value="Herramientas"> Herramientas </option>
                 </select>
             </div>
         </div>
 
         <div class="flex justify-between items-center w-full mb-2 ">
-            
+
         </div>
 
         <Card class="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -185,8 +194,8 @@ onMounted(() => {
                             Presolicitudes ({{ prerequest.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in prerequest" :key="proc.id_PreRequest" v-bind="proc"
-                                @updatePreRequest="loadProcesses" />
+                            <ProcessCard v-for="proc in prerequest" :key="proc.id_Request" v-bind="proc"
+                                @updateRequest="loadProcesses" />
                             <p v-if="!prerequest.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -197,7 +206,7 @@ onMounted(() => {
                             Solicitud ({{ request.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in request" :key="proc.id_PreRequest" v-bind="proc" />
+                            <ProcessCard v-for="proc in request" :key="proc.id_Request" v-bind="proc" />
                             <p v-if="!request.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -205,12 +214,12 @@ onMounted(() => {
 
                     <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-700 whitespace-nowrap">
-                            Autorizadas ({{ autorizadas.length }})
+                            Autorizadas ({{ authorized.length }})
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in autorizadas" :key="proc.id_PreRequest" v-bind="proc" />
-                            <p v-if="!autorizadas.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en
+                            <ProcessCard v-for="proc in authorized" :key="proc.id_Request" v-bind="proc" />
+                            <p v-if="!authorized.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en
                                 esta etapa.
                             </p>
                         </div>
@@ -218,40 +227,39 @@ onMounted(() => {
 
                     <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-green-600 whitespace-nowrap">
-                            Surtir ({{SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir').length}})
+                            Surtir ({{supplyFinished.filter(p => p.currentStatus === 'supply').length}})
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir')"
-                                :key="proc.id_PreRequest" v-bind="proc" />
-                            <p v-if="!SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir').length"
+                            <ProcessCard v-for="proc in supplyFinished.filter(p => p.currentStatus === 'supply')"
+                                :key="proc.id_Request" v-bind="proc" />
+                            <p v-if="!supplyFinished.filter(p => p.currentStatus === 'supply').length"
                                 class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
                         </div>
                     </section>
 
                     <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-700 whitespace-nowrap">
-                            Terminadas ({{SurtirsTerminadas.filter(p => p.currentStatus === 'Terminada').length}})
+                            Terminadas ({{supplyFinished.filter(p => p.currentStatus === 'finished').length}})
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in SurtirsTerminadas.filter(p => p.currentStatus === 'Terminada')"
-                                :key="proc.id_PreRequest" v-bind="proc" />
-                            <p v-if="!SurtirsTerminadas.filter(p => p.currentStatus === 'Terminada').length"
+                            <ProcessCard v-for="proc in supplyFinished.filter(p => p.currentStatus === 'finished')"
+                                :key="proc.id_Request" v-bind="proc" />
+                            <p v-if="!supplyFinished.filter(p => p.currentStatus === 'finished').length"
                                 class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
                         </div>
                     </section>
 
                     <section class="bg-gray-50 p-3 rounded-lg min-h-[500px] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-500 whitespace-nowrap">
-                            Archivada ({{SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir').length}})
+                            Archivada ({{ archived.length }})
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir')"
-                                :key="proc.id_PreRequest" v-bind="proc" />
-                            <p v-if="!SurtirsTerminadas.filter(p => p.currentStatus === 'Surtir').length"
-                                class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
+                            <ProcessCard v-for="proc in archived" :key="proc.id_Request" v-bind="proc" />
+                            <p v-if="!archived.values" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                                etapa.</p>
                         </div>
                     </section>
                 </div>

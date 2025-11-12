@@ -9,16 +9,16 @@ interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 interface ProcessData {
-    id_PreRequest: number;
+    id_Request: number;
     title: string;
     article: string;
-    currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada';
+    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived' | 'returnExchange';
     date: string;
     time: string;
     type?: string;
-    applicant?: string
+    user?: string
     collaborator?: string
-    applicantName?: Users;
+    userName?: Users;
     collaboratorName?: Collaborators;
     description?: string
     amount?: number
@@ -34,13 +34,15 @@ const processes = ref<ProcessData[]>([]);
 
 const loadProcesses = async () => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/api/prerequest/');
-        const statusMap: Record<string, ProcessData['currentStatus']> = {
+        const response = await axios.get('http://127.0.0.1:8000/api/request/');
+        const statusMap: Record<string, string> = {
             prerequest: 'Presolicitud',
             request: 'Solicitud',
             authorized: 'Autorizada',
+            declined: 'Rechazada',
             supply: 'Surtir',
             finished: 'Terminada',
+            archived: 'archivada'
         };
 
         const formatDate = (datetime: string) => {
@@ -55,19 +57,19 @@ const loadProcesses = async () => {
         processes.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
-            const userObj = item.applicant;
+            const userObj = item.user;
             const collabObj = item.collaborator;
 
             return {
-                id_PreRequest: item.id_PreRequest,
+                id_Request: item.id_Request,
                 title: item.type || 'Sin tipo',
                 article: item.article || 'Sin producto',
                 currentStatus: statusMap[item.status] || 'Presolicitud',
                 date: formatDate(item.requested_datetime),
                 time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: item.type,
-                applicant: userObj?.id_user,
-                applicantName: userObj,
+                user: userObj?.id_user,
+                userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
                 description: item.description,
@@ -89,9 +91,9 @@ const loadProcesses = async () => {
 };
 
 const filterByTypeAndStatus = (type: ProcessData['type']) =>
-    processes.value.filter(p => p.currentStatus === 'Solicitud' && p.type === type);
+    processes.value.filter(p => p.currentStatus === 'request' && p.type === type);
 
-const Consumables = computed(() => filterByTypeAndStatus('Consumible'));
+const Consumables = computed(() => filterByTypeAndStatus('Consumable'));
 const Tools = computed(() => filterByTypeAndStatus('Herramienta'));
 const PersonalConsumption = computed(() => filterByTypeAndStatus('ConsumoPersonal'));
 
@@ -115,7 +117,7 @@ onMounted(() => { loadProcesses() });
                             Consumible ({{ Consumables.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Consumables" :key="proc.id_PreRequest" v-bind="proc" @updatePreRequest="loadProcesses"/>
+                            <ProcessCard v-for="proc in Consumables" :key="proc.id_Request" v-bind="proc" @updateRequest="loadProcesses"/>
                             <p v-if="!Consumables.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Consumible.
                             </p>
@@ -127,7 +129,7 @@ onMounted(() => { loadProcesses() });
                             Herramienta ({{ Tools.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Tools" :key="proc.id_PreRequest" v-bind="proc" @updatePreRequest="loadProcesses"/>
+                            <ProcessCard v-for="proc in Tools" :key="proc.id_Request" v-bind="proc" @updatRequest="loadProcesses"/>
                             <p v-if="!Tools.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Herramienta.
                             </p>
@@ -139,7 +141,7 @@ onMounted(() => { loadProcesses() });
                             ConsumoPersonal ({{ PersonalConsumption.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id_PreRequest" v-bind="proc" @updatePreRequest="loadProcesses"/>
+                            <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id_Request" v-bind="proc" @updateRequest="loadProcesses"/>
                             <p v-if="!PersonalConsumption.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de ConsumoPersonal.
                             </p>

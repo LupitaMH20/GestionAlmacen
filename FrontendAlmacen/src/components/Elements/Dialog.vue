@@ -5,7 +5,7 @@ import Button from '../ui/button/Button.vue';
 import { LucideIcon, Ban, Save } from 'lucide-vue-next';
 
 //Son las rutas de lo que se mostrara en el dialog
-import DialogPreRequestandRequest from './ComponentsDialog/DialogPreRequestandRequest.vue';
+import DialogPreRequestRequest from './ComponentsDialog/DialogPreRequestRequest.vue';
 import DialogAuthorize from './ComponentsDialog/DialogAuthorize.vue';
 import DialogDecline from './ComponentsDialog/DialogDecline.vue';
 import DialogDeliverie from './ComponentsDialog/DialogDeliverie.vue';
@@ -22,20 +22,22 @@ import UpdateDelete from './ComponentsDialog/UpdateDelete.vue';
 interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article {id_mainarticle: string, name:string}
 
 const props = defineProps<{
   title: string;
   titleButton: string;
   iconP: LucideIcon;
   iconT: LucideIcon;
-  preRequest: {
-    id_PreRequest: string | number;
-    applicant?: string;
-    applicantName?: Users;
+  Request: {
+    id_Request: string | number;
+    user?: string;
+    userName?: Users;
     collaborator?: string;
     collaboratorName?: Collaborators;
     type?: string;
     article?: string;
+    articleName?: Article;
     description?: string;
     amount?: number;
     status?: string;
@@ -48,48 +50,49 @@ const props = defineProps<{
     date?: string;
     time?: string;
 
-    request?: {
-      id_Request?: string | number;
-      position?: string;
-      request_datetime?: string;
+    // Acceptance?: {
+    //   id_acceptance?: string | number;
+    //   article?: string;
+    //   articlename: Article;
+    //   request_datetime?: string;
 
-      authorization?: {
-        authorize?: string;
-        comment?: string;
-        authorized_datetime?: string;
-      };
+    //   authorization?: {
+    //     authorize?: string;
+    //     comment?: string;
+    //     authorized_datetime?: string;
+    //   };
 
-      decline?: {
-        decline?: string;
-        comment?: string;
-        datetime?: string;
-      };
+    //   decline?: {
+    //     decline?: string;
+    //     comment?: string;
+    //     datetime?: string;
+    //   };
 
-      deliverie?: {
-        persondelivery?: string;
-        personreceives?: string;
-        companydelivery?: string;
-        companyreceives?: string;
-        comment?: string;
-        photo?: string;
-        document?: string;
-        deliverie_datetime?: string;
+    //   deliverie?: {
+    //     persondelivery?: string;
+    //     personreceives?: string;
+    //     companydelivery?: string;
+    //     companyreceives?: string;
+    //     comment?: string;
+    //     photo?: string;
+    //     document?: string;
+    //     deliverie_datetime?: string;
 
-        return_exchange?: {
-          returnenby?: string;
-          receivedby?: string;
-          deliverycompany?: string;
-          receivingcompany?: string;
-          reason?: string;
-          return_datetime?: string;
-        };
-      };
-    };
+    //     return_exchange?: {
+    //       returnenby?: string;
+    //       receivedby?: string;
+    //       deliverycompany?: string;
+    //       receivingcompany?: string;
+    //       reason?: string;
+    //       return_datetime?: string;
+    //     };
+    //   };
+    // };
   };
 }>();
 
 const open = defineModel<boolean>();
-const emit = defineEmits(['updatePreRequest']);
+const emit = defineEmits(['updateRequest']);
 
 const IconComponent = (icon: LucideIcon) => icon;
 </script>
@@ -110,15 +113,15 @@ const IconComponent = (icon: LucideIcon) => icon;
         </div>
 
         <div>
-          <UpdateDelete :preRequest="props.preRequest" @updatePreRequest="emit('updatePreRequest')" />
+          <UpdateDelete :Request="props.Request" @updateRequest="emit('updateRequest')" />
         </div>
       </DialogTitle>
 
-      <DialogPreRequestandRequest v-if="props.preRequest" :preRequest="props.preRequest"/>
-      <DialogAuthorize v-if="props.preRequest.request?.authorization" :authorization="props.preRequest.request.authorization" />
-      <DialogDecline v-if="props.preRequest.request?.decline" :decline="props.preRequest.request.decline" />
-      <DialogDeliverie v-if="props.preRequest.request?.deliverie" :deliverie="props.preRequest.request.deliverie" />
-      <DialogReturnExchange v-if="props.preRequest.request?.deliverie?.return_exchange" :return_exchange="props.preRequest.request.deliverie.return_exchange" />
+      <DialogPreRequestRequest v-if="props.Request" :preRequest="props.Request"/>
+      <!-- <DialogAuthorize v-if="props.Request.request?.authorization" :authorization="props.Request.request.authorization" />
+      <DialogDecline v-if="props.Request.request?.decline" :decline="props.Request.request.decline" />
+      <DialogDeliverie v-if="props.Request.request?.deliverie" :deliverie="props.Request.request.deliverie" />
+      <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
 
       <DialogFooter class="flex justify-between mt-5 pt-3 border-t">
         <Button variant="secondary" @click="open = false" class="flex items-center gap-2">
@@ -126,12 +129,12 @@ const IconComponent = (icon: LucideIcon) => icon;
         </Button>
 
         
-        <component :is="props.preRequest.type === 'Consumible' ? CreateApplicationCO 
-          : props.preRequest.type === 'Herramienta' ? CreateApplicationT
-            : props.preRequest.type === 'ConsumoPersonal' ? CreateApplicationC
+        <component :is="props.Request.type === 'Consumable' ? CreateApplicationCO 
+          : props.Request.type === 'Tool' ? CreateApplicationT
+            : props.Request.type === 'PersonalConsumption' ? CreateApplicationC
               : null" 
-              :preRequest="props.preRequest"
-              :@updatePreRequest="emit('updatePreRequest')"/>
+              :Request="props.Request"
+              @updateRequest="emit('updateRequest')"/>
       </DialogFooter>
     </DialogContent>
   </Dialog>

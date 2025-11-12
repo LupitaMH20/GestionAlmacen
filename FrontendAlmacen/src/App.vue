@@ -9,26 +9,37 @@ interface User {
 }
 
 const user = ref<User | null>(null)
+const token = ref<string | null>(null)
 
 function login(userData: User, authToken: string | null) {
   console.log('App.vue: loginAction llamada', userData); 
   user.value = userData;
-  localStorage.setItem('user', JSON.stringify(userData)); 
+  sessionStorage.setItem('user', JSON.stringify(userData)); 
+
+  if(authToken){
+    token.value = authToken;
+    sessionStorage.setItem('token', authToken);
+  }
 }
 
 function logout() {
   console.log('App.vue: logoutAction llamada');
   user.value = null;
-  localStorage.removeItem('user');
-  localStorage.removeItem('token');
+  token.value = null;
+  sessionStorage.removeItem('user');
+  sessionStorage.removeItem('token');
 }
 
 onMounted(() => {
-  const storedUser = localStorage.getItem('user');
+  const storedUser = sessionStorage.getItem('user');
+  const storedToken = sessionStorage.getItem('token');
+  
   if (storedUser) {
     user.value = JSON.parse(storedUser);
   }
-  console.log('App.vue montado, usuario cargado:', user.value);
+  if (storedToken) {
+    token.value = storedToken;
+  }
 })
 
 provide('loggedInUser', readonly(user));

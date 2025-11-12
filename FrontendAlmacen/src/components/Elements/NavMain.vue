@@ -7,12 +7,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 defineProps<{
     items: {
         title: string
-        url: string
+        routerName: string
         icon?: LucideIcon
         isActive?: boolean
         items?: {
             title: string
-            url: string
+            routerName: string
             icon?: LucideIcon
             isActive?: boolean
         }[]
@@ -26,7 +26,7 @@ defineProps<{
             <SidebarMenuItem v-for="item in items" :key="item.title">
                 <template v-if="!item.items || item.items.length === 0">
                     <SidebarMenuButton as-child :tooltip="item.title">
-                        <router-link :to="item.url" class="flex items-center gap-2 w-full">
+                        <router-link :to="item.routerName" class="flex items-center gap-2 w-full">
                             <component :is="item.icon" v-if="item.icon" />
                             <span>{{ item.title }}</span>
                         </router-link>
@@ -49,7 +49,7 @@ defineProps<{
                                 <SidebarMenuSub>
                                     <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
                                         <SidebarMenuSubButton as-child>
-                                            <router-link :to="subItem.url" class="flex items-center gap-2">
+                                            <router-link :to="subItem.routerName" class="flex items-center gap-2">
                                                 <component :is="subItem.icon" v-if="subItem.icon" />
                                                 <span>{{ subItem.title }}</span>
                                             </router-link>

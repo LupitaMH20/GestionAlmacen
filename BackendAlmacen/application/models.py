@@ -34,8 +34,8 @@ class RequestActions(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     acceptance = models.OneToOneField(Acceptance, on_delete=models.CASCADE)
     ACTION_CHOICES = [
-        ('authorize', 'Autorizado'),
-        ('decline', 'Rechazado'),
+        ('authorized', 'Autorizado'),
+        ('declined', 'Rechazado'),
     ]
     action = models.CharField(max_length=10, choices=ACTION_CHOICES)
     comment = models.TextField()

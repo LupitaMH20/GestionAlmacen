@@ -1,3 +1,5 @@
+# En users/views.py
+
 from rest_framework.decorators import action
 from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
@@ -5,6 +7,9 @@ from rest_framework import status
 from rest_framework import viewsets
 from .models import Users
 from .serializers import UserSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.settings import api_settings
+
 
 class UserViewSets(viewsets.ModelViewSet): 
     serializer_class = UserSerializer
@@ -29,11 +34,19 @@ class UserViewSets(viewsets.ModelViewSet):
         try:
             user = Users.objects.get(name=name)
             if not check_password(password, user.password):
-                raise Users.DoesNotExist            
+                raise Users.DoesNotExist
             if not user.active:
-                return Response({'error': 'Usuario inactiv0.'}, status=status.HTTP_403_FORBIDDEN)
-            
+                return Response({'error': 'Usuario inactivo.'}, status=status.HTTP_403_FORBIDDEN)
+
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
             serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response({
+                'user': serializer.data,
+                'refresh': str(refresh),
+                'access': access_token
+            }, status=status.HTTP_200_OK)
         except Users.DoesNotExist:
             return Response({'error': 'No existe el usuario'}, status=status.HTTP_401_UNAUTHORIZED)

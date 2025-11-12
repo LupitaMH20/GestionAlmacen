@@ -38,14 +38,25 @@ class RequestActionsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AcceptanceSerializer(serializers.ModelSerializer):
-    request = serializers.PrimaryKeyRelatedField(queryset=Request.objects.all())
-    article = serializers.PrimaryKeyRelatedField(queryset=Articles.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
-    requestactions = RequestActionsSerializer(read_only=True)
+    
+    # 1. Nombramos el campo 'request_id' (para coincidir con Vue y Meta)
+    request_id = serializers.PrimaryKeyRelatedField(
+        # 2. Ahora 'source' SÍ es necesario, porque 'request_id'
+        #    apunta al campo 'request' del modelo.
+        source='request', 
+        queryset=Request.objects.filter(status='prerequest'),
+        write_only=True
+    )
+    
+    # (Tus otros campos están bien)
+    article = ArticleSerializers(read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Acceptance
-        fields = '__all__'
+        # 3. La lista 'fields' ahora SÍ coincide con el campo 'request_id'
+        fields = ['id_acceptance', 'request_id', 'user', 'article', 'acceptance_datetime']
+        read_only_fields = ['id_acceptance', 'user', 'article', 'acceptance_datetime']
 
 class RequestSerializer(serializers.ModelSerializer):
     supplierCompany = CompanySerializer(read_only=True)

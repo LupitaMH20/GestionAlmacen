@@ -54,14 +54,14 @@ class AcceptanceViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        article_name = pre_request.article
+        article_id_mainarticle = pre_request.article
         requested_amount = pre_request.amount
 
         try:
-            article_to_supply = Articles.objects.get(name__iexact=article_name)
+            article_to_supply = Articles.objects.get(id_mainarticle__iexact=article_id_mainarticle)
         except Articles.DoesNotExist:
             return Response(
-                {"error": f"Artículo no registrado: '{article_name}'. No se puede aceptar."},
+                {"error": f"Artículo no registrado en el sistema: '{article_id_mainarticle}'. No se puede aceptar."},
                 status=status.HTTP_404_NOT_FOUND 
             )
         
@@ -75,7 +75,6 @@ class AcceptanceViewSet(viewsets.ModelViewSet):
         article_to_supply.save()
         pre_request.status = 'request'
         pre_request.save()
-        acceptance = serializer.save(user=acceptor, article=article_to_supply) 
         
         return Response(
             {"success": "Solicitud aceptada y stock actualizado.", "data": serializer.data},
@@ -85,6 +84,7 @@ class AcceptanceViewSet(viewsets.ModelViewSet):
 class RequestActionsViewSet(viewsets.ModelViewSet):
     queryset = RequestActions.objects.all().order_by('-requestactions_datetime')
     serializer_class = RequestActionsSerializer
+    permission_classes =[IsAuthenticated]
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
@@ -94,15 +94,31 @@ class RequestActionsViewSet(viewsets.ModelViewSet):
         except serializers.ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        self.perform_create(serializer)
-        linked_request = serializer.instance.acceptance.request
-        action_taken = serializer.instance.action
+        acceptance_to_action = serializer.validated_data.get('acceptance')
+        action_taken = serializer.validated_data.get('action')
+        authorizer = request.user
 
-        if action_taken == 'authorize':
-            linked_request.status = 'authorized'
-        elif action_taken == 'decline':
-            linked_request.status = 'declined'
+        linked_request = acceptance_to_action.request
+        original_requester = linked_request.user
+
+        if authorizer.id_user == original_requester.id_user:
+            return Response({"error": "No puedes autorizar o rechazar tus propias solicitudes."}, status=status.HTTP_403_FORBIDDEN)
+        
+        if authorizer.position in ['applicant', 'deliberystaff']:
+            return Response(
+                {"error": "No tienes permisos para authorizar o rechazar."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if authorizer.company != linked_request.requestingCompany:
+            return Response(
+                {"error": "No perteneces a la empresa de esta solicitud."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        linked_request.status = action_taken
         linked_request.save(update_fields=['status'])
+        serializer.save(user=authorizer) 
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

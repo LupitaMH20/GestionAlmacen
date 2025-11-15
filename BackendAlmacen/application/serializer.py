@@ -4,7 +4,6 @@ from company.serializers import CompanySerializer
 from company.models import Companies
 from users.models import Users
 from users.serializers import UserSerializer
-from article.models import Articles
 from article.serializer import ArticleSerializers
 from collaborator.models import Collaborators
 from collaborator.serializer import Collaboratorserializers
@@ -29,32 +28,29 @@ class SupplySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RequestActionsSerializer(serializers.ModelSerializer):
-    acceptance = serializers.PrimaryKeyRelatedField(queryset=Acceptance.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
-    supply = SupplySerializer(read_only=True)
+    acceptance = serializers.PrimaryKeyRelatedField(
+        queryset=Acceptance.objects.filter(request__status='request'),
+        write_only=True
+    )
+
+    user=UserSerializer(read_only = True)
 
     class Meta:
         model = RequestActions
-        fields = '__all__'
+        fields = [ 'id_RequestActions', 'user', 'acceptance', 'action', 'comment', 'requestactions_datetime']
+        read_only_fields = ['id_RequestActions', 'user', 'requestactions_datetime']
 
 class AcceptanceSerializer(serializers.ModelSerializer):
-    
-    # 1. Nombramos el campo 'request_id' (para coincidir con Vue y Meta)
     request_id = serializers.PrimaryKeyRelatedField(
-        # 2. Ahora 'source' SÍ es necesario, porque 'request_id'
-        #    apunta al campo 'request' del modelo.
         source='request', 
         queryset=Request.objects.filter(status='prerequest'),
         write_only=True
     )
-    
-    # (Tus otros campos están bien)
     article = ArticleSerializers(read_only=True)
     user = UserSerializer(read_only=True)
 
     class Meta:
         model = Acceptance
-        # 3. La lista 'fields' ahora SÍ coincide con el campo 'request_id'
         fields = ['id_acceptance', 'request_id', 'user', 'article', 'acceptance_datetime']
         read_only_fields = ['id_acceptance', 'user', 'article', 'acceptance_datetime']
 

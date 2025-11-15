@@ -35,14 +35,12 @@ const processes = ref<ProcessData[]>([]);
 const loadProcesses = async () => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/request/');
-        const statusMap: Record<string, string> = {
-            prerequest: 'Presolicitud',
-            request: 'Solicitud',
-            authorized: 'Autorizada',
-            declined: 'Rechazada',
-            supply: 'Surtir',
-            finished: 'Terminada',
-            archived: 'archivada'
+        // const response2 = await axios.get('')
+
+        const typeMap: Record<string, string> = {
+            "Consumable": "Consumibles",
+            "Tool": "Herramientas",
+            "PersonalConsumpion": "Consumo Personal"
         };
 
         const formatDate = (datetime: string) => {
@@ -62,9 +60,9 @@ const loadProcesses = async () => {
 
             return {
                 id_Request: item.id_Request,
-                title: item.type || 'Sin tipo',
+                title: typeMap[item.type] || 'Sin tipo',
                 article: item.article || 'Sin producto',
-                currentStatus: statusMap[item.status] || 'Presolicitud',
+                currentStatus: item.status || 'solicitud',
                 date: formatDate(item.requested_datetime),
                 time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: item.type,
@@ -94,8 +92,8 @@ const filterByTypeAndStatus = (type: ProcessData['type']) =>
     processes.value.filter(p => p.currentStatus === 'request' && p.type === type);
 
 const Consumables = computed(() => filterByTypeAndStatus('Consumable'));
-const Tools = computed(() => filterByTypeAndStatus('Herramienta'));
-const PersonalConsumption = computed(() => filterByTypeAndStatus('ConsumoPersonal'));
+const Tools = computed(() => filterByTypeAndStatus('Tools'));
+const PersonalConsumption = computed(() => filterByTypeAndStatus('PersonalConsumption'));
 
 onMounted(() => { loadProcesses() });
 </script>

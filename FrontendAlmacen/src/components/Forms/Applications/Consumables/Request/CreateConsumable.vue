@@ -19,7 +19,7 @@ const props = defineProps<{
     Request: {
         id_Request: string | number;
         article?: string;
-        amount?: number;
+        stock?: number;
         type?: string;
     }
 }>()
@@ -73,9 +73,18 @@ const handleSave = async () => {
 </script>
 
 <template>
-    <Dialog1 v-if="canAccept" title="Aceptar Pre-Solicitud" titleButton="Consumible" :iconP="FilePlus2"
-        :iconT="FilePlus2" recordof="Registro" :IconOf="Building2" description="Descripción" :IconD="Notebook"
-        @save="handleSave" @cancel="handleCancel" v-model:open="isDialogOpen">
+    <Dialog1 v-if="canAccept" 
+        title="Pre-Solicitud a Solicitud" 
+        titleButton="Solicitud" 
+        :iconP="FilePlus2"
+        :iconT="FilePlus2" 
+        recordof="Registro" 
+        :IconOf="Building2" 
+        description="Descripción" 
+        :IconD="Notebook"
+        @save="handleSave" 
+        @cancel="handleCancel" 
+        v-model:open="isDialogOpen">
 
         <template #forms>
             <div class="space-y-3 p-4">
@@ -83,7 +92,7 @@ const handleSave = async () => {
                 <ul class="list-disc pl-5 my-2 p-3 bg-gray-50 rounded-md border">
                     <li><strong>ID:</strong> {{ props.Request.id_Request }}</li>
                     <li><strong>Artículo:</strong> {{ props.Request.article }}</li>
-                    <li><strong>Cantidad:</strong> {{ props.Request.amount }}</li>
+                    <li><strong>Cantidad:</strong> {{ props.Request.stock }}</li>
                 </ul>
                 <p>El sistema verificará que el artículo exista en la base de datos y que haya stock suficiente.</p>
                 <p class="font-semibold text-center mt-4">¿Deseas continuar?</p>

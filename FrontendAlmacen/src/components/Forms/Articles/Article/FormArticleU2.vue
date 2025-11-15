@@ -30,7 +30,7 @@ const props2 = defineProps<{
                 <div class="p-1.5">
                     <FormLabel>Descripción</FormLabel>
                     <FormControl>
-                        <Textarea v-model="props.description"/>
+                        <Textarea class="w-50 font-sans text-12 font-light my-3 h-25" v-model="props.description"/>
                     </FormControl>
                 </div>
                 <div class="p-1.5">

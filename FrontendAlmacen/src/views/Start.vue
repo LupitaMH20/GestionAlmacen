@@ -13,6 +13,8 @@ import { Card, CardContent } from '../components/ui/card';
 interface Companies { id_Company: string; name: string }
 interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article {id_mainarticle: string, name:string}
+
 const searchQuery = ref('');
 const selectedType = ref('All')
 const displayedProcesses = ref<any[]>([]);
@@ -38,6 +40,9 @@ interface ProcessData {
     supplierCompany?: string
     requestingCompanyName?: Companies
     supplierCompanyName?: Companies
+
+    id_acceptance?: string | number;
+    articleName?: Article;
 }
 
 const allProcesses = ref<ProcessData[]>([]);
@@ -67,9 +72,10 @@ const loadProcesses = async () => {
             const supCompanyObj = item.supplierCompany;
             const userObj = item.user;
             const collabObj = item.collaborator;
+            const acceptanceObj = item.acceptance;
 
             const originalType = item.type;
-            const translatedTitle = typeMap[originalType] || originalType || 'Sin tipo'; 
+            const translatedTitle = typeMap[originalType] || originalType || 'Sin tipo';
 
             console.log('Procesando item:', userObj);
             return {
@@ -80,7 +86,7 @@ const loadProcesses = async () => {
                 date: formatDate(item.request_datetime),
                 time: new Date(item.request_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: originalType,
-                user: userObj?.id_user,
+                user: userObj.id_user,
                 userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
@@ -93,6 +99,8 @@ const loadProcesses = async () => {
                 supplierCompany: supCompanyObj?.id_Company,
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
+
+                acceptance_id: acceptanceObj ? acceptanceObj.id_acceptance : null
             };
         });
         displayedProcesses.value = [...allProcesses.value];
@@ -195,7 +203,7 @@ onMounted(() => {
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in prerequest" :key="proc.id_Request" v-bind="proc"
-                                @updateRequest="loadProcesses" />
+                                @card="loadProcesses" />
                             <p v-if="!prerequest.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>

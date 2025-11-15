@@ -33,7 +33,7 @@ const process = defineProps <{
 }>();
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['updateRequest']);
+const emit = defineEmits(['card']);
 </script>
 
 <template>
@@ -53,7 +53,7 @@ const emit = defineEmits(['updateRequest']);
 
         <CardFooter class="flex justify-end ">
             <Dialog v-model="isDialogOpen" :title="`Detalles de ${process.title}`" titleButton="Detalles" :iconP="Eye"
-                :iconT="FileText" :Request="process" @updateRequest="emit('updateRequest')">
+                :iconT="FileText" :Request="process" @dialog="emit('card')">
             </Dialog>
         </CardFooter>
     </Card>

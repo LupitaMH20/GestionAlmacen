@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const handelDelete = async() => {
     try{
-    await axios.delete(`http://127.0.0.1:8000/api/prerequest/${props.id_Request}/`)
+    await axios.delete(`http://127.0.0.1:8000/api/request/${props.id_Request}/`)
     console.log('Presolicitud eliminada con exito');
     emit('deletePreRequest');
     } catch (error) {

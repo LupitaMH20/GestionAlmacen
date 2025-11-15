@@ -16,7 +16,7 @@ interface User {
 const loggedInUser = inject<Ref<User | null>>('loggedInUser')
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['updateRequest'])
+const emit = defineEmits(['updatePreRequest'])
 const company = ref<any[]>([])
 
 const props = defineProps<{
@@ -102,7 +102,7 @@ const handleSave = async () => {
         await axios.patch(`http://127.0.0.1:8000/api/request/${data.id_Request}/`, payload);
         console.log('se actualizo la presolicitud')
         isDialogOpen.value = false
-        emit('updateRequest')
+        emit('updatePreRequest')
     } catch (error) {
         console.log('No se guardo la solicitud', error)
     }

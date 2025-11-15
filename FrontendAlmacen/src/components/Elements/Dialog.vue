@@ -11,10 +11,8 @@ import DialogDecline from './ComponentsDialog/DialogDecline.vue';
 import DialogDeliverie from './ComponentsDialog/DialogDeliverie.vue';
 import DialogReturnExchange from './ComponentsDialog/DialogReturnExchange.vue';
 
-// rutas para crear una soliciud
-import CreateApplicationC from '../Forms/Applications/PersonalConsumption/Request/CreatePersonalConsumption.vue';
-import CreateApplicationCO from '../Forms/Applications/Consumables/Request/CreateConsumable.vue';
-import CreateApplicationT from '../Forms/Applications/Tools/Request/CreateTools.vue';
+// rutas para crear el estado de la solicitud
+import CreateProcess from './ComponentsDialog/CreateProcess.vue';
 
 //rutas para editar y eliminar los procesos de la solicitud
 import UpdateDelete from './ComponentsDialog/UpdateDelete.vue';
@@ -50,11 +48,15 @@ const props = defineProps<{
     date?: string;
     time?: string;
 
-    // Acceptance?: {
-    //   id_acceptance?: string | number;
-    //   article?: string;
-    //   articlename: Article;
-    //   request_datetime?: string;
+      acceptance?: {
+            id_acceptance?: string | number;
+            user?: string;
+            userName?: Users;
+            article?: string;
+            articleName?: Article;
+            date?: string;
+            time?: string;
+        }
 
     //   authorization?: {
     //     authorize?: string;
@@ -92,7 +94,7 @@ const props = defineProps<{
 }>();
 
 const open = defineModel<boolean>();
-const emit = defineEmits(['updateRequest']);
+const emit = defineEmits(['dialog']);
 
 const IconComponent = (icon: LucideIcon) => icon;
 </script>
@@ -113,28 +115,22 @@ const IconComponent = (icon: LucideIcon) => icon;
         </div>
 
         <div>
-          <UpdateDelete :Request="props.Request" @updateRequest="emit('updateRequest')" />
+          <UpdateDelete :Request="props.Request" @updateDelete="emit('dialog')" />
         </div>
       </DialogTitle>
 
       <DialogPreRequestRequest v-if="props.Request" :preRequest="props.Request"/>
-      <!-- <DialogAuthorize v-if="props.Request.request?.authorization" :authorization="props.Request.request.authorization" />
-      <DialogDecline v-if="props.Request.request?.decline" :decline="props.Request.request.decline" />
+      <DialogAuthorize v-if="props.Request.acceptance" :acceptance="props.Request.acceptance" />
+      <!-- <DialogDecline v-if="props.Request.request?.decline" :decline="props.Request.request.decline" />
       <DialogDeliverie v-if="props.Request.request?.deliverie" :deliverie="props.Request.request.deliverie" />
       <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
 
       <DialogFooter class="flex justify-between mt-5 pt-3 border-t">
-        <Button variant="secondary" @click="open = false" class="flex items-center gap-2">
+        <Button v-if="props.Request.status != 'request'" variant="secondary" @click="open = false" class="flex items-center gap-2">
           <Ban class="w-4 h-4" />Cancelar
         </Button>
 
-        
-        <component :is="props.Request.type === 'Consumable' ? CreateApplicationCO 
-          : props.Request.type === 'Tool' ? CreateApplicationT
-            : props.Request.type === 'PersonalConsumption' ? CreateApplicationC
-              : null" 
-              :Request="props.Request"
-              @updateRequest="emit('updateRequest')"/>
+        <CreateProcess :Request="props.Request" @createPrecess="emit('dialog')" />
       </DialogFooter>
     </DialogContent>
   </Dialog>

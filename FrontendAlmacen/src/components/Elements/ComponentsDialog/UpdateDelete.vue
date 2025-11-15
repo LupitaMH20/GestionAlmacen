@@ -19,31 +19,33 @@ const props = defineProps<{
     }
 }>();
 
-const emit = defineEmits(['updateRequest'])
+const emit = defineEmits(['updateDelete'])
 </script>
 <template>
     <!-- Para editar o eliminar la Request -->
     <div v-if="props.Request?.status === 'prerequest'">
         <div v-if="props.Request.type === 'Consumable'" class="flex justify-end gap-2">
-            <UpdatePreRequestC :Request="props.Request" @updateRequest="emit('updateRequest')" />
-            <DeletePreRequestC :id_Request="props.Request.id_Request"
-                @deleteRequest="emit('updateRequest')" />
+            <UpdatePreRequestC :Request="props.Request" @updatePreRequest="emit('updateDelete')" />
+            <DeletePreRequestC :id_Request="props.Request.id_Request" @deletePreRequest="emit('updateDelete')" />
         </div>
         <div v-else-if="props.Request.type === 'ConsumoPersonal'" class="flex justify-end gap-2">
-            <UpdateRequestPC :Request="props.Request" @updateRequest="emit('updateRequest')" />
-            <DeleteRequestPC :id_Request="props.Request.id_Request"
-                @deleteRequest="emit('updateRequest')" />
+            <UpdateRequestPC :Request="props.Request" @updateRequest="emit('updateDelete')" />
+            <DeleteRequestPC :id_Request="props.Request.id_Request" @deleteRequest="emit('updateDelete')" />
         </div>
         <div v-else-if="props.Request.type === 'Herramienta'" class="flex justify-end gap-2">
-            <UpdateRequestT :Request="props.Request" @updateRequest="emit('updateRequest')" />
-            <DeleteRequestT :id_Request="props.Request.id_Request"
-                @deleteRequest="emit('updateRequest')" />
+            <UpdateRequestT :Request="props.Request" @updateRequest="emit('updateDelete')" />
+            <DeleteRequestT :id_Request="props.Request.id_Request" @deleteRequest="emit('updateDelete')" />
         </div>
     </div>
+
     <!-- Para editar o eliminar la request -->
     <div v-if="props.Request?.status === 'request'" class="flex justify-end gap-2">
-
+        <div v-if="props.Request.type === 'Consumable'" class="flex justify-end gap-2">
+            <UpdatePreRequestC :Request="props.Request" @updateRequest="emit('updateDelete')" />
+            <DeletePreRequestC :id_Request="props.Request.id_Request" @deleteRequest="emit('updateDelete')" />
+        </div>
     </div>
+
     <!-- Para editar o eliminar la authorization -->
     <div v-if="props.Request?.status === 'authorization'" class="flex justify-end gap-2">
 

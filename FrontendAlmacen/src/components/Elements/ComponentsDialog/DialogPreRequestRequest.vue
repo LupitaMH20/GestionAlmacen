@@ -2,6 +2,7 @@
 interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article { id_mainarticle: string; name: string }
 
 const props = defineProps<{
     preRequest: {
@@ -24,11 +25,15 @@ const props = defineProps<{
         date?: string;
         time?: string;
 
-        // request?: {
-        //     id_Request?: string | number;
-        //     position?: string;
-        //     request_datetime?: string;
-        // }
+        acceptance?: {
+            id_acceptance?: string | number;
+            user?: string;
+            userName?: Users;
+            article?: string;
+            articleName?: Article;
+            date?: string;
+            time?: string;
+        }
     }
 }>();
 
@@ -89,12 +94,16 @@ const formatType = (type: string) => {
             props.preRequest.time || '—' }}</div>
     </div>
 
-    <!-- <template v-if="props.preRequest.request">
+    <template v-if="props.preRequest.acceptance">
         <div class="pt-4 space-y-2 text-sm border-t">
             <h4 class="flex justify-center text-[24px] font-bold">Solicitud</h4>
-            <div><strong>ID de la Solicitud:</strong> {{ props.preRequest.request.id_Request || '—' }}</div>
-            <div><strong>Cargo:</strong> {{ props.preRequest.request.position || '—' }}</div>
-            <div><strong>Fecha de Solicitud:</strong> {{ props.preRequest.request.request_datetime || '—' }}</div>
+            <div><strong>ID de la Solicitud:</strong> {{ props.preRequest.acceptance.id_acceptance || '—' }}</div>
+            <div><strong>Aprobado por:</strong>ID: {{ props.preRequest.acceptance.user || '—' }} Nombre: {{
+                props.preRequest.acceptance.userName?.name }}</div>
+            <div><strong>Articulo:</strong> ID: {{ props.preRequest.acceptance.article || '—' }} Nombre: {{
+                props.preRequest.acceptance.articleName?.id_mainarticle }}</div>
+            <div><strong>Creacion:</strong> Fecha: {{ props.preRequest.acceptance.date || '—' }} Hora: {{
+                props.preRequest.acceptance.time }}</div>
         </div>
-    </template> -->
+    </template>
 </template>

@@ -40,7 +40,7 @@ const props = defineModel('props', {type:Object, required:true})
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5"> Descripción</FormLabel>
                     <FormControl>
-                        <Textarea v-model="props.description" type="text" placeholder="Ingrese una descripción" class="w-50 font-sans text-12 font-light"></Textarea>
+                        <Textarea v-model="props.description" type="text" placeholder="Ingrese una descripción" class="w-50 font-sans text-12 font-light my-3 h-25"></Textarea>
                     </FormControl>
                 </div>
             </FormItem>

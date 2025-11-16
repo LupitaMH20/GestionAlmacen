@@ -9,27 +9,27 @@ interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 const process = defineProps <{
-    id_Request: number | string
-    position?: string
-    title: string
-    article: string
+    id_Request: number | string;
+    position?: string;
+    title: string;
+    article: string;
     currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived' | 'returnExchange';
-    date: string
-    time: string
-    type?: string
-    user?: string
-    userName?: Users
-    collaborator?: string
-    collaboratorName?: Collaborators
-    description?: string
-    amount?: number
-    status?: string
-    order_workshop?: string
-    store?: string
-    requestingCompany?: string
-    supplierCompany?: string
-    requestingCompanyName?: Companies
-    supplierCompanyName?: Companies
+    date: string;
+    time: string;
+    type?: string;
+    user?: Users;
+    userName?: Users;
+    collaborator?: string;
+    collaboratorName?: Collaborators;
+    description?: string;
+    amount?: number;
+    status?: string;
+    order_workshop?: string;
+    store?: string;
+    requestingCompany?: string;
+    supplierCompany?: string;
+    requestingCompanyName?: Companies;
+    supplierCompanyName?: Companies;
 }>();
 
 const isDialogOpen = ref(false)

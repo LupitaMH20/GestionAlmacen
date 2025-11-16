@@ -4,12 +4,12 @@ import DeleteApplicant from '../../../../Elements/DeleteApplicant.vue'
 
 const emit = defineEmits(['deletePreRequest']);
 const props = defineProps<{
-    id_PreRequest: number | string;
+    id_Request: number | string;
 }>();
 
 const handelDelete = async() => {
     try{
-    await axios.delete(`http://127.0.0.1:8000/api/prerequest/${props.id_PreRequest}/`)
+    await axios.delete(`http://127.0.0.1:8000/api/request/${props.id_Request}/`)
     console.log('Presolicitud eliminada con exito');
     emit('deletePreRequest');
     } catch (error) {

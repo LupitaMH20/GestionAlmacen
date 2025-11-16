@@ -56,6 +56,7 @@ const handleSave = async () => {
 
     if (!props.Request.acceptance || !props.Request.acceptance.id_acceptance) {
         alert("Error: No se encontró el ID de Aceptación (id_acceptance) en esta solicitud.");
+        console.log(props)
         return;
     }
 

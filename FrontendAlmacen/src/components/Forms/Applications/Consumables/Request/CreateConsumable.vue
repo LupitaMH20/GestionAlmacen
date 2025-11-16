@@ -13,13 +13,13 @@ interface User {
 const loggedInUser = inject<Ref<User | null>>('loggedInUser')
 
 const isDialogOpen = ref(false);
-const emit = defineEmits(['updateRequest'])
+const emit = defineEmits(['createRequest'])
 
 const props = defineProps<{
     Request: {
         id_Request: string | number;
         article?: string;
-        stock?: number;
+        amount?: number;
         type?: string;
     }
 }>()
@@ -57,7 +57,7 @@ const handleSave = async () => {
 
         alert('Solicitud Aceptada! El stock ha sido actualizado.')
         isDialogOpen.value = false
-        emit('updateRequest')
+        emit('createRequest')
 
     } catch (error: any) {
         console.error('Error al aceptar la solicitud:', error)
@@ -92,7 +92,7 @@ const handleSave = async () => {
                 <ul class="list-disc pl-5 my-2 p-3 bg-gray-50 rounded-md border">
                     <li><strong>ID:</strong> {{ props.Request.id_Request }}</li>
                     <li><strong>Artículo:</strong> {{ props.Request.article }}</li>
-                    <li><strong>Cantidad:</strong> {{ props.Request.stock }}</li>
+                    <li><strong>Cantidad:</strong> {{ props.Request.amount }}</li>
                 </ul>
                 <p>El sistema verificará que el artículo exista en la base de datos y que haya stock suficiente.</p>
                 <p class="font-semibold text-center mt-4">¿Deseas continuar?</p>

@@ -6,7 +6,7 @@ import Input from '../components/ui/input/Input.vue'
 import Button from '../components/ui/button/Button.vue'
 import { Search } from 'lucide-vue-next'
 import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest/PreRequest.vue'
-import PreRequestCo from '../components/Forms/Applications/PersonalConsumption/PreRequest/PreRequest.vue'
+import PreRequestCP from '../components/Forms/Applications/PersonalConsumption/PreRequest/PreRequest.vue'
 import PreRequestT from '../components/Forms/Applications/Tools/PreRequest/PreRequest.vue'
 import { Card, CardContent } from '../components/ui/card';
 
@@ -64,7 +64,7 @@ const loadProcesses = async () => {
         const typeMap: Record<string, string> = {
             "Consumable": 'Consumibles',
             "Tool": 'Herramientas',
-            "PersonalConsumption": 'ConsumoPersonal',
+            "PersonalConsumption": 'Consumo Personal',
         };
 
         allProcesses.value = response.data.map((item: any) => {
@@ -100,7 +100,7 @@ const loadProcesses = async () => {
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
 
-                acceptance_id: acceptanceObj ? acceptanceObj.id_acceptance : null
+                acceptance: acceptanceObj
             };
         });
         displayedProcesses.value = [...allProcesses.value];
@@ -174,8 +174,8 @@ onMounted(() => {
                 <label class="flex text-{14 px}">Registro de nuevas: PreSolicitudes</label>
                 <div class="flex justify-between items-center p-2 gap-4 ">
                     <PreRequestC @createPreRequest="loadProcesses" />
-                    <PreRequestCo @createPreRequest="loadProcesses" />
-                    <PreRequestT @createPreRequest="loadProcesses" />
+                    <PreRequestCP @createPreRequest="loadProcesses" />
+                    <!-- <PreRequestT @createPreRequest="loadProcesses" /> -->
                 </div>
             </div>
             <div class="flex gap-5 text-{12px}">
@@ -183,7 +183,7 @@ onMounted(() => {
                 <select v-model="selectedType" @change="searchProcess"
                     class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
                     <option value="All"> Todos </option>
-                    <option value="ConsumoPersonal"> Consumo Personal </option>
+                    <option value="Consumo Personal"> Consumo Personal </option>
                     <option value="Consumibles"> Consumibles </option>
                     <option value="Herramientas"> Herramientas </option>
                 </select>

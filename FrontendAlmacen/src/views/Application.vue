@@ -16,8 +16,8 @@ interface ProcessData {
     date: string;
     time: string;
     type?: string;
-    user?: string
-    collaborator?: string
+    user?: Users;
+    collaborator?: string;
     userName?: Users;
     collaboratorName?: Collaborators;
     description?: string
@@ -35,7 +35,6 @@ const processes = ref<ProcessData[]>([]);
 const loadProcesses = async () => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/request/');
-        // const response2 = await axios.get('')
 
         const typeMap: Record<string, string> = {
             "Consumable": "Consumibles",
@@ -63,8 +62,8 @@ const loadProcesses = async () => {
                 title: typeMap[item.type] || 'Sin tipo',
                 article: item.article || 'Sin producto',
                 currentStatus: item.status || 'solicitud',
-                date: formatDate(item.requested_datetime),
-                time: new Date(item.requested_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                date: formatDate(item.acceptance_datetime),
+                time: new Date(item.acceptance_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: item.type,
                 user: userObj?.id_user,
                 userName: userObj,

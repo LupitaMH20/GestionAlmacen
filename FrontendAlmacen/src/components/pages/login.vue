@@ -29,9 +29,6 @@ const handleLogin = async () => {
             password: password.value
         })
 
-        // Esperamos un backend tipo:
-        // { user: {...}, access: "...", refresh: "..." }
-
         const { user, access, refresh } = response.data
 
         if (!access || !user) {
@@ -42,8 +39,6 @@ const handleLogin = async () => {
         localStorage.setItem('access', access)
         localStorage.setItem('refresh', refresh)
         localStorage.setItem('user', JSON.stringify(user))
-
-        // Si tienes un sistema global, actualiza el estado
         if (loginAction) {
             loginAction(user, access)
         }

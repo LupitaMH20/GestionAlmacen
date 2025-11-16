@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch } from 'vue'
+import { ref, onMounted, reactive, watch, inject, Ref } from 'vue'
 import Dialog2 from '../../../../Elements/Dialog2.vue';
 import FormPrerequestC1 from './FormPreRequestC1.vue';
 import FormPreRequestC2 from '../PreRequest/FormPreRequestC2.vue';
@@ -7,16 +7,24 @@ import { Building2, Notebook } from 'lucide-vue-next';
 import axios from 'axios';
 import { User2 } from 'lucide-vue-next';
 
+interface User {
+    id_user: string;
+    name: string;
+    position: string;
+    admin: boolean;
+}
+
+const loggedInUser = inject<Ref<User | null>>('loggedInUser')
+
 const isDialogOpen = ref(false)
-const emit = defineEmits(['updateRequest'])
+const emit = defineEmits(['updatePreRequest'])
 const company = ref<any[]>([])
-const userRequest = ref<any[]>([])
 const collaborator = ref<any[]>([])
 
 const props = defineProps<{
-    preRequest: {
-        id_PreRequest: string | number;
-        applicant?: string;
+    Request: {
+        id_Request: string | number;
+        user?: string;
         collaborator?: string;
         type?: string;
         article?: string;
@@ -31,10 +39,10 @@ const props = defineProps<{
 }>()
 
 const data = reactive({
-    id_PreRequest: '',
-    applicant: '',
+    id_Request: '',
+    user: '',
     collaborator: '',
-    type: '',
+    type: 'PersonalConsumption',
     article: '',
     description: '',
     amount: 0,
@@ -58,18 +66,6 @@ const loadCompanies = async () => {
     }
 }
 
-const loadUser = async (position: string) => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/api/users/', {
-            params: { position: position }
-        })
-        userRequest.value = response.data
-        console.log('Usuarios filtrados por posición:', position)
-    } catch (error) {
-        console.error('Error al mostrar usuarios', error)
-    }
-}
-
 const loadCollaboartor = async () => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/collaborator/')
@@ -82,34 +78,48 @@ const loadCollaboartor = async () => {
 watch(isDialogOpen, (newVal) => {
     if (newVal) {
         Object.assign(data, {
-            id_PreRequest: props.preRequest.id_PreRequest || '',
-            applicant: props.preRequest.applicant || '',
-            collaborator: props.preRequest.collaborator || '',
-            type: props.preRequest.type || 'ConsumoPersonal',
-            article: props.preRequest.article || '',
-            description: props.preRequest.description || '',
-            amount: props.preRequest.amount || 0,
-            status: props.preRequest.status || 'prerequest',
-            order_workshop: props.preRequest.order_workshop || '',
-            store: props.preRequest.store || '',
-            requestingCompany: props.preRequest.requestingCompany || '',
-            supplierCompany: props.preRequest.supplierCompany || '',
+            id_Request: props.Request.id_Request || '',
+            user: props.Request.user || '',
+            collaborator: props.Request.collaborator || '',
+            type: props.Request.type || '',
+            article: props.Request.article || '',
+            description: props.Request.description || '',
+            amount: props.Request.amount || 0,
+            status: props.Request.status || 'prerequest',
+            order_workshop: props.Request.order_workshop || '',
+            store: props.Request.store || '',
+            requestingCompany: props.Request.requestingCompany || '',
+            supplierCompany: props.Request.supplierCompany || '',
         });
+        console.log("Formulario cargado con datos:", data);
     }
 });
 const handleSave = async () => {
     try {
-        await axios.patch(`http://127.0.0.1:8000/api/prerequest/${data.id_PreRequest}/`, data)
+        const payload = {
+            user_id: data.user,
+            collaborator_id: data.collaborator || null,
+            requestingCompany_id: data.requestingCompany,
+            supplierCompany_id: data.supplierCompany,
+            type: data.type,
+            article: data.article,
+            description: data.description,
+            amount: data.amount,
+            status: data.status,
+            order_workshop: data.order_workshop,
+            store: data.store
+        }
+        await axios.patch(`http://127.0.0.1:8000/api/request/${data.id_Request}/`, payload)
         console.log('Solicitud actualizada guardada con éxito')
         isDialogOpen.value = false
-        emit('updateRequest')
+        emit('updatePreRequest')
     } catch (error) {
         console.error('No se guardó la solicitud:', error)
     }
 }
 
 onMounted(() => {
-    loadCompanies(), loadUser('applicant'), loadCollaboartor()
+    loadCompanies(), loadCollaboartor()
 })
 </script>
 
@@ -119,8 +129,7 @@ onMounted(() => {
         @cancel="handleCancel" v-model:open="isDialogOpen">
 
         <template #form1>
-            <FormPrerequestC1 v-model:props="data" :companies="company" :users="userRequest"
-                :collaborator="collaborator" />
+            <FormPrerequestC1 v-model:props="data" :companies="company" :collaborator="collaborator" />
         </template>
         <template #form2>
             <FormPreRequestC2 v-model:props="data" />

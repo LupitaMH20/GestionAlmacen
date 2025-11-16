@@ -11,7 +11,7 @@ const props = defineModel('props', {type:Object, required:true})
         <FormField name="Consumablename3">
             <FormItem>
                 <div class="p-1.5">
-                    <Label class="text-24 font-sans font-bold p-1.5">Nombre ó ID *</Label>
+                    <Label class="text-24 font-sans font-bold p-1.5">ID del Producto *</Label>
                     <FormControl>
                         <Input v-model="props.article" type="text" class="w-50 font-sans text-12 font-light" />
                     </FormControl>

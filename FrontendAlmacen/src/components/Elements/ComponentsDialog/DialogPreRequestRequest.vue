@@ -5,9 +5,9 @@ interface Collaborators { id_Collaborator: string; name: string; last_name: stri
 interface Article { id_mainarticle: string; name: string }
 
 const props = defineProps<{
-    preRequest: {
+    Request: {
         id_Request: string | number;
-        user?: string;
+        user?: Users | null;
         userName?: Users;
         collaborator?: string;
         collaboratorName?: Collaborators;
@@ -33,7 +33,7 @@ const props = defineProps<{
             articleName?: Article;
             date?: string;
             time?: string;
-        }
+        } | null
     }
 }>();
 
@@ -69,41 +69,41 @@ const formatType = (type: string) => {
 <template>
     <div class="space-y-2 text-sm">
         <h4 class="flex justify-center text-[24px] font-bold">PreSolicitud</h4>
-        <div><strong>ID de la PreSolicitud</strong> {{ props.preRequest.id_Request }} </div>
-        <div><strong>Solicitante:</strong> ID: {{ props.preRequest.user || '—' }} Nombre: {{
-            props.preRequest.userName?.name || '—' }} </div>
-        <div v-if="props.preRequest.collaborator"><strong>Colaborador:</strong> ID: {{ props.preRequest.collaborator ||
-            '—' }} Nombre: {{ props.preRequest.collaboratorName?.name || '—' }} {{
-                props.preRequest.collaboratorName?.last_name || '' }} </div>
-        <div><strong>Tipo:</strong> {{ formatType(props.preRequest.type || '') || '—' }}</div>
-        <div><strong>Artículo:</strong> {{ props.preRequest.article || '—' }}</div>
-        <div><strong>Descripción:</strong> {{ props.preRequest.description || '—' }}</div>
-        <div><strong>Cantidad:</strong> {{ props.preRequest.amount || '—' }}</div>
-        <div><strong>Estatus:</strong> {{ formatStatus(props.preRequest.status || '') || '—' }}</div>
-        <div v-if="props.preRequest.order_workshop"><strong>Orden/Taller:</strong> {{ props.preRequest.order_workshop ||
+        <div><strong>ID de la PreSolicitud</strong> {{ props.Request.id_Request }} </div>
+        <div><strong>Solicitante:</strong> ID: {{ props.Request.user || '—' }} Nombre: {{
+            props.Request.userName?.name || '—' }} </div>
+        <div v-if="props.Request.collaborator"><strong>Colaborador:</strong> ID: {{ props.Request.collaborator ||
+            '—' }} Nombre: {{ props.Request.collaboratorName?.name || '—' }} {{
+                props.Request.collaboratorName?.last_name || '' }} </div>
+        <div><strong>Tipo:</strong> {{ formatType(props.Request.type || '') || '—' }}</div>
+        <div><strong>Artículo:</strong> {{ props.Request.article || '—' }}</div>
+        <div><strong>Descripción:</strong> {{ props.Request.description || '—' }}</div>
+        <div><strong>Cantidad:</strong> {{ props.Request.amount || '—' }}</div>
+        <div><strong>Estatus:</strong> {{ formatStatus(props.Request.status || '') || '—' }}</div>
+        <div v-if="props.Request.order_workshop"><strong>Orden/Taller:</strong> {{ props.Request.order_workshop ||
             '—' }}</div>
-        <div v-if="props.preRequest.store"><strong>Almacén:</strong> {{ formatStore(props.preRequest.store || '') || '—'
+        <div v-if="props.Request.store"><strong>Almacén:</strong> {{ formatStore(props.Request.store || '') || '—'
         }}</div>
-        <div v-if="props.preRequest.requestingCompany"><strong>Empresa Solicitante: </strong>ID: {{
-            props.preRequest.requestingCompany || '—' }} Empresa: {{
-                props.preRequest.requestingCompanyName?.name || '—' }}</div>
-        <div v-if="props.preRequest.supplierCompany"><strong>Empresa Proveedora: </strong>ID: {{
-            props.preRequest.supplierCompany || '—' }} Empresa: {{
-                props.preRequest.supplierCompanyName?.name || '—' }}</div>
-        <div v-if="props.preRequest.date"><strong>Creación: </strong>Fecha: {{ props.preRequest.date || '—' }} Hora: {{
-            props.preRequest.time || '—' }}</div>
+        <div v-if="props.Request.requestingCompany"><strong>Empresa Solicitante: </strong>ID: {{
+            props.Request.requestingCompany || '—' }} Empresa: {{
+                props.Request.requestingCompanyName?.name || '—' }}</div>
+        <div v-if="props.Request.supplierCompany"><strong>Empresa Proveedora: </strong>ID: {{
+            props.Request.supplierCompany || '—' }} Empresa: {{
+                props.Request.supplierCompanyName?.name || '—' }}</div>
+        <div v-if="props.Request.date"><strong>Creación: </strong>Fecha: {{ props.Request.date || '—' }} Hora: {{
+            props.Request.time || '—' }}</div>
     </div>
 
-    <template v-if="props.preRequest.acceptance">
+    <template v-if="props.Request.acceptance">
         <div class="pt-4 space-y-2 text-sm border-t">
             <h4 class="flex justify-center text-[24px] font-bold">Solicitud</h4>
-            <div><strong>ID de la Solicitud:</strong> {{ props.preRequest.acceptance.id_acceptance || '—' }}</div>
-            <div><strong>Aprobado por:</strong>ID: {{ props.preRequest.acceptance.user || '—' }} Nombre: {{
-                props.preRequest.acceptance.userName?.name }}</div>
-            <div><strong>Articulo:</strong> ID: {{ props.preRequest.acceptance.article || '—' }} Nombre: {{
-                props.preRequest.acceptance.articleName?.id_mainarticle }}</div>
-            <div><strong>Creacion:</strong> Fecha: {{ props.preRequest.acceptance.date || '—' }} Hora: {{
-                props.preRequest.acceptance.time }}</div>
+            <div><strong>ID de la Solicitud:</strong> {{ props.Request.acceptance.id_acceptance || '—' }}</div>
+            <div><strong>Aprobado por:</strong>ID: {{ props.Request.acceptance.user || '—' }} Nombre: {{
+                props.Request.acceptance.userName?.name }}</div>
+            <div><strong>Articulo:</strong> ID: {{ props.Request.acceptance.article || '—' }} Nombre: {{
+                props.Request.acceptance.articleName?.id_mainarticle }}</div>
+            <div><strong>Creacion:</strong> Fecha: {{ props.Request.acceptance.date || '—' }} Hora: {{
+                props.Request.acceptance.time }}</div>
         </div>
     </template>
 </template>

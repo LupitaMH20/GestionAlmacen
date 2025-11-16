@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Creacion de request
-import CreateApplicationC from '../../Forms/Applications/PersonalConsumption/Request/CreatePersonalConsumption.vue';
+import CreateApplicationCP from '../../Forms/Applications/PersonalConsumption/Request/CreatePersonalConsumption.vue';
 import CreateApplicationCO from '../../Forms/Applications/Consumables/Request/CreateConsumable.vue';
 import CreateApplicationT from '../../Forms/Applications/Tools/Request/CreateTools.vue';
 
@@ -11,12 +11,14 @@ import Decline from '../../Forms/AuthorizeDeclined/CreateDecline.vue';
 const props = defineProps<{
     Request: {
         id_Request: string | number;
-        type?: string;
-        status?: string;
+        type?: string | null;
+        status?: string | null;
         acceptance: {
             id_acceptance: number;
         } | null
         user: {id_user:string};
+        article?: string;
+        amount?: number;
     }
 }>();
 
@@ -29,8 +31,8 @@ const validRequestType = ['Consumable', 'Tools', 'PersonalConsumption'];
     <div v-if="props.Request.status === 'prerequest'">
         <component :is="props.Request.type === 'Consumable' ? CreateApplicationCO
             : props.Request.type === 'Tool' ? CreateApplicationT
-                : props.Request.type === 'PersonalConsumption' ? CreateApplicationC
-                    : null" :Request="props.Request" @updateRequest="emit('createPrecess')" />
+                : props.Request.type === 'PersonalConsumption' ? CreateApplicationCP
+                    : null" :Request="props.Request" @createRequest="emit('createPrecess')" />
     </div>
     <div v-else-if="props.Request.status === 'request'">
         <div class="flex justify-center gap-2" v-if="validRequestType.includes(props.Request.type || '')">

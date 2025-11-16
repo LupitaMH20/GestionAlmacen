@@ -5,14 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const props = defineModel('props', { type: Object, required: true })
 const props2 = defineProps<{
     companies: Array<{ id_Company: string, name: string }>
-    users: Array<{ id_user: string, name: string }>
     collaborator: Array<{id_Collaborator:string, name:string}>
 }>()
 
 </script>
 <template>
     <form>
-        <FormField name="Consumablename1">
+        <FormField name="PersonalConsumptionname1">
             <FormItem>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa Solicitante *</FormLabel>
@@ -51,19 +50,6 @@ const props2 = defineProps<{
                         <SelectContent>
                             <SelectItem v-for="collaborator in props2.collaborator" :key="collaborator.id_Collaborator" :value="collaborator.id_Collaborator">
                                 {{ collaborator.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Solicitante *</FormLabel>
-                    <Select v-model="props.applicant">
-                        <SelectTrigger class="w-50">
-                            <SelectValue v-model="props.applicant" class="text-12 font-sans font-light" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="user in props2.users" :key="user.id_user" :value="user.id_user">
-                                {{ user.name }} ({{ user.id_user }})
                             </SelectItem>
                         </SelectContent>
                     </Select>

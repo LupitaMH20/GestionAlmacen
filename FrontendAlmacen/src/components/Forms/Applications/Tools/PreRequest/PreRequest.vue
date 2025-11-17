@@ -1,35 +1,47 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, inject, computed } from 'vue'
 import Dialog2 from '../../../../Elements/Dialog2.vue';
 import FormPrerequestC1 from './FormPrerequestC1.vue';
 import FormPreRequestC2 from './FormPreRequestC2.vue';
 import { Building2, Hammer, Notebook } from 'lucide-vue-next';
 import axios from 'axios'
 
+interface User {
+    id_user: string;
+    name: string;
+    position: string;
+    admin: boolean;
+}
+
+const loggedInUser = inject<Ref<User | null>>('loggedInUser')
+
+const canCreate = computed(() => {
+    return loggedInUser?.value?.position === 'applicant'
+})
+
 const isDialogOpen = ref(false)
 const emit = defineEmits(['createPreRequest'])
 const company = ref<any[]>([])
-const userRequest = ref<any[]>([])
 const collaborator = ref<any[]>([])
 
 const preRequest = reactive({
-    applicant: '',
+    user: loggedInUser?.value?.id_user,
     collaborator: '',
-    type: 'Herramienta',
+    supplierCompany: '',
+    requestingCompany: '',
     article: '',
+    type: 'Tool',
     description: '',
-    amount: 0,
+    amount: '',
     status: 'prerequest',
     order_workshop: '',
     store: '',
-    requestingCompany: '',
-    supplierCompany: '',
 });
 
 const handleCancel = () => {
     isDialogOpen.value = false
     Object.assign(preRequest, {
-        applicant: '',
+        user: loggedInUser?.value?.id_user || '',
         collaborator: '',
         type: '',
         article: '',
@@ -52,18 +64,6 @@ const loadCompanies = async () => {
     }
 }
 
-const loadUser = async (position: string) => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/users/', {
-      params: { position: position }
-    })
-    userRequest.value = response.data
-    console.log('Usuarios filtrados por posición:', position)
-  } catch (error) {
-    console.error('Error al mostrar usuarios', error)
-  }
-}
-
 const loadCollaboartor = async () => {
     try{
         const response =await axios.get('http://127.0.0.1:8000/api/collaborator/')
@@ -80,10 +80,10 @@ const handleSave = async () => {
             ...preRequest,
             requestingCompany_id: preRequest.requestingCompany,
             supplierCompany_id: preRequest.supplierCompany,
-            applicant_id: preRequest.applicant,
+            user_id: preRequest.user,
             collaborator_id: preRequest.collaborator,
         }
-        await axios.post('http://127.0.0.1:8000/api/prerequest/', payload)
+        await axios.post('http://127.0.0.1:8000/api/request/', payload)
         console.log('Se registró la presolicitud correctamente')
         isDialogOpen.value = false
         emit('createPreRequest')
@@ -92,14 +92,13 @@ const handleSave = async () => {
     }
 }
 
-onMounted(()=> {
-    loadCompanies(), loadUser('applicant'), loadCollaboartor()
-})
+onMounted(()=> { loadCompanies(), loadCollaboartor() })
 </script>
 
 <template>
-    <Dialog2 title="Registro PreSolicitud" 
-    titleButton="Herramientas" 
+    <Dialog2 v-if="canCreate"
+    title="Registro PreSolicitud" 
+    titleButton="Herramienta" 
     :iconP="Hammer" 
     :iconT="Hammer"
     recordof="Registro" 
@@ -111,7 +110,7 @@ onMounted(()=> {
     v-model:open="isDialogOpen">
 
         <template #form1>
-            <FormPrerequestC1 v-model:props="preRequest" :companies="company" :users="userRequest" :collaborator="collaborator"/>
+            <FormPrerequestC1 v-model:props="preRequest" :companies="company" :collaborator="collaborator"/>
         </template>
         <template #form2>
             <FormPreRequestC2 v-model:props="preRequest"/>

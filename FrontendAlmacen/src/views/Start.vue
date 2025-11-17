@@ -175,7 +175,7 @@ onMounted(() => {
                 <div class="flex justify-between items-center p-2 gap-4 ">
                     <PreRequestC @createPreRequest="loadProcesses" />
                     <PreRequestCP @createPreRequest="loadProcesses" />
-                    <!-- <PreRequestT @createPreRequest="loadProcesses" /> -->
+                    <PreRequestT @createPreRequest="loadProcesses" />
                 </div>
             </div>
             <div class="flex gap-5 text-{12px}">

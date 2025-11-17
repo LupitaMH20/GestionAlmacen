@@ -78,10 +78,6 @@ const handleSave = async () => {
         titleButton="Solicitud" 
         :iconP="FilePlus2"
         :iconT="FilePlus2" 
-        recordof="Registro" 
-        :IconOf="Building2" 
-        description="Descripción" 
-        :IconD="Notebook"
         @save="handleSave" 
         @cancel="handleCancel" 
         v-model:open="isDialogOpen">

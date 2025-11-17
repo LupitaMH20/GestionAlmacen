@@ -16,7 +16,7 @@ interface User{
 
 const loggedInUser = inject<Ref<User | null>>('loggedInUser')
 
-const CanCreate = computed(() => {
+const canAccept = computed(() => {
     return loggedInUser?.value?.position === 'applicant'
 })
 
@@ -97,7 +97,7 @@ onMounted(() => { loadCompanies(), loadCollaboartor() })
 </script>
 
 <template>
-    <Dialog2 
+    <Dialog2 v-if="canAccept"
     title="Registro PreSolicitud" 
     titleButton="Consumo Personal" 
     :iconP="User2" 

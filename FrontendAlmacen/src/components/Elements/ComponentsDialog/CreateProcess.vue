@@ -11,7 +11,7 @@ import Decline from '../../Forms/AuthorizeDeclined/CreateDecline.vue';
 const props = defineProps<{
     Request: {
         id_Request: string | number;
-        type?: string | null;
+        type?: string;
         status?: string | null;
         acceptance: {
             id_acceptance: number;
@@ -24,7 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['createPrecess']);
 
-const validRequestType = ['Consumable', 'Tools', 'PersonalConsumption'];
+const validRequestType = ['Consumable', 'Tool', 'PersonalConsumption'];
 </script>
 
 <template>

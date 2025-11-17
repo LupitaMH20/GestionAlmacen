@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, inject, Ref, computed } from 'vue'
+import { ref, inject, Ref, computed } from 'vue'
 import Dialog1 from '../../../../Elements/Dialog1.vue'
-import { Building2, Notebook } from 'lucide-vue-next';
+import { Building2, Notebook, User2 } from 'lucide-vue-next';
 import axios from 'axios';
-import { User2 } from 'lucide-vue-next';
 
 interface User {
     id_user: string;
@@ -78,11 +77,7 @@ const handleSave = async () => {
         title="Pre-Solicitud a Solicitud" 
         titleButton="Solicitud" 
         :iconP="User2"
-        :iconT="User2" 
-        recordof="Registro" 
-        :IconOf="Building2" 
-        description="Descripción" 
-        :IconD="Notebook"
+        :iconT="User2"
         @save="handleSave" 
         @cancel="handleCancel" 
         v-model:open="isDialogOpen">

@@ -8,8 +8,8 @@ import UpdatePreRequestCP from '../../Forms/Applications/PersonalConsumption/Pre
 import DeletePreRequestCP from '../../Forms/Applications/PersonalConsumption/PreRequest/DeletePreRequest.vue'
 
 // //rutas para editar y eliminar la presolicitud de Tools
-// import UpdateRequestT from '../../Forms/Applications/Tools/Request/UpdateRequest.vue'
-// import DeleteRequestT from '../../Forms/Applications/Tools/Request/DeleteRequest.vue'
+import UpdatePreRequestT from '../../Forms/Applications/Tools/PreRequest/UpdatePreRequest.vue'
+import DeletePreRequestT from '../../Forms/Applications/Tools/PreRequest/DeletePreRequest.vue'
 
 const props = defineProps<{
     Request: {
@@ -33,9 +33,9 @@ const emit = defineEmits(['update'])
             <UpdatePreRequestCP :Request="props.Request" @updatePreRequest="emit('update')" />
             <DeletePreRequestCP :id_Request="props.Request.id_Request" @deletePreRequest="emit('update')" />
         </div>
-        <div v-else-if="props.Request.type === 'Herramienta'" class="flex justify-end gap-2">
-            <!-- <UpdateRequestT :Request="props.Request" @updateRequest="emit('updateDelete')" />
-            <DeleteRequestT :id_Request="props.Request.id_Request" @deleteRequest="emit('updateDelete')" /> -->
+        <div v-else-if="props.Request.type === 'Tool'" class="flex justify-end gap-2">
+            <UpdatePreRequestT :Request="props.Request" @updatePreRequest="emit('update')" />
+            <DeletePreRequestT :id_Request="props.Request.id_Request" @deletePreRequest="emit('update')" />
         </div>
     </div>
 
@@ -48,6 +48,10 @@ const emit = defineEmits(['update'])
         <div v-else-if="props.Request.type === ''" class="flex justify-end gap-2">
             <UpdatePreRequestCP :Request="props.Request" @updatePreRequest="emit('update')" />
             <DeletePreRequestCP :id_Request="props.Request.id_Request" @deletePreRequest="emit('update')" />
+        </div>
+        <div v-else-if="props.Request.type === 'Tool'" class="flex justify-end gap-2">
+            <UpdatePreRequestT :Request="props.Request" @updatePreRequest="emit('update')" />
+            <DeletePreRequestT :id_Request="props.Request.id_Request" @deletePreRequest="emit('update')" />
         </div>
     </div>
 

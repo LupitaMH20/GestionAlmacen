@@ -93,7 +93,7 @@ const IconComponent = (icon: LucideIcon) => icon;
 
         <CreateProcess :Request="{
           id_Request: props.Request.id_Request,
-          type: props.Request.type ?? null,
+          type: props.Request.type,
           status: props.Request.status ?? null,
           acceptance: props.Request.acceptance
             ? { id_acceptance: props.Request.acceptance.id_acceptance }

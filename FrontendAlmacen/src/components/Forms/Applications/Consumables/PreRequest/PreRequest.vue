@@ -67,14 +67,14 @@ const loadCompanies = async () => {
 const handleSave = async () => {
     try {
         console.log('Datos a guardar:', preRequest)
-        const data = {
+        const payload = {
             ...preRequest,
             requestingCompany_id: preRequest.requestingCompany,
             supplierCompany_id: preRequest.supplierCompany,
             user_id: preRequest.user,
             collaborator_id: preRequest.collaborator || null,
         }
-        await axios.post('http://127.0.0.1:8000/api/request/', data)
+        await axios.post('http://127.0.0.1:8000/api/request/', payload)
         console.log('Se registró la presolicitud correctamente')
         isDialogOpen.value = false
         emit('createPreRequest')

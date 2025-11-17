@@ -16,7 +16,7 @@ interface ProcessData {
     date: string;
     time: string;
     type?: string;
-    user?: string
+    user?: Users
     collaborator?: string
     userName?: Users;
     collaboratorName?: Collaborators;
@@ -91,7 +91,7 @@ const filterByTypeAndStatus = (type: ProcessData['type']) =>
     processes.value.filter(p => p.currentStatus === 'prerequest' && p.type === type);
 
 const Consumable = computed(() => filterByTypeAndStatus('Consumable'));
-const Tools = computed(() => filterByTypeAndStatus('Tools'));
+const Tool = computed(() => filterByTypeAndStatus('Tool'));
 const PersonalConsumption = computed(() => filterByTypeAndStatus('PersonalConsumption'));
 
 onMounted(() => { loadProcesses() });
@@ -124,12 +124,12 @@ onMounted(() => { loadProcesses() });
 
                     <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-orange-700">
-                            Herramienta ({{ Tools.length }})
+                            Herramienta ({{ Tool.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Tools" :key="proc.id_Request" v-bind="proc"
+                            <ProcessCard v-for="proc in Tool" :key="proc.id_Request" v-bind="proc"
                                 @updateRequest="loadProcesses" />
-                            <p v-if="!Tools.length" class="text-gray-500 text-sm italic mt-4">
+                            <p v-if="!Tool.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Herramienta.
                             </p>
                         </div>

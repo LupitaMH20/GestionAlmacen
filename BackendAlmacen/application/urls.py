@@ -7,7 +7,7 @@ router.register(r'request', RequestViewSet, basename='request')
 router.register(r'acceptance', AcceptanceViewSet, basename='acceptance')
 router.register(r'requestActions', RequestActionsViewSet, basename='requestActions')
 router.register(r'supply', SupplyViewSet, basename='supply')
-router.register(r'returnExchange', ReturnExchangeViewSet, basename='returnExchange')
+# router.register(r'returnExchange', ReturnExchangeViewSet, basename='returnExchange')
 
 urlpatterns = router.urls
 

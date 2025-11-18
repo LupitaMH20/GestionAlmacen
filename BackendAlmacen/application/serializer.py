@@ -48,10 +48,11 @@ class AcceptanceSerializer(serializers.ModelSerializer):
     )
     article = ArticleSerializers(read_only=True)
     user = UserSerializer(read_only=True)
+    requestactions = RequestActionsSerializer(read_only=True)
 
     class Meta:
         model = Acceptance
-        fields = ['id_acceptance', 'request_id', 'user', 'article', 'acceptance_datetime']
+        fields = ['id_acceptance', 'request_id', 'user', 'article', 'acceptance_datetime', 'requestactions']
         read_only_fields = ['id_acceptance', 'user', 'article', 'acceptance_datetime']
 
 class RequestSerializer(serializers.ModelSerializer):

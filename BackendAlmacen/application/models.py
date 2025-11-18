@@ -17,6 +17,7 @@ class Request(models.Model):
     status = models.CharField(max_length=20, default='prerequest')
     order_workshop = models.TextField(null=True, blank=True)
     store = models.TextField(null=True, blank=True)
+    is_paid = models.BooleanField(default=False)
     request_datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -47,10 +48,9 @@ class Supply(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     collaborator = models.ForeignKey(Collaborators, on_delete=models.CASCADE)
     comment = models.TextField()
-    photo = models.CharField(max_length=255, null=True)
-    document = models.CharField(max_length=255, null=True)
+    document = models.FileField(upload_to='supplies/', null=True, blank=True)
     supply_datetime = models.DateTimeField(auto_now_add=True)
-
+    
 class ReturnExchange(models.Model):
     id_returnExchange = models.AutoField(primary_key=True)
     supply = models.OneToOneField(Supply, on_delete=models.SET_NULL, null=True, blank=True)

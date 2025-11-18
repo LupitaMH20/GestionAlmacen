@@ -5,14 +5,52 @@ import { BookCheck } from 'lucide-vue-next';
 import { ref, inject, Ref, computed } from 'vue';
 import axios from 'axios';
 
+interface Companies { id_Company: string; name: string };
+interface Users { id_user: string; name: string; };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article { id_mainarticle: string, name: string }
+
 const props = defineProps<{
     Request: {
         id_Request: string | number;
-        user: { id_user: string };
-        acceptance: {
+        user?: Users | null;
+        userName?: Users;
+        collaborator?: string;
+        collaboratorName?: Collaborators;
+        type?: string;
+        article?: string;
+        articleName?: Article;
+        description?: string;
+        amount?: number;
+        status?: string;
+        order_workshop?: string;
+        store?: string;
+        requestingCompany?: string;
+        supplierCompany?: string;
+        requestingCompanyName?: Companies;
+        supplierCompanyName?: Companies;
+        date?: string;
+        time?: string;
+        acceptance?: {
             id_acceptance: number;
-        } | null
-    }
+            user?: Users | null;
+            userName?: Users;
+            article?: Article | null;
+            articleName?: Article;
+            date?: string;
+            time?: string;
+            requestactions?: {
+                id_RequestActions: number;
+                action: 'authorized' | 'declined';
+                comment: string;
+                requestactions_datetime: string;
+                user: Users | null;
+                userName?: Users;
+                date?: string;
+                time?: string;
+            } | null;
+        } | null;
+    };
 }>();
 
 interface User {

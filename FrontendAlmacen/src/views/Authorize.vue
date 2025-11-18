@@ -1,36 +1,167 @@
 <script setup lang="ts">
 import ProcessCard from '../components/Elements/Card.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 
+interface Companies { id_Company: string; name: string };
+interface Users { id_user: string; name: string; last_name: string };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article { id_mainarticle: string; name: string };
+
 interface ProcessData {
-    id: number;
+    id_Request: number | string;
+    position?: string;
     title: string;
-    currentStatus: 'Presolicitud' | 'Solicitud' | 'Autorizada' | 'Surtir' | 'Terminada';
+    article: string;
+    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived' | 'returnExchange';
     date: string;
     time: string;
-    detailsUrl: string;
-    type: 'Consumible' | 'Herramienta' | 'Consumo personal';
+    type?: string;
+    user?: Users;
+    userName?: Users;
+    collaborator?: string;
+    collaboratorName?: Collaborators;
+    description?: string;
+    amount?: number;
+    status?: string;
+    order_workshop?: string;
+    store?: string;
+    requestingCompany?: string;
+    supplierCompany?: string;
+    requestingCompanyName?: Companies;
+    supplierCompanyName?: Companies;
+    acceptance?: {
+        id_acceptance: number;
+        user?: Users;
+        userName?: Users;
+        article?: Article;
+        articleName?: Article;
+        date?: string;
+        time?: string;
+        requestactions?: {
+            id_RequestActions: number;
+            action: 'authorized' | 'declined';
+            comment: string;
+            requestactions_datetime: string;
+            user: Users;
+            date?: string;
+            time?: string;
+        } | null;
+    } | null;
 }
-const allProcesses = ref<ProcessData[]>([
-    { id: 101, title: 'Consumo personal', currentStatus: 'Autorizada', date: '2025-10-10',time:'12:30 am', detailsUrl: '/process/101', type: 'Consumo personal' },
-    { id: 102, title: 'Herramienta', currentStatus: 'Presolicitud', date: '2025-10-12',time:'12:30 am', detailsUrl: '/process/102', type: 'Herramienta' },
-    { id: 103, title: 'Consumibles', currentStatus: 'Surtir', date: '2025-10-05', time:'12:30 am', detailsUrl: '/process/103', type: 'Consumible' },
-    { id: 104, title: 'Consumo personal', currentStatus: 'Presolicitud', date: '2025-10-01',time:'12:30 am', detailsUrl: '/process/104', type: 'Consumo personal' },
-    { id: 105, title: 'Herramienta', currentStatus: 'Autorizada', date: '2025-10-02',time:'12:30 am', detailsUrl: '/process/105', type: 'Herramienta' },
-    { id: 106, title: 'Consumible', currentStatus: 'Surtir', date: '2025-10-03',time:'12:30 am', detailsUrl: '/process/106', type: 'Consumible' },
-]);
-const filterByTypeAndStatus = (type: ProcessData['type']) => {
-    return allProcesses.value.filter(p =>
-        (p.currentStatus === 'Autorizada') &&
-        p.type === type
-    );
+
+const processes = ref<ProcessData[]>([]);
+
+const loadProcesses = async () => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/request/');
+
+        const typeMap: Record<string, string> = {
+            "Consumable": "Consumibles",
+            "Tool": "Herramientas",
+            "PersonalConsumption": "Consumo Personal"
+        };
+
+        const formatDate = (datetime: string) => {
+            if (!datetime) return 'Sin fecha';
+            const date = new Date(datetime);
+            const dia = date.getDate().toString().padStart(2, '0');
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const mes = meses[date.getMonth()];
+            const año = date.getFullYear();
+            return `${dia}/${mes}/${año}`;
+        };
+
+        const formatTime = (datetime: string) => {
+            if (!datetime) return 'Sin hora';
+            const date = new Date(datetime);
+            return date.toLocaleTimeString('es-MX', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+        };
+
+        processes.value = response.data.map((item: any) => {
+            const reqCompanyObj = item.requestingCompany;
+            const supCompanyObj = item.supplierCompany;
+            const userObj = item.user;
+            const collabObj = item.collaborator;
+            const acceptanceObj = item.acceptance;
+
+            let acceptance = null;
+            if (acceptanceObj) {
+                const acceptanceUserObj = acceptanceObj.user;
+                const acceptanceArticleObj = acceptanceObj.article;
+                const requestActionsObj = acceptanceObj.requestactions;
+                
+                let requestactions = null;
+                if (requestActionsObj) {
+                    const actionUserObj = requestActionsObj.user;
+                    requestactions = {
+                        id_RequestActions: requestActionsObj.id_RequestActions,
+                        action: requestActionsObj.action,
+                        comment: requestActionsObj.comment,
+                        requestactions_datetime: requestActionsObj.requestactions_datetime,
+                        user: actionUserObj,
+                        userName: actionUserObj,
+                        date: formatDate(requestActionsObj.requestactions_datetime),
+                        time: formatTime(requestActionsObj.requestactions_datetime)
+                    };
+                }
+
+                acceptance = {
+                    id_acceptance: acceptanceObj.id_acceptance,
+                    user: acceptanceUserObj,
+                    userName: acceptanceUserObj,
+                    article: acceptanceArticleObj,
+                    articleName: acceptanceArticleObj,
+                    date: formatDate(acceptanceObj.acceptance_datetime),
+                    time: formatTime(acceptanceObj.acceptance_datetime),
+                    requestactions: requestactions
+                };
+            }
+
+            return {
+                id_Request: item.id_Request,
+                title: typeMap[item.type] || 'Sin tipo',
+                article: item.article || 'Sin producto',
+                currentStatus: item.status || 'solicitud',
+                date: formatDate(item.request_datetime),
+                time: formatTime(item.request_datetime),
+                type: item.type,
+                user: userObj,
+                userName: userObj,
+                collaborator: collabObj?.id_Collaborator,
+                collaboratorName: collabObj,
+                description: item.description,
+                amount: item.amount,
+                status: item.status,
+                order_workshop: item.order_workshop,
+                store: item.store,
+                requestingCompany: reqCompanyObj?.id_Company,
+                supplierCompany: supCompanyObj?.id_Company,
+                requestingCompanyName: reqCompanyObj,
+                supplierCompanyName: supCompanyObj,
+                acceptance: acceptance
+            };
+        });
+        
+        console.log('Procesos cargados:', processes.value);
+    } catch (error) {
+        console.error('Error al cargar procesos:', error);
+    }
 };
 
-const consumibles = computed(() => filterByTypeAndStatus('Consumible'));
-const herramienta = computed(() => filterByTypeAndStatus('Herramienta'));
-const consumoPersonal = computed(() => filterByTypeAndStatus('Consumo personal'));
+const filterByTypeAndStatus = (type: ProcessData['type']) =>
+    processes.value.filter(p => p.currentStatus === 'authorized' && p.type === type);
 
+const Consumables = computed(() => filterByTypeAndStatus('Consumable'));
+const Tool = computed(() => filterByTypeAndStatus('Tool'));
+const PersonalConsumption = computed(() => filterByTypeAndStatus('PersonalConsumption'));
+
+onMounted(() => { loadProcesses() });
 </script>
 
 <template>
@@ -39,47 +170,63 @@ const consumoPersonal = computed(() => filterByTypeAndStatus('Consumo personal')
             <CardHeader>
                 <CardTitle
                     class="flex justify-center text-4xl font-sans font-bold text-indigo-700 bg-gray-50 p-3 rounded-lg">
-                    Autorizar
+                    Autorizadas 
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div class="grid grid-cols-3 gap-6">
+                <div class="grid grid-cols-3 gap-6 h-[65vh] overflow-hidden">
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[500px]">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-700 whitespace-nowrap">
-                            Consumibles ({{ consumibles.length }})
+                    <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
+                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-700">
+                            Consumible ({{ Consumables.length }})
                         </h2>
-
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in consumibles" :key="proc.id" :process="proc" />
-                            <p v-if="!consumibles.length" class="text-gray-500 text-sm italic mt-4">No hay solicitudes
-                                de consumibles.</p>
+                            <ProcessCard 
+                                v-for="proc in Consumables" 
+                                :key="proc.id_Request" 
+                                v-bind="proc" 
+                                @updateRequest="loadProcesses"
+                            />
+                            <p v-if="!Consumables.length" class="text-gray-500 text-sm italic mt-4">
+                                No hay solicitudes de Consumible.
+                            </p>
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[500px]">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-orange-700 whitespace-nowrap">
-                            Herramienta ({{ herramienta.length }})
+                    <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
+                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-orange-700">
+                            Herramienta ({{ Tool.length }})
                         </h2>
-
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in herramienta" :key="proc.id" :process="proc" />
-                            <p v-if="!herramienta.length" class="text-gray-500 text-sm italic mt-4">No hay solicitudes
-                                de herramienta.</p>
+                            <ProcessCard 
+                                v-for="proc in Tool" 
+                                :key="proc.id_Request" 
+                                v-bind="proc" 
+                                @updateRequest="loadProcesses"
+                            />
+                            <p v-if="!Tool.length" class="text-gray-500 text-sm italic mt-4">
+                                No hay solicitudes de Herramienta.
+                            </p>
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[500px]">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-purple-700 whitespace-nowrap">
-                            Consumo personal ({{ consumoPersonal.length }})
+                    <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
+                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-purple-700">
+                            ConsumoPersonal ({{ PersonalConsumption.length }})
                         </h2>
-
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in consumoPersonal" :key="proc.id" :process="proc" />
-                            <p v-if="!consumoPersonal.length" class="text-gray-500 text-sm italic mt-4">No hay
-                                solicitudes de consumo personal.</p>
+                            <ProcessCard 
+                                v-for="proc in PersonalConsumption" 
+                                :key="proc.id_Request" 
+                                v-bind="proc" 
+                                @updateRequest="loadProcesses"
+                            />
+                            <p v-if="!PersonalConsumption.length" class="text-gray-500 text-sm italic mt-4">
+                                No hay solicitudes de ConsumoPersonal.
+                            </p>
                         </div>
                     </section>
+
                 </div>
             </CardContent>
         </Card>

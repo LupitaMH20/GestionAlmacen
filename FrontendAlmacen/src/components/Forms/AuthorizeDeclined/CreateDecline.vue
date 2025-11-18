@@ -5,14 +5,52 @@ import { BookCheck } from 'lucide-vue-next';
 import { ref, inject, Ref, computed } from 'vue';
 import axios from 'axios';
 
+interface Companies { id_Company: string; name: string };
+interface Users { id_user: string; name: string; };
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article { id_mainarticle: string, name: string }
+
 const props = defineProps<{
     Request: {
         id_Request: string | number;
-        user: { id_user: string };
-        acceptance: {
+        user?: Users | null;
+        userName?: Users;
+        collaborator?: string;
+        collaboratorName?: Collaborators;
+        type?: string;
+        article?: string;
+        articleName?: Article;
+        description?: string;
+        amount?: number;
+        status?: string;
+        order_workshop?: string;
+        store?: string;
+        requestingCompany?: string;
+        supplierCompany?: string;
+        requestingCompanyName?: Companies;
+        supplierCompanyName?: Companies;
+        date?: string;
+        time?: string;
+        acceptance?: {
             id_acceptance: number;
-        } | null
-    }
+            user?: Users | null;
+            userName?: Users;
+            article?: Article | null;
+            articleName?: Article;
+            date?: string;
+            time?: string;
+            requestactions?: {
+                id_RequestActions: number;
+                action: 'authorized' | 'declined';
+                comment: string;
+                requestactions_datetime: string;
+                user: Users | null;
+                userName?: Users;
+                date?: string;
+                time?: string;
+            } | null;
+        } | null;
+    };
 }>();
 
 interface User {
@@ -27,16 +65,16 @@ const isDialogOpen = ref(false)
 const emit = defineEmits(['createAuthorized'])
 const comment = ref('');
 
-const canDeclined = computed( () => {
+const canDeclined = computed(() => {
     const user = loggedInUser?.value
-    
-    if(!user) return false;
-    
+
+    if (!user) return false;
+
     if (user.position === 'applicant' || user.position === 'deliberystaff') {
         return false;
     }
 
-    if (user.id_user === props.Request.user?.id_user){
+    if (user.id_user === props.Request.user?.id_user) {
         return false
     }
     return true
@@ -62,20 +100,20 @@ const handleSave = async () => {
 
     try {
         const token = sessionStorage.getItem('token');
-        if(!token){
-            alert ("Error: Tu sesión ha expirado. Por favor, inicie sesión de nuevo")
+        if (!token) {
+            alert("Error: Tu sesión ha expirado. Por favor, inicie sesión de nuevo")
             return;
         }
 
         const payload = {
-            acceptance:props.Request.acceptance.id_acceptance,
+            acceptance: props.Request.acceptance.id_acceptance,
             action: 'declined',
             comment: comment.value
         };
 
         const config = {
             headers: {
-                'Authorization':`Bearer ${token}`
+                'Authorization': `Bearer ${token}`
             }
         }
 
@@ -84,7 +122,7 @@ const handleSave = async () => {
         isDialogOpen.value = false
         emit('createAuthorized');
         comment.value = '';
-    } catch (error){
+    } catch (error) {
         console.error('Error al Rechazar:', error);
         if (axios.isAxiosError(error) && error.response) {
             if (error.response.status === 404) {
@@ -99,18 +137,11 @@ const handleSave = async () => {
 </script>
 
 <template>
-    <Dialog1 
-        v-if="canDeclined"
-        title="Rechazar" 
-        titleButton="Rechazar"
-        :iconP="BookCheck" 
-        :iconT="BookCheck"
-        @cancel="handleCancel"
-        @save="handleSave"
-        v-model:open = isDialogOpen>
-        
+    <Dialog1 v-if="canDeclined" title="Rechazar" titleButton="Rechazar" :iconP="BookCheck" :iconT="BookCheck"
+        @cancel="handleCancel" @save="handleSave" v-model:open=isDialogOpen>
+
         <template #forms>
-            <FormDecline v-model:comment="comment"/>
+            <FormDecline v-model:comment="comment" />
         </template>
     </Dialog1>
 </template>

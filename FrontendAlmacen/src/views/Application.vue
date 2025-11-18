@@ -7,9 +7,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article { id_mainarticle: string; name: string };
 
 interface ProcessData {
-    id_Request: number;
+    id_Request: number | string;
+    position?: string;
     title: string;
     article: string;
     currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived' | 'returnExchange';
@@ -17,19 +19,38 @@ interface ProcessData {
     time: string;
     type?: string;
     user?: Users;
-    collaborator?: string;
     userName?: Users;
+    collaborator?: string;
     collaboratorName?: Collaborators;
-    description?: string
-    amount?: number
-    status?: string
-    order_workshop?: string
-    store?: string
-    requestingCompany?: string
-    supplierCompany?: string
-    requestingCompanyName?: Companies
-    supplierCompanyName?: Companies
+    description?: string;
+    amount?: number;
+    status?: string;
+    order_workshop?: string;
+    store?: string;
+    requestingCompany?: string;
+    supplierCompany?: string;
+    requestingCompanyName?: Companies;
+    supplierCompanyName?: Companies;
+    acceptance?: {
+        id_acceptance: number;
+        user?: Users;
+        userName?: Users;
+        article?: Article;
+        articleName?: Article;
+        date?: string;
+        time?: string;
+        requestactions?: {
+            id_RequestActions: number;
+            action: 'authorized' | 'declined';
+            comment: string;
+            requestactions_datetime: string;
+            user: Users;
+            date?: string;
+            time?: string;
+        } | null;
+    } | null;
 }
+
 const processes = ref<ProcessData[]>([]);
 
 const loadProcesses = async () => {
@@ -39,7 +60,7 @@ const loadProcesses = async () => {
         const typeMap: Record<string, string> = {
             "Consumable": "Consumibles",
             "Tool": "Herramientas",
-            "PersonalConsumpion": "Consumo Personal"
+            "PersonalConsumption": "Consumo Personal"
         };
 
         const formatDate = (datetime: string) => {
@@ -51,21 +72,66 @@ const loadProcesses = async () => {
             const año = date.getFullYear();
             return `${dia}/${mes}/${año}`;
         };
+
+        const formatTime = (datetime: string) => {
+            if (!datetime) return 'Sin hora';
+            const date = new Date(datetime);
+            return date.toLocaleTimeString('es-MX', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+        };
+
         processes.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
             const userObj = item.user;
             const collabObj = item.collaborator;
+            const acceptanceObj = item.acceptance;
+
+            let acceptance = null;
+            if (acceptanceObj) {
+                const acceptanceUserObj = acceptanceObj.user;
+                const acceptanceArticleObj = acceptanceObj.article;
+                const requestActionsObj = acceptanceObj.requestactions;
+
+                let requestactions = null;
+                if (requestActionsObj) {
+                    const actionUserObj = requestActionsObj.user;
+                    requestactions = {
+                        id_RequestActions: requestActionsObj.id_RequestActions,
+                        action: requestActionsObj.action,
+                        comment: requestActionsObj.comment,
+                        requestactions_datetime: requestActionsObj.requestactions_datetime,
+                        user: actionUserObj,
+                        userName: actionUserObj,
+                        date: formatDate(requestActionsObj.requestactions_datetime),
+                        time: formatTime(requestActionsObj.requestactions_datetime)
+                    };
+                }
+
+                acceptance = {
+                    id_acceptance: acceptanceObj.id_acceptance,
+                    user: acceptanceUserObj,
+                    userName: acceptanceUserObj,
+                    article: acceptanceArticleObj,
+                    articleName: acceptanceArticleObj,
+                    date: formatDate(acceptanceObj.acceptance_datetime),
+                    time: formatTime(acceptanceObj.acceptance_datetime),
+                    requestactions: requestactions
+                };
+            }
 
             return {
                 id_Request: item.id_Request,
                 title: typeMap[item.type] || 'Sin tipo',
                 article: item.article || 'Sin producto',
                 currentStatus: item.status || 'solicitud',
-                date: formatDate(item.acceptance_datetime),
-                time: new Date(item.acceptance_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                date: formatDate(item.request_datetime),
+                time: formatTime(item.request_datetime),
                 type: item.type,
-                user: userObj?.id_user,
+                user: userObj,
                 userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
@@ -78,9 +144,10 @@ const loadProcesses = async () => {
                 supplierCompany: supCompanyObj?.id_Company,
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
-                request: item.request
+                acceptance: acceptance
             };
         });
+        
         console.log('Procesos cargados:', processes.value);
     } catch (error) {
         console.error('Error al cargar procesos:', error);
@@ -88,7 +155,10 @@ const loadProcesses = async () => {
 };
 
 const filterByTypeAndStatus = (type: ProcessData['type']) =>
-    processes.value.filter(p => p.currentStatus === 'request' && p.type === type);
+    processes.value.filter(p => 
+        (p.currentStatus === 'request' || p.currentStatus === 'declined') && 
+        p.type === type
+    );
 
 const Consumables = computed(() => filterByTypeAndStatus('Consumable'));
 const Tool = computed(() => filterByTypeAndStatus('Tool'));
@@ -114,7 +184,12 @@ onMounted(() => { loadProcesses() });
                             Consumible ({{ Consumables.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Consumables" :key="proc.id_Request" v-bind="proc" @updateRequest="loadProcesses"/>
+                            <ProcessCard 
+                                v-for="proc in Consumables" 
+                                :key="proc.id_Request" 
+                                v-bind="proc" 
+                                @updateRequest="loadProcesses"
+                            />
                             <p v-if="!Consumables.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Consumible.
                             </p>
@@ -126,7 +201,12 @@ onMounted(() => { loadProcesses() });
                             Herramienta ({{ Tool.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in Tool" :key="proc.id_Request" v-bind="proc" @updatRequest="loadProcesses"/>
+                            <ProcessCard 
+                                v-for="proc in Tool" 
+                                :key="proc.id_Request" 
+                                v-bind="proc" 
+                                @updateRequest="loadProcesses"
+                            />
                             <p v-if="!Tool.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Herramienta.
                             </p>
@@ -138,7 +218,12 @@ onMounted(() => { loadProcesses() });
                             ConsumoPersonal ({{ PersonalConsumption.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id_Request" v-bind="proc" @updateRequest="loadProcesses"/>
+                            <ProcessCard 
+                                v-for="proc in PersonalConsumption" 
+                                :key="proc.id_Request" 
+                                v-bind="proc" 
+                                @updateRequest="loadProcesses"
+                            />
                             <p v-if="!PersonalConsumption.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de ConsumoPersonal.
                             </p>

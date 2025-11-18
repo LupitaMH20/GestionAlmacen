@@ -5,9 +5,11 @@ import Button from '../ui/button/Button.vue';
 import { LucideIcon, Ban, Save } from 'lucide-vue-next';
 
 //Son las rutas de lo que se mostrara en el dialog
-import DialogPreRequestRequest from './ComponentsDialog/DialogPreRequestRequest.vue';
+import DialogPreRequest from './ComponentsDialog/DialogPreRequest.vue';
+import DialogRequest from './ComponentsDialog/DialogRequest.vue';
 import DialogAuthorize from './ComponentsDialog/DialogAuthorize.vue';
-import DialogDeliverie from './ComponentsDialog/DialogDeliverie.vue';
+import DialogDeclined from './ComponentsDialog/DialogDeclined.vue';
+import DialogSupply from './ComponentsDialog/DialogSupply.vue';
 import DialogReturnExchange from './ComponentsDialog/DialogReturnExchange.vue';
 
 // rutas para crear el estado de la solicitud
@@ -46,6 +48,7 @@ const props = defineProps<{
     supplierCompanyName?: Companies;
     date?: string;
     time?: string;
+
     acceptance?: {
       id_acceptance: number;
       user?: Users | null;
@@ -54,18 +57,31 @@ const props = defineProps<{
       articleName?: Article;
       date?: string;
       time?: string;
+
       requestactions?: {
         id_RequestActions: number;
         action: 'authorized' | 'declined';
         comment: string;
         requestactions_datetime: string;
-        user: Users;
+        user: Users | null;
+        userName?: Users;
         date?: string;
         time?: string;
+        supply?: {
+          id_supply: number;
+          user?: Users;
+          userName?: Users;
+          collaborator?: string;
+          collaboratorName?: Collaborators;
+          comment?: string;
+          date?: string;
+          time?: string;
+        } | null
       } | null;
     } | null;
-  };
+  }
 }>();
+
 
 const open = defineModel<boolean>();
 const emit = defineEmits(['dialog']);
@@ -94,32 +110,25 @@ const IconComponent = (icon: LucideIcon) => icon;
       </DialogTitle>
 
       <div class="flex flex-col gap-4 overflow-y-auto max-h-[60vh] p-1">
-        <DialogPreRequestRequest v-if="props.Request" :Request="props.Request" />
-        <DialogAuthorize v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'authorized'" :authorization="props.Request.acceptance.requestactions" />
-        <DialogAuthorize v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'declined'" :decline="props.Request.acceptance.requestactions" />
-        <!-- <DialogDeliverie v-if="props.Request.request?.deliverie" :deliverie="props.Request.request.deliverie" />
-        <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
+        <DialogPreRequest v-if="props.Request" :Request="props.Request" />
+        <DialogRequest v-if="props.Request" :Request="props.Request" />
+        <DialogAuthorize
+          v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'authorized'"
+          :authorization="props.Request.acceptance.requestactions" />
+        <DialogDeclined
+          v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'declined'"
+          :decline="props.Request.acceptance.requestactions" />
+        <DialogSupply v-if="props.Request.acceptance?.requestactions?.supply" :supply="props.Request.acceptance.requestactions.supply" />
+        <!-- <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
       </div>
 
       <DialogFooter class="flex justify-between mt-5 pt-3 border-t">
-        <Button v-if="props.Request.status != 'request'" variant="secondary" @click="open = false"
-          class="flex items-center gap-2">
+        <Button v-if="props.Request.status != 'request' && props.Request.status != 'declined'" variant="secondary"
+          @click="open = false" class="flex items-center gap-2">
           <Ban class="w-4 h-4" />Cancelar
         </Button>
 
-        <CreateProcess :Request="{
-          id_Request: props.Request.id_Request,
-          type: props.Request.type,
-          status: props.Request.status ?? null,
-          acceptance: props.Request.acceptance
-            ? { id_acceptance: props.Request.acceptance.id_acceptance }
-            : null,
-          user: props.Request.user
-            ? { id_user: props.Request.user.id_user }
-            : { id_user: '' },
-          amount: props.Request.amount,
-          article: props.Request.article
-        }" @createPrecess="emit('dialog')" />
+        <CreateProcess :Request="props.Request" @createPrecess="emit('dialog')" />
       </DialogFooter>
     </DialogContent>
   </Dialog>

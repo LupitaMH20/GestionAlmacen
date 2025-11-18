@@ -56,6 +56,16 @@ interface ProcessData {
             user: Users;
             date?: string;
             time?: string;
+            supply?: {
+                id_supply: number;
+                user?: Users;
+                userName?: Users;
+                collaborator?: string;
+                collaboratorName?: Collaborators;
+                comment?: string;
+                date?: string;
+                time?: string;
+            } | null
         } | null;
     } | null;
 }
@@ -75,6 +85,15 @@ const loadProcesses = async () => {
             const año = date.getFullYear();
             return `${dia}/${mes}/${año}`;
         };
+        const formatTime = (datetime: string) => {
+            if (!datetime) return 'Sin hora';
+            const date = new Date(datetime);
+            return date.toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        };
 
         const typeMap: Record<string, string> = {
             "Consumable": 'Consumibles',
@@ -88,19 +107,59 @@ const loadProcesses = async () => {
             const userObj = item.user;
             const collabObj = item.collaborator;
             const acceptanceObj = item.acceptance;
+            let acceptance = null;
+            if (acceptanceObj) {
+                const requestActionsObj = acceptanceObj.requestactions;
 
-            const originalType = item.type;
-            const translatedTitle = typeMap[originalType] || originalType || 'Sin tipo';
+                let requestactions = null;
+                if (requestActionsObj) {
+                    const supplyObj = requestActionsObj.supply;
+                    let supply = null;
+                    if (supplyObj) {
+                        supply = {
+                            id_supply: supplyObj.id_supply,
+                            user: supplyObj.user,
+                            userName: supplyObj.user,
+                            collaborator: supplyObj.collaborator,
+                            comment: supplyObj.comment,
+                            date: formatDate(supplyObj.supply_datetime),
+                            time: formatTime(supplyObj.supply_datetime)
+                        };
+                    }
 
-            console.log('Procesando item:', userObj);
+                    requestactions = {
+                        id_RequestActions: requestActionsObj.id_RequestActions,
+                        action: requestActionsObj.action,
+                        comment: requestActionsObj.comment,
+                        requestactions_datetime: requestActionsObj.requestactions_datetime,
+                        user: requestActionsObj.user,
+                        userName: requestActionsObj.user,
+                        date: formatDate(requestActionsObj.requestactions_datetime),
+                        time: formatTime(requestActionsObj.requestactions_datetime),
+                        supply: supply // Asignamos supply aquí
+                    };
+                }
+
+                acceptance = {
+                    id_acceptance: acceptanceObj.id_acceptance,
+                    user: acceptanceObj.user,
+                    userName: acceptanceObj.user,
+                    article: acceptanceObj.article,
+                    articleName: acceptanceObj.article,
+                    date: formatDate(acceptanceObj.acceptance_datetime),
+                    time: formatTime(acceptanceObj.acceptance_datetime),
+                    requestactions: requestactions
+                };
+            }
+
             return {
                 id_Request: item.id_Request,
-                title: translatedTitle,
+                title: typeMap[item.type] || 'Sin tipo',
                 article: item.article || 'Sin producto',
-                currentStatus: item.status,
+                currentStatus: item.status || 'solicitud',
                 date: formatDate(item.request_datetime),
-                time: new Date(item.request_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                type: originalType,
+                time: formatTime(item.request_datetime),
+                type: item.type,
                 user: userObj,
                 userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
@@ -114,8 +173,7 @@ const loadProcesses = async () => {
                 supplierCompany: supCompanyObj?.id_Company,
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
-
-                acceptance: acceptanceObj
+                acceptance: acceptance
             };
         });
         displayedProcesses.value = [...allProcesses.value];

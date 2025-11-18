@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted, ref, computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Dialog from './Dialog.vue';
 import { Eye, FileText } from 'lucide-vue-next'
@@ -47,12 +47,53 @@ const process = defineProps<{
             user: Users;
             date?: string;
             time?: string;
+            supply?: {
+                id_supply: number;
+                user?: Users;
+                userName?: Users;
+                collaborator?: string;
+                collaboratorName?: Collaborators;
+                comment?: string;
+                date?: string;
+                time?: string;
+            } | null
         } | null;
     } | null;
 }>();
 
 const isDialogOpen = ref(false)
 const emit = defineEmits(['card']);
+
+const displayDateInfo = computed(() => {
+    if ((process.currentStatus === 'supply') && 
+        process.acceptance?.requestactions?.supply?.date) {
+        return {
+            label: 'Surtido',
+            date: process.acceptance.requestactions.supply.date,
+            time: process.acceptance.requestactions.supply.time
+        };
+    }
+    if ((process.currentStatus === 'authorized' || process.currentStatus === 'declined') && 
+        process.acceptance?.requestactions?.date) {
+        return {
+            label: process.currentStatus === 'authorized' ? 'Autorización' : 'Rechazo',
+            date: process.acceptance.requestactions.date,
+            time: process.acceptance.requestactions.time
+        };
+    }
+    if (process.currentStatus === 'request' && process.acceptance?.date) {
+        return {
+            label: 'Solicitud',
+            date: process.acceptance.date,
+            time: process.acceptance.time
+        };
+    }
+    return {
+        label: 'Creación',
+        date: process.date,
+        time: process.time
+    };
+});
 </script>
 
 <template>
@@ -70,8 +111,8 @@ const emit = defineEmits(['card']);
         <CardContent class="flex flex-col space-y-3 flex-grow">
             <div class="border-t pt-2 ">
                 <p class="text-sm text-gray-500">Creación</p>
-                <p class="text-sm text-gray-500">Fecha: {{ process.date }} </p>
-                <p class="text-sm text-gray-500">Hora: {{ process.time }} </p>
+                <p class="text-sm text-gray-500">Fecha: {{ displayDateInfo.date }} </p>
+                <p class="text-sm text-gray-500">Hora: {{ displayDateInfo.time }} </p>
             </div>
         </CardContent>
 

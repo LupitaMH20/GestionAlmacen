@@ -75,6 +75,8 @@ class AcceptanceViewSet(viewsets.ModelViewSet):
         article_to_supply.save()
         pre_request.status = 'request'
         pre_request.save()
+
+        acceptance_instance = serializer.save(user=acceptor, article=article_to_supply)
         
         return Response(
             {"success": "Solicitud aceptada y stock actualizado.", "data": serializer.data},
@@ -97,6 +99,7 @@ class RequestActionsViewSet(viewsets.ModelViewSet):
         acceptance_to_action = serializer.validated_data.get('acceptance')
         action_taken = serializer.validated_data.get('action')
         authorizer = request.user
+        comment = serializer.validated_data.get('comment')
 
         linked_request = acceptance_to_action.request
         original_requester = linked_request.user
@@ -110,18 +113,35 @@ class RequestActionsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        if authorizer.company != linked_request.requestingCompany:
-            return Response(
-                {"error": "No perteneces a la empresa de esta solicitud."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # if authorizer.company != linked_request.requestingCompany:
+        #     return Response(
+        #         {"error": "No perteneces a la empresa de esta solicitud."},
+        #         status=status.HTTP_403_FORBIDDEN
+        #     )
         
-        linked_request.status = action_taken
-        linked_request.save(update_fields=['status'])
-        serializer.save(user=authorizer) 
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        existing_action = None
+        if hasattr(acceptance_to_action, 'requestactions'):
+            existing_action = acceptance_to_action.requestactions
+        
+        if existing_action:
+            existing_action.action = action_taken
+            existing_action.comment = comment
+            existing_action.user = authorizer
+            existing_action.save()
+            
+            linked_request.status = action_taken
+            linked_request.save(update_fields=['status'])
+            
+            response_serializer = self.get_serializer(existing_action)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        
+        else:
+            linked_request.status = action_taken
+            linked_request.save(update_fields=['status'])
+            serializer.save(user=authorizer)
+            
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class SupplyViewSet(viewsets.ModelViewSet):
     queryset = Supply.objects.all().order_by('-supply_datetime')

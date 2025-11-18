@@ -29,7 +29,7 @@ class SupplySerializer(serializers.ModelSerializer):
 
 class RequestActionsSerializer(serializers.ModelSerializer):
     acceptance = serializers.PrimaryKeyRelatedField(
-        queryset=Acceptance.objects.filter(request__status='request'),
+        queryset=Acceptance.objects.filter(request__status__in=['request', 'declined']),
         write_only=True
     )
 

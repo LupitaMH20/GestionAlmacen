@@ -7,7 +7,6 @@ import { LucideIcon, Ban, Save } from 'lucide-vue-next';
 //Son las rutas de lo que se mostrara en el dialog
 import DialogPreRequestRequest from './ComponentsDialog/DialogPreRequestRequest.vue';
 import DialogAuthorize from './ComponentsDialog/DialogAuthorize.vue';
-import DialogDecline from './ComponentsDialog/DialogDecline.vue';
 import DialogDeliverie from './ComponentsDialog/DialogDeliverie.vue';
 import DialogReturnExchange from './ComponentsDialog/DialogReturnExchange.vue';
 
@@ -49,6 +48,21 @@ const props = defineProps<{
     time?: string;
     acceptance?: {
       id_acceptance: number;
+      user?: Users | null;
+      userName?: Users;
+      article?: Article | null;
+      articleName?: Article;
+      date?: string;
+      time?: string;
+      requestactions?: {
+        id_RequestActions: number;
+        action: 'authorized' | 'declined';
+        comment: string;
+        requestactions_datetime: string;
+        user: Users;
+        date?: string;
+        time?: string;
+      } | null;
     } | null;
   };
 }>();
@@ -79,11 +93,13 @@ const IconComponent = (icon: LucideIcon) => icon;
         </div>
       </DialogTitle>
 
-      <DialogPreRequestRequest v-if="props.Request" :Request="props.Request" />
-      <DialogAuthorize v-if="props.Request.acceptance" :acceptance="props.Request.acceptance" />
-      <!-- <DialogDecline v-if="props.Request.request?.decline" :decline="props.Request.request.decline" />
-      <DialogDeliverie v-if="props.Request.request?.deliverie" :deliverie="props.Request.request.deliverie" />
-      <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
+      <div class="flex flex-col gap-4 overflow-y-auto max-h-[60vh] p-1">
+        <DialogPreRequestRequest v-if="props.Request" :Request="props.Request" />
+        <DialogAuthorize v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'authorized'" :authorization="props.Request.acceptance.requestactions" />
+        <DialogAuthorize v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'declined'" :decline="props.Request.acceptance.requestactions" />
+        <!-- <DialogDeliverie v-if="props.Request.request?.deliverie" :deliverie="props.Request.request.deliverie" />
+        <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
+      </div>
 
       <DialogFooter class="flex justify-between mt-5 pt-3 border-t">
         <Button v-if="props.Request.status != 'request'" variant="secondary" @click="open = false"

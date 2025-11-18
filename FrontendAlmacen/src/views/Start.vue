@@ -13,7 +13,7 @@ import { Card, CardContent } from '../components/ui/card';
 interface Companies { id_Company: string; name: string }
 interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
-interface Article {id_mainarticle: string, name:string}
+interface Article { id_mainarticle: string, name: string }
 
 const searchQuery = ref('');
 const selectedType = ref('All')
@@ -40,9 +40,24 @@ interface ProcessData {
     supplierCompany?: string
     requestingCompanyName?: Companies
     supplierCompanyName?: Companies
-
-    id_acceptance?: string | number;
-    articleName?: Article;
+    acceptance?: {
+        id_acceptance: number;
+        user?: string;
+        userName?: Users;
+        article?: string;
+        articleName?: Article;
+        date?: string;
+        time?: string;
+        requestactions?: {
+            id_RequestActions: number;
+            action: 'authorized' | 'declined';
+            comment: string;
+            requestactions_datetime: string;
+            user: Users;
+            date?: string;
+            time?: string;
+        } | null;
+    } | null;
 }
 
 const allProcesses = ref<ProcessData[]>([]);
@@ -86,7 +101,7 @@ const loadProcesses = async () => {
                 date: formatDate(item.request_datetime),
                 time: new Date(item.request_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
                 type: originalType,
-                user: userObj.id_user,
+                user: userObj,
                 userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
@@ -114,16 +129,12 @@ const prerequest = computed(() =>
     displayedProcesses.value.filter(p => p.currentStatus === 'prerequest')
 );
 
-const request = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'request')
+const requestDeclined = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'request' || p.currentStatus === 'declined')
 );
 
 const authorized = computed(() =>
     displayedProcesses.value.filter(p => p.currentStatus === 'authorized')
-);
-
-const declined = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'declined')
 );
 
 const supplyFinished = computed(() =>
@@ -211,11 +222,12 @@ onMounted(() => {
 
                     <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-500 whitespace-nowrap">
-                            Solicitud ({{ request.length }})
+                            Solicitud ({{ requestDeclined.length }})
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in request" :key="proc.id_Request" v-bind="proc" />
-                            <p v-if="!request.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                            <ProcessCard v-for="proc in requestDeclined" :key="proc.id_Request" v-bind="proc"
+                                @card="loadProcesses" />
+                            <p v-if="!requestDeclined.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
                     </section>

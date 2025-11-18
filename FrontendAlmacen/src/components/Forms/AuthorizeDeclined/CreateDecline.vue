@@ -6,10 +6,12 @@ import { ref, inject, Ref, computed } from 'vue';
 import axios from 'axios';
 
 const props = defineProps<{
-    Request:{
+    Request: {
         id_Request: string | number;
-        acceptance: number;
-        user: {id_user:string};
+        user: { id_user: string };
+        acceptance: {
+            id_acceptance: number;
+        } | null
     }
 }>();
 
@@ -22,7 +24,7 @@ interface User {
 
 const loggedInUser = inject<Ref<User | null>>('loggedInUser')
 const isDialogOpen = ref(false)
-const emit = defineEmits(['createDeclined'])
+const emit = defineEmits(['createAuthorized'])
 const comment = ref('');
 
 const canDeclined = computed( () => {
@@ -52,6 +54,12 @@ const handleSave = async () => {
         return;
     }
 
+    if (!props.Request.acceptance || !props.Request.acceptance.id_acceptance) {
+        alert("Error: No se encontró el ID de Aceptación (id_acceptance) en esta solicitud.");
+        console.log(props)
+        return;
+    }
+
     try {
         const token = sessionStorage.getItem('token');
         if(!token){
@@ -60,7 +68,7 @@ const handleSave = async () => {
         }
 
         const payload = {
-            acceptance:props.Request.acceptance,
+            acceptance:props.Request.acceptance.id_acceptance,
             action: 'declined',
             comment: comment.value
         };
@@ -74,13 +82,17 @@ const handleSave = async () => {
         await axios.post('http://127.0.0.1:8000/api/requestActions/', payload, config)
         alert('Solicitud Rechazada');
         isDialogOpen.value = false
-        emit('createDeclined');
+        emit('createAuthorized');
         comment.value = '';
     } catch (error){
-        console.error('Error al autorizar:', error);
+        console.error('Error al Rechazar:', error);
         if (axios.isAxiosError(error) && error.response) {
-            const errorMsg = error.response.data.error || error.response.data.detail || 'No se pudo autorizar.';
-            alert(`Error: ${errorMsg}`);
+            if (error.response.status === 404) {
+                alert("Error 404: No se encontró la URL '/api/requestActions/'. Revisa las URLs de Django.");
+            } else {
+                const errorMsg = error.response.data.error || error.response.data.detail || 'No se pudo autorizar.';
+                alert(`Error: ${errorMsg}`);
+            }
         }
     }
 };

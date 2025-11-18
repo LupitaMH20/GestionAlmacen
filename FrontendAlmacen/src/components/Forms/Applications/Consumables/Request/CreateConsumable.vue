@@ -35,7 +35,7 @@ const handleCancel = () => {
 
 const handleSave = async () => {
     try {
-        const token = localStorage.getItem('access')
+        const token = sessionStorage.getItem('token')
 
         if (!token) {
             alert("Tu sesión ha expirado o no estás logueado. Por favor, inicia sesión nuevamente.")

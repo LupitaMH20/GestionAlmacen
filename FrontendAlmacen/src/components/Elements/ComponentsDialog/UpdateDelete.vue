@@ -42,10 +42,10 @@ const emit = defineEmits(['update'])
     <!-- Para editar o eliminar la request -->
     <div v-if="props.Request?.status === 'request'" class="flex justify-end gap-2">
         <div v-if="props.Request.type === 'Consumable'" class="flex justify-end gap-2">
-            <UpdatePreRequestC :Request="props.Request" @updateRequest="emit('update')" />
-            <DeletePreRequestC :id_Request="props.Request.id_Request" @deleteRequest="emit('update')" />
+            <UpdatePreRequestC :Request="props.Request" @updatePreRequest="emit('update')" />
+            <DeletePreRequestC :id_Request="props.Request.id_Request" @deletePreRequest="emit('update')" />
         </div>
-        <div v-else-if="props.Request.type === ''" class="flex justify-end gap-2">
+        <div v-else-if="props.Request.type === 'PersonalConsumption'" class="flex justify-end gap-2">
             <UpdatePreRequestCP :Request="props.Request" @updatePreRequest="emit('update')" />
             <DeletePreRequestCP :id_Request="props.Request.id_Request" @deletePreRequest="emit('update')" />
         </div>

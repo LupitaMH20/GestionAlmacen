@@ -35,7 +35,7 @@ const handleCancel = () => {
 
 const handleSave = async () => {
     try {
-        const token = localStorage.getItem('access')
+        const token = sessionStorage.getItem('token')
 
         if (!token) {
             alert("Tu sesión ha expirado o no estás logueado. Por favor, inicia sesión nuevamente.")
@@ -53,7 +53,7 @@ const handleSave = async () => {
             }
         }
 
-        const response = await axios.post('http://127.0.0.1:8000/api/acceptance/', payload, config)
+        await axios.post('http://127.0.0.1:8000/api/acceptance/', payload, config)
 
         alert('Solicitud Aceptada! El stock ha sido actualizado.')
         isDialogOpen.value = false

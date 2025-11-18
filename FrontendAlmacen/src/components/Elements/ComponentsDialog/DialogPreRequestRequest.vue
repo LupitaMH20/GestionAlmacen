@@ -24,16 +24,15 @@ const props = defineProps<{
         supplierCompanyName?: Companies;
         date?: string;
         time?: string;
-
         acceptance?: {
-            id_acceptance?: string | number;
-            user?: string;
+            id_acceptance: number;
+            user?: Users | null;
             userName?: Users;
-            article?: string;
+            article?: Article | null;
             articleName?: Article;
             date?: string;
             time?: string;
-        } | null
+        } | null;
     }
 }>();
 
@@ -70,7 +69,7 @@ const formatType = (type: string) => {
     <div class="space-y-2 text-sm">
         <h4 class="flex justify-center text-[24px] font-bold">PreSolicitud</h4>
         <div><strong>ID de la PreSolicitud</strong> {{ props.Request.id_Request }} </div>
-        <div><strong>Solicitante:</strong> ID: {{ props.Request.user || '—' }} Nombre: {{
+        <div><strong>Solicitante:</strong> ID: {{ props.Request.user?.id_user || '—' }} Nombre: {{
             props.Request.userName?.name || '—' }} </div>
         <div v-if="props.Request.collaborator"><strong>Colaborador:</strong> ID: {{ props.Request.collaborator ||
             '—' }} Nombre: {{ props.Request.collaboratorName?.name || '—' }} {{
@@ -83,7 +82,7 @@ const formatType = (type: string) => {
         <div v-if="props.Request.order_workshop"><strong>Orden/Taller:</strong> {{ props.Request.order_workshop ||
             '—' }}</div>
         <div v-if="props.Request.store"><strong>Almacén:</strong> {{ formatStore(props.Request.store || '') || '—'
-        }}</div>
+            }}</div>
         <div v-if="props.Request.requestingCompany"><strong>Empresa Solicitante: </strong>ID: {{
             props.Request.requestingCompany || '—' }} Empresa: {{
                 props.Request.requestingCompanyName?.name || '—' }}</div>
@@ -98,10 +97,10 @@ const formatType = (type: string) => {
         <div class="pt-4 space-y-2 text-sm border-t">
             <h4 class="flex justify-center text-[24px] font-bold">Solicitud</h4>
             <div><strong>ID de la Solicitud:</strong> {{ props.Request.acceptance.id_acceptance || '—' }}</div>
-            <div><strong>Aprobado por:</strong>ID: {{ props.Request.acceptance.user || '—' }} Nombre: {{
+            <div><strong>Aprobado por:</strong>ID: {{ props.Request.acceptance.user?.id_user || '—' }} Nombre: {{
                 props.Request.acceptance.userName?.name }}</div>
-            <div><strong>Articulo:</strong> ID: {{ props.Request.acceptance.article || '—' }} Nombre: {{
-                props.Request.acceptance.articleName?.id_mainarticle }}</div>
+            <div><strong>Articulo:</strong> ID: {{ props.Request.acceptance.article?.id_mainarticle || '—' }} Nombre: {{
+                props.Request.acceptance.articleName?.name }}</div>
             <div><strong>Creacion:</strong> Fecha: {{ props.Request.acceptance.date || '—' }} Hora: {{
                 props.Request.acceptance.time }}</div>
         </div>

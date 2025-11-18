@@ -34,10 +34,10 @@ const validRequestType = ['Consumable', 'Tool', 'PersonalConsumption'];
                 : props.Request.type === 'PersonalConsumption' ? CreateApplicationCP
                     : null" :Request="props.Request" @createRequest="emit('createPrecess')" />
     </div>
-    <div v-else-if="props.Request.status === 'request'">
+    <div v-else-if="props.Request.status === 'request' || 'declined'">
         <div class="flex justify-center gap-2" v-if="validRequestType.includes(props.Request.type || '')">
             <Authorized :Request="props.Request" @createAuthorized="emit('createPrecess')" />
-            <!-- <Decline :Request="props.Request" @createDecline="emit('createPrecess')"/> -->
+            <Decline :Request="props.Request" @createAuthorized="emit('createPrecess')"/>
         </div>
     </div>
 </template>

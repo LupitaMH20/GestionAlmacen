@@ -12,14 +12,18 @@ interface Article { id_mainarticle: string, name: string }
 
 const props = defineProps<{
     Request: {
-        id_Request: string | number;
-        user?: Users | null;
-        userName?: Users;
-        collaborator?: string;
-        collaboratorName?: Collaborators;
-        type?: string;
-        article?: string;
+        id_Request: number | string;
+        title: string;
+        article: string;
         articleName?: Article;
+        currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
+        date: string;
+        time: string;
+        type?: string;
+        user?: string;
+        collaborator?: string;
+        userName?: Users;
+        collaboratorName?: Collaborators;
         description?: string;
         amount?: number;
         status?: string;
@@ -29,13 +33,13 @@ const props = defineProps<{
         supplierCompany?: string;
         requestingCompanyName?: Companies;
         supplierCompanyName?: Companies;
-        date?: string;
-        time?: string;
+        unitPrice?: number;
+        totalValue?: number;
         acceptance?: {
             id_acceptance: number;
-            user?: Users | null;
+            user?: string;
             userName?: Users;
-            article?: Article | null;
+            article?: string;
             articleName?: Article;
             date?: string;
             time?: string;
@@ -44,10 +48,19 @@ const props = defineProps<{
                 action: 'authorized' | 'declined';
                 comment: string;
                 requestactions_datetime: string;
-                user: Users | null;
-                userName?: Users;
+                user: Users;
                 date?: string;
                 time?: string;
+                supply?: {
+                    id_supply: number;
+                    user?: Users;
+                    userName?: Users;
+                    collaborator?: string;
+                    collaboratorName?: Collaborators;
+                    comment?: string;
+                    date?: string;
+                    time?: string;
+                } | null
             } | null;
         } | null;
     };
@@ -74,7 +87,7 @@ const canAuthorize = computed(() => {
         return false;
     }
 
-    if (user.id_user === props.Request.user?.id_user) {
+    if (user.id_user === props.Request.user) {
         return false
     }
     return true

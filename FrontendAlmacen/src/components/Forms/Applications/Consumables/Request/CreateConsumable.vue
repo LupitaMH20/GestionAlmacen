@@ -19,6 +19,7 @@ const props = defineProps<{
     Request: {
         id_Request: string | number;
         article?: string;
+        articleName?: string;
         amount?: number;
         type?: string;
     }

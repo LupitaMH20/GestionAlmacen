@@ -10,6 +10,7 @@ export const navMainS = [
     {
         title: "Modulos",
         icon: Boxes,
+        routerName: "modules",
         isActive: true,
         items: [
             {
@@ -31,21 +32,9 @@ export const navMainS = [
                 isActive: true,
             },
             {
-                title: "Surtir",
+                title: "Surtirdas",
                 routerName: "supply",
                 icon: BookOpenCheck,
-                isActive: true,
-            },
-            {
-                title: "Terminadas",
-                routerName: "finished",
-                icon: BookmarkCheck,
-                isActive: true,
-            },
-            {
-                title: "Devoluciones",
-                routerName: "returns",
-                icon: ArrowLeftRight,
                 isActive: true,
             },
         ]

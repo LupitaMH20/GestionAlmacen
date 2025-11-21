@@ -17,17 +17,22 @@ interface LoggedInUserType {
 interface Collaborator { id_Collaborator: string; name: string; last_name: string; }
 interface Companies { id_Company: string; name: string };
 interface Article { id_mainarticle: string, name: string }
+interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 
 const props = defineProps<{
     Request: {
-        id_Request: string | number;
-        user?: Users | null;
-        userName?: Users;
-        collaborator?: string;
-        collaboratorName?: Collaborator;
-        type?: string;
-        article?: string;
+        id_Request: number | string;
+        title: string;
+        article: string;
         articleName?: Article;
+        currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
+        date: string;
+        time: string;
+        type?: string;
+        user?: string;
+        collaborator?: string;
+        userName?: Users;
+        collaboratorName?: Collaborators;
         description?: string;
         amount?: number;
         status?: string;
@@ -37,13 +42,13 @@ const props = defineProps<{
         supplierCompany?: string;
         requestingCompanyName?: Companies;
         supplierCompanyName?: Companies;
-        date?: string;
-        time?: string;
+        unitPrice?: number;
+        totalValue?: number;
         acceptance?: {
             id_acceptance: number;
-            user?: Users | null;
+            user?: string;
             userName?: Users;
-            article?: Article | null;
+            article?: string;
             articleName?: Article;
             date?: string;
             time?: string;
@@ -52,10 +57,19 @@ const props = defineProps<{
                 action: 'authorized' | 'declined';
                 comment: string;
                 requestactions_datetime: string;
-                user: Users | null;
-                userName?: Users;
+                user: Users;
                 date?: string;
                 time?: string;
+                supply?: {
+                    id_supply: number;
+                    user?: Users;
+                    userName?: Users;
+                    collaborator?: string;
+                    collaboratorName?: Collaborators;
+                    comment?: string;
+                    date?: string;
+                    time?: string;
+                } | null
             } | null;
         } | null;
     };
@@ -87,11 +101,9 @@ const loadCollaborators = async () => {
         collaboratorsList.value = response.data
     } catch (error) {
         console.log('Sin colaboradores', error)
-        // Verificar si es error 401
         if (axios.isAxiosError(error) && error.response?.status === 401) {
             alert('Sesión expirada. Por favor, inicie sesión nuevamente.');
-            // Aquí podrías redirigir al login
-            // window.location.href = '/login';
+
         }
     }
 }
@@ -104,18 +116,16 @@ const handleSave = async () => {
         alert("Debe seleccionar el colaborador que recibe.");
         return;
     }
-    
+
     const requestActionsId = props.Request.acceptance?.requestactions?.id_RequestActions;
     if (!requestActionsId) {
         alert("Error: No se encontró el ID de la autorización (RequestActions).");
         return;
     }
-    
+
     const token = sessionStorage.getItem('token');
     if (!token) {
         alert("No se encontró el token de sesión. Por favor, inicie sesión nuevamente.");
-        // Opcional: redirigir al login
-        // window.location.href = '/login';
         return;
     }
 
@@ -157,22 +167,18 @@ const handleSave = async () => {
         console.log('Respuesta exitosa:', response.data);
         alert('Solicitud surtida con éxito.');
         isDialogOpen.value = false;
-        
-        // Limpiar el formulario
         collaboratorId.value = null;
         comment.value = '';
         selectedFile.value = null;
-        
+
         emit('supplyCreated');
     } catch (error) {
         console.error('Error completo:', error);
-        
+
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
                 alert('Sesión expirada. Por favor, inicie sesión nuevamente.');
-                // Limpiar sesión y redirigir
                 sessionStorage.removeItem('token');
-                // window.location.href = '/login';
             } else if (error.response) {
                 console.error('Datos del error:', error.response.data);
                 alert(`Error: ${error.response.data.error || error.response.data.message || 'No se pudo surtir.'}`);

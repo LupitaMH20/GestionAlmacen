@@ -2,9 +2,6 @@
 import ProcessCard from '../components/Elements/Card.vue';
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
-import Input from '../components/ui/input/Input.vue'
-import Button from '../components/ui/button/Button.vue'
-import { Search } from 'lucide-vue-next'
 import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest/PreRequest.vue'
 import PreRequestCP from '../components/Forms/Applications/PersonalConsumption/PreRequest/PreRequest.vue'
 import PreRequestT from '../components/Forms/Applications/Tools/PreRequest/PreRequest.vue'
@@ -13,16 +10,13 @@ import { Card, CardContent } from '../components/ui/card';
 interface Companies { id_Company: string; name: string }
 interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
-interface Article { id_mainarticle: string, name: string }
-
-const searchQuery = ref('');
-const selectedType = ref('All')
-const displayedProcesses = ref<any[]>([]);
+interface Article { id_mainarticle: string; name: string };
 
 interface ProcessData {
     id_Request: number | string;
     title: string;
     article: string;
+    articleName?: Article;
     currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
     date: string;
     time: string;
@@ -31,15 +25,17 @@ interface ProcessData {
     collaborator?: string;
     userName?: Users;
     collaboratorName?: Collaborators;
-    description?: string
-    amount?: number
-    status?: string
-    order_workshop?: string
-    store?: string
-    requestingCompany?: string
-    supplierCompany?: string
-    requestingCompanyName?: Companies
-    supplierCompanyName?: Companies
+    description?: string;
+    amount?: number;
+    status?: string;
+    order_workshop?: string;
+    store?: string;
+    requestingCompany?: string;
+    supplierCompany?: string;
+    requestingCompanyName?: Companies;
+    supplierCompanyName?: Companies;
+    unitPrice?: number;
+    totalValue?: number;
     acceptance?: {
         id_acceptance: number;
         user?: string;
@@ -70,11 +66,31 @@ interface ProcessData {
     } | null;
 }
 
+const searchQuery = ref('');
+const selectedType = ref('All')
+const displayedProcesses = ref<ProcessData[]>([]);
 const allProcesses = ref<ProcessData[]>([]);
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+        minimumFractionDigits: 2
+    }).format(value);
+};
+
+const calculateTotalMoney = (list: ProcessData[]) => {
+    const total = list.reduce((acc, item) => {
+        const value = item.totalValue || 0;
+        return acc + value;
+    }, 0);
+    return total;
+};
 
 const loadProcesses = async () => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/request/');
+        console.log('🔍 Primera respuesta del backend:', response.data[0]);
 
         const formatDate = (datetime: string) => {
             if (!datetime) return 'Sin fecha';
@@ -85,6 +101,7 @@ const loadProcesses = async () => {
             const año = date.getFullYear();
             return `${dia}/${mes}/${año}`;
         };
+
         const formatTime = (datetime: string) => {
             if (!datetime) return 'Sin hora';
             const date = new Date(datetime);
@@ -102,15 +119,19 @@ const loadProcesses = async () => {
         };
 
         allProcesses.value = response.data.map((item: any) => {
+            const unitPrice = parseFloat(item.article_price) || 0;
+            const amount = parseFloat(item.amount) || 0;
+            const totalValue = unitPrice * amount;
+
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
             const userObj = item.user;
             const collabObj = item.collaborator;
             const acceptanceObj = item.acceptance;
+
             let acceptance = null;
             if (acceptanceObj) {
                 const requestActionsObj = acceptanceObj.requestactions;
-
                 let requestactions = null;
                 if (requestActionsObj) {
                     const supplyObj = requestActionsObj.supply;
@@ -120,7 +141,8 @@ const loadProcesses = async () => {
                             id_supply: supplyObj.id_supply,
                             user: supplyObj.user,
                             userName: supplyObj.user,
-                            collaborator: supplyObj.collaborator,
+                            collaborator: supplyObj.collaborator?.id_Collaborator || supplyObj.collaborator,
+                            collaboratorName: supplyObj.collaborator,
                             comment: supplyObj.comment,
                             date: formatDate(supplyObj.supply_datetime),
                             time: formatTime(supplyObj.supply_datetime)
@@ -136,7 +158,7 @@ const loadProcesses = async () => {
                         userName: requestActionsObj.user,
                         date: formatDate(requestActionsObj.requestactions_datetime),
                         time: formatTime(requestActionsObj.requestactions_datetime),
-                        supply: supply // Asignamos supply aquí
+                        supply: supply
                     };
                 }
 
@@ -144,7 +166,7 @@ const loadProcesses = async () => {
                     id_acceptance: acceptanceObj.id_acceptance,
                     user: acceptanceObj.user,
                     userName: acceptanceObj.user,
-                    article: acceptanceObj.article,
+                    article: acceptanceObj.article?.id_mainarticle || acceptanceObj.article,
                     articleName: acceptanceObj.article,
                     date: formatDate(acceptanceObj.acceptance_datetime),
                     time: formatTime(acceptanceObj.acceptance_datetime),
@@ -152,10 +174,11 @@ const loadProcesses = async () => {
                 };
             }
 
-            return {
+            const processData = {
                 id_Request: item.id_Request,
                 title: typeMap[item.type] || 'Sin tipo',
-                article: item.article || 'Sin producto',
+                article: item.article,
+                articleName: item.article_obj,
                 currentStatus: item.status || 'solicitud',
                 date: formatDate(item.request_datetime),
                 time: formatTime(item.request_datetime),
@@ -165,7 +188,9 @@ const loadProcesses = async () => {
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
                 description: item.description,
-                amount: item.amount,
+                amount: amount,
+                unitPrice: unitPrice,
+                totalValue: totalValue,
                 status: item.status,
                 order_workshop: item.order_workshop,
                 store: item.store,
@@ -175,28 +200,39 @@ const loadProcesses = async () => {
                 supplierCompanyName: supCompanyObj,
                 acceptance: acceptance
             };
+            console.log('ProcessData construido:', {
+                id: processData.id_Request,
+                articleId: processData.article,
+                articleName: processData.articleName
+            });
+
+            return processData;
         });
+
         displayedProcesses.value = [...allProcesses.value];
-        console.log('Procesos cargados:', allProcesses.value);
+        console.log('Total procesos cargados:', allProcesses.value.length);
+        const conNombre = allProcesses.value.filter(p => p.articleName?.name).length;
+        console.log(`Procesos con nombre de artículo: ${conNombre}/${allProcesses.value.length}`);
+        
     } catch (error) {
         console.error('Error al cargar procesos:', error);
     }
 };
 
-const prerequest = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'prerequest')
+const prerequestDeclined = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'prerequest' || p.currentStatus === 'declined')
 );
 
-const requestDeclined = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'request' || p.currentStatus === 'declined')
+const request = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'request')
 );
 
 const authorized = computed(() =>
     displayedProcesses.value.filter(p => p.currentStatus === 'authorized')
 );
 
-const supplyFinished = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'supply' || p.currentStatus === 'finished')
+const supply = computed(() =>
+    displayedProcesses.value.filter(p => p.currentStatus === 'supply')
 );
 
 const archived = computed(() =>
@@ -265,78 +301,88 @@ onMounted(() => {
 
         <Card class="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent>
-                <div class="grid grid-cols-6 h-[65vh] w-full overflow-x-auto gap-50">
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
+                <div class="grid grid-cols-5 h-[65vh] w-full overflow-x-auto gap-50">
+                    <section class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-400 whitespace-nowrap">
-                            Presolicitudes ({{ prerequest.length }})
+                            <div class="flex flex-col">
+                                <span>Presolicitudes ({{ prerequestDeclined.length }})</span>
+                                <span class="text-sm text-gray-500 font-normal mt-1">
+                                    Total: {{ formatCurrency(calculateTotalMoney(prerequestDeclined)) }}
+                                </span>
+                            </div>
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in prerequest" :key="proc.id_Request" v-bind="proc"
+                            <ProcessCard v-for="proc in prerequestDeclined" :key="proc.id_Request" v-bind="proc"
                                 @card="loadProcesses" />
-                            <p v-if="!prerequest.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
-                                etapa.</p>
+                            <p v-if="!prerequestDeclined.length" class="text-gray-500 text-sm italic mt-4">Sin elementos
+                                en esta etapa.</p>
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
+                    <section class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-500 whitespace-nowrap">
-                            Solicitud ({{ requestDeclined.length }})
+                            <div class="flex flex-col">
+                                <span>Solicitud ({{ request.length }})</span>
+                                <span class="text-sm text-gray-500 font-normal mt-1">
+                                    Total: {{ formatCurrency(calculateTotalMoney(request)) }}
+                                </span>
+                            </div>
                         </h2>
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in requestDeclined" :key="proc.id_Request" v-bind="proc"
+                            <ProcessCard v-for="proc in request" :key="proc.id_Request" v-bind="proc"
                                 @card="loadProcesses" />
-                            <p v-if="!requestDeclined.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                            <p v-if="!request.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
+                    <section class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-700 whitespace-nowrap">
-                            Autorizadas ({{ authorized.length }})
+                            <div class="flex flex-col">
+                                <span>Autorizadas ({{ authorized.length }})</span>
+                                <span class="text-sm text-gray-500 font-normal mt-1">
+                                    Total: {{ formatCurrency(calculateTotalMoney(authorized)) }}
+                                </span>
+                            </div>
                         </h2>
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in authorized" :key="proc.id_Request" v-bind="proc" />
-                            <p v-if="!authorized.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en
-                                esta etapa.
-                            </p>
+                            <p v-if="!authorized.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                                etapa.</p>
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
+                    <section class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-green-600 whitespace-nowrap">
-                            Surtir ({{supplyFinished.filter(p => p.currentStatus === 'supply').length}})
+                            <div class="flex flex-col">
+                                <span>Entregadas ({{ supply.length }})</span>
+                                <span class="text-sm text-gray-500 font-normal mt-1">
+                                    Total: {{ formatCurrency(calculateTotalMoney(supply)) }}
+                                </span>
+                            </div>
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in supplyFinished.filter(p => p.currentStatus === 'supply')"
-                                :key="proc.id_Request" v-bind="proc" />
-                            <p v-if="!supplyFinished.filter(p => p.currentStatus === 'supply').length"
-                                class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
+                            <ProcessCard v-for="proc in supply" :key="proc.id_Request" v-bind="proc" />
+                            <p v-if="!supply.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                                etapa.</p>
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[698vh] min-w-[28vh]">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-700 whitespace-nowrap">
-                            Terminadas ({{supplyFinished.filter(p => p.currentStatus === 'finished').length}})
-                        </h2>
-
-                        <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in supplyFinished.filter(p => p.currentStatus === 'finished')"
-                                :key="proc.id_Request" v-bind="proc" />
-                            <p v-if="!supplyFinished.filter(p => p.currentStatus === 'finished').length"
-                                class="text-gray-500 text-sm italic mt-4">Sin elementos en esta etapa.</p>
-                        </div>
-                    </section>
-
-                    <section class="bg-gray-50 p-3 rounded-lg min-h-[500px] min-w-[28vh]">
+                    <section class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-500 whitespace-nowrap">
-                            Archivada ({{ archived.length }})
+                            <div class="flex flex-col">
+                                <span>Archivada ({{ archived.length }})</span>
+                                <span class="text-sm text-gray-500 font-normal mt-1">
+                                    Total: {{ formatCurrency(calculateTotalMoney(archived)) }}
+                                </span>
+                            </div>
                         </h2>
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in archived" :key="proc.id_Request" v-bind="proc" />
-                            <p v-if="!archived.values" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
+                            <p v-if="!archived.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
                     </section>

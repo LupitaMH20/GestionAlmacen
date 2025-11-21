@@ -29,14 +29,18 @@ const props = defineProps<{
   iconP: LucideIcon;
   iconT: LucideIcon;
   Request: {
-    id_Request: string | number;
-    user?: Users | null;
-    userName?: Users;
-    collaborator?: string;
-    collaboratorName?: Collaborators;
-    type?: string;
-    article?: string;
+    id_Request: number | string;
+    title: string;
+    article: string;
     articleName?: Article;
+    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
+    date: string;
+    time: string;
+    type?: string;
+    user?: string;
+    collaborator?: string;
+    userName?: Users;
+    collaboratorName?: Collaborators;
     description?: string;
     amount?: number;
     status?: string;
@@ -46,25 +50,22 @@ const props = defineProps<{
     supplierCompany?: string;
     requestingCompanyName?: Companies;
     supplierCompanyName?: Companies;
-    date?: string;
-    time?: string;
-
+    unitPrice?: number;
+    totalValue?: number;
     acceptance?: {
       id_acceptance: number;
-      user?: Users | null;
+      user?: string;
       userName?: Users;
-      article?: Article | null;
+      article?: string;
       articleName?: Article;
       date?: string;
       time?: string;
-
       requestactions?: {
         id_RequestActions: number;
         action: 'authorized' | 'declined';
         comment: string;
         requestactions_datetime: string;
-        user: Users | null;
-        userName?: Users;
+        user: Users;
         date?: string;
         time?: string;
         supply?: {
@@ -111,21 +112,22 @@ const IconComponent = (icon: LucideIcon) => icon;
 
       <div class="flex flex-col gap-4 overflow-y-auto max-h-[60vh] p-1">
         <DialogPreRequest v-if="props.Request" :Request="props.Request" />
-        <DialogRequest v-if="props.Request" :Request="props.Request" />
+        <DialogRequest v-if="props.Request.acceptance" :acceptance="props.Request.acceptance" />
         <DialogAuthorize
           v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'authorized'"
-          :authorization="props.Request.acceptance.requestactions" />
+          :requestactions="props.Request.acceptance.requestactions" />
         <DialogDeclined
           v-if="props.Request.acceptance?.requestactions && props.Request.acceptance.requestactions.action === 'declined'"
-          :decline="props.Request.acceptance.requestactions" />
-        <DialogSupply v-if="props.Request.acceptance?.requestactions?.supply" :supply="props.Request.acceptance.requestactions.supply" />
+          :requestactions="props.Request.acceptance.requestactions" />
+        <DialogSupply v-if="props.Request.acceptance?.requestactions?.supply"
+          :supply="props.Request.acceptance.requestactions.supply" />
         <!-- <DialogReturnExchange v-if="props.Request.request?.deliverie?.return_exchange" :return_exchange="props.Request.request.deliverie.return_exchange" /> -->
       </div>
 
       <DialogFooter class="flex justify-between mt-5 pt-3 border-t">
-        <Button v-if="props.Request.status != 'request' && props.Request.status != 'declined'" variant="secondary"
+        <Button  variant="secondary"
           @click="open = false" class="flex items-center gap-2">
-          <Ban class="w-4 h-4" />Cancelar
+          <Ban class="w-4 h-4" />cerrar
         </Button>
 
         <CreateProcess :Request="props.Request" @createPrecess="emit('dialog')" />

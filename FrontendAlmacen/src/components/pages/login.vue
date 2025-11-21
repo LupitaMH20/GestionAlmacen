@@ -43,7 +43,6 @@ const handleLogin = async () => {
             loginAction(user, access)
         }
 
-        // Redirección por rol
         const position = user.position?.toLowerCase()
         if (['managerjom', 'managerns', 'managerprintek', 'managerhefesto', 'managerblackworkshop', 'applicant', 'deliberystaff'].includes(position)) {
             router.push('/staff')

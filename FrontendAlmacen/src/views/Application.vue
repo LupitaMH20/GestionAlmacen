@@ -155,9 +155,7 @@ const loadProcesses = async () => {
 };
 
 const filterByTypeAndStatus = (type: ProcessData['type']) =>
-    processes.value.filter(p => 
-        (p.currentStatus === 'request' || p.currentStatus === 'declined') && 
-        p.type === type
+    processes.value.filter(p => p.currentStatus === 'request' && p.type === type
     );
 
 const Consumables = computed(() => filterByTypeAndStatus('Consumable'));

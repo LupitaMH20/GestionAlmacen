@@ -7,7 +7,7 @@ const props = defineProps<{
         action: 'authorized' | 'declined';
         comment: string;
         requestactions_datetime: string;
-        user: Users;
+        user: Users | null;
         date?: string;
         time?: string;
     } | null;
@@ -17,11 +17,8 @@ const props = defineProps<{
 <template v-if="props.requestactions?.action === 'declined'">
     <div class="pt-4 space-y-2 text-sm border-t">
         <h4 class="flex justify-center text-[24px] font-bold">Rechazado</h4>
-        <div><strong>Id de Rechazado</strong>{{ props.requestactions?.id_RequestActions }}</div>
-        <div><strong>Autorizado por:</strong>{{ props.requestactions?.user.id_user || '—' }} Nombre: {{
-            props.requestactions?.user.name || '—' }}</div>
-        <div><strong>Comemtario:</strong>{{ props.requestactions?.comment || '—' }}</div>
-        <div><strong>Fecha de rechazo:</strong>Fecha: {{ props.requestactions?.date || '—' }} Hora: {{
-            props.requestactions?.time }}</div>
+        <div><strong>Rechazado por:</strong> {{props.requestactions?.user?.name || '—' }}</div>
+        <div><strong>Comemtario:</strong>  {{ props.requestactions?.comment || '—' }}</div>
+        <div><strong>Fecha de rechazo:</strong> Fecha: {{ props.requestactions?.date || '—' }} Hora: {{ props.requestactions?.time }}</div>
     </div>
 </template>

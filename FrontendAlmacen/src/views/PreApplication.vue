@@ -51,21 +51,66 @@ const loadProcesses = async () => {
             const año = date.getFullYear();
             return `${dia}/${mes}/${año}`;
         };
+
+        const formatTime = (datetime: string) => {
+            if (!datetime) return 'Sin hora';
+            const date = new Date(datetime);
+            return date.toLocaleTimeString('es-MX', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+        };
+        
         processes.value = response.data.map((item: any) => {
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
             const userObj = item.user;
             const collabObj = item.collaborator;
+            const acceptanceObj = item.acceptance;
+
+            let acceptance = null;
+            if (acceptanceObj) {
+                const acceptanceUserObj = acceptanceObj.user;
+                const acceptanceArticleObj = acceptanceObj.article;
+                const requestActionsObj = acceptanceObj.requestactions;
+
+                let requestactions = null;
+                if (requestActionsObj) {
+                    const actionUserObj = requestActionsObj.user;
+                    requestactions = {
+                        id_RequestActions: requestActionsObj.id_RequestActions,
+                        action: requestActionsObj.action,
+                        comment: requestActionsObj.comment,
+                        requestactions_datetime: requestActionsObj.requestactions_datetime,
+                        user: actionUserObj,
+                        userName: actionUserObj,
+                        date: formatDate(requestActionsObj.requestactions_datetime),
+                        time: formatTime(requestActionsObj.requestactions_datetime)
+                    };
+                }
+
+                acceptance = {
+                    id_acceptance: acceptanceObj.id_acceptance,
+                    user: acceptanceUserObj,
+                    userName: acceptanceUserObj,
+                    article: acceptanceArticleObj,
+                    articleName: acceptanceArticleObj,
+                    date: formatDate(acceptanceObj.acceptance_datetime),
+                    time: formatTime(acceptanceObj.acceptance_datetime),
+                    requestactions: requestactions
+                };
+            }
 
             return {
                 id_Request: item.id_Request,
-                title: typeMap[item.type] || item.type || 'Sin tipo',
+                title: typeMap[item.type] || 'Sin tipo',
                 article: item.article || 'Sin producto',
-                currentStatus: item.status,
+                currentStatus: item.status || 'solicitud',
                 date: formatDate(item.request_datetime),
-                time: new Date(item.request_datetime).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
+                time: formatTime(item.request_datetime),
                 type: item.type,
-                user: userObj?.id_user,
+                user: userObj,
                 userName: userObj,
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
@@ -78,7 +123,7 @@ const loadProcesses = async () => {
                 supplierCompany: supCompanyObj?.id_Company,
                 requestingCompanyName: reqCompanyObj,
                 supplierCompanyName: supCompanyObj,
-                request: item.request
+                acceptance: acceptance
             };
         });
         console.log('Procesos cargados:', processes.value);
@@ -88,7 +133,7 @@ const loadProcesses = async () => {
 };
 
 const filterByTypeAndStatus = (type: ProcessData['type']) =>
-    processes.value.filter(p => p.currentStatus === 'prerequest' && p.type === type);
+    processes.value.filter(p => (p.currentStatus === 'prerequest' || p.currentStatus === 'declined') && p.type === type);
 
 const Consumable = computed(() => filterByTypeAndStatus('Consumable'));
 const Tool = computed(() => filterByTypeAndStatus('Tool'));

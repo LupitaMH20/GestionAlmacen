@@ -90,8 +90,7 @@ const calculateTotalMoney = (list: ProcessData[]) => {
 const loadProcesses = async () => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/request/');
-        console.log('🔍 Primera respuesta del backend:', response.data[0]);
-
+        
         const formatDate = (datetime: string) => {
             if (!datetime) return 'Sin fecha';
             const date = new Date(datetime);

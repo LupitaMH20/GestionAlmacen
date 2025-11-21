@@ -34,14 +34,14 @@ export const navMainA = [
                 isActive: true,
             },
             {
-                title: "Surtirdas",
+                title: "Entregadas",
                 routerName: "supply",
                 icon: BookOpenCheck,
                 isActive: true,
             },
             {
                 title: "Archivadas",
-                routerName: "",
+                routerName: "archived",
                 icon: BookmarkCheck,
                 isActive: true,
             },

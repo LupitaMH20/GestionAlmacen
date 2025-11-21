@@ -7,40 +7,54 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
+interface Article { id_mainarticle: string; name: string };
 
 interface ProcessData {
-    id_Request: number;
+    id_Request: number | string;
     title: string;
     article: string;
+    articleName?: Article;
     currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
     date: string;
     time: string;
     type?: string;
-    user?: Users
-    collaborator?: string
+    user?: string;
+    collaborator?: string;
     userName?: Users;
     collaboratorName?: Collaborators;
-    description?: string
-    amount?: number
-    status?: string
-    order_workshop?: string
-    store?: string
-    requestingCompany?: string
-    supplierCompany?: string
-    requestingCompanyName?: Companies
-    supplierCompanyName?: Companies
+    description?: string;
+    amount?: number;
+    status?: string;
+    order_workshop?: string;
+    store?: string;
+    requestingCompany?: string;
+    supplierCompany?: string;
+    requestingCompanyName?: Companies;
+    supplierCompanyName?: Companies;
+    unitPrice?: number;
+    totalValue?: number;
 }
 const processes = ref<ProcessData[]>([]);
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+        minimumFractionDigits: 2
+    }).format(value);
+};
+
+const calculateTotalMoney = (list: ProcessData[]) => {
+    const total = list.reduce((acc, item) => {
+        const value = item.totalValue || 0;
+        return acc + value;
+    }, 0);
+    return total;
+};
 
 const loadProcesses = async () => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/request/');
-        
-        const typeMap: Record<string, string> = {
-            "Consumable": 'Consumibles',
-            "Tool": 'Herramientas',
-            "PersonalConsumption": 'Consumo Personal',
-        };
 
         const formatDate = (datetime: string) => {
             if (!datetime) return 'Sin fecha';
@@ -55,14 +69,24 @@ const loadProcesses = async () => {
         const formatTime = (datetime: string) => {
             if (!datetime) return 'Sin hora';
             const date = new Date(datetime);
-            return date.toLocaleTimeString('es-MX', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                hour12: true 
+            return date.toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
             });
         };
-        
+
+        const typeMap: Record<string, string> = {
+            "Consumable": 'Consumibles',
+            "Tool": 'Herramientas',
+            "PersonalConsumption": 'Consumo Personal',
+        };
+
         processes.value = response.data.map((item: any) => {
+            const unitPrice = parseFloat(item.article_price) || 0;
+            const amount = parseFloat(item.amount) || 0;
+            const totalValue = unitPrice * amount;
+
             const reqCompanyObj = item.requestingCompany;
             const supCompanyObj = item.supplierCompany;
             const userObj = item.user;
@@ -71,41 +95,54 @@ const loadProcesses = async () => {
 
             let acceptance = null;
             if (acceptanceObj) {
-                const acceptanceUserObj = acceptanceObj.user;
-                const acceptanceArticleObj = acceptanceObj.article;
                 const requestActionsObj = acceptanceObj.requestactions;
-
                 let requestactions = null;
                 if (requestActionsObj) {
-                    const actionUserObj = requestActionsObj.user;
+                    const supplyObj = requestActionsObj.supply;
+                    let supply = null;
+                    if (supplyObj) {
+                        supply = {
+                            id_supply: supplyObj.id_supply,
+                            user: supplyObj.user,
+                            userName: supplyObj.user,
+                            collaborator: supplyObj.collaborator?.id_Collaborator || supplyObj.collaborator,
+                            collaboratorName: supplyObj.collaborator,
+                            comment: supplyObj.comment,
+                            date: formatDate(supplyObj.supply_datetime),
+                            time: formatTime(supplyObj.supply_datetime)
+                        };
+                    }
+
                     requestactions = {
                         id_RequestActions: requestActionsObj.id_RequestActions,
                         action: requestActionsObj.action,
                         comment: requestActionsObj.comment,
                         requestactions_datetime: requestActionsObj.requestactions_datetime,
-                        user: actionUserObj,
-                        userName: actionUserObj,
+                        user: requestActionsObj.user,
+                        userName: requestActionsObj.user,
                         date: formatDate(requestActionsObj.requestactions_datetime),
-                        time: formatTime(requestActionsObj.requestactions_datetime)
+                        time: formatTime(requestActionsObj.requestactions_datetime),
+                        supply: supply
                     };
                 }
 
                 acceptance = {
                     id_acceptance: acceptanceObj.id_acceptance,
-                    user: acceptanceUserObj,
-                    userName: acceptanceUserObj,
-                    article: acceptanceArticleObj,
-                    articleName: acceptanceArticleObj,
+                    user: acceptanceObj.user,
+                    userName: acceptanceObj.user,
+                    article: acceptanceObj.article?.id_mainarticle || acceptanceObj.article,
+                    articleName: acceptanceObj.article,
                     date: formatDate(acceptanceObj.acceptance_datetime),
                     time: formatTime(acceptanceObj.acceptance_datetime),
                     requestactions: requestactions
                 };
             }
 
-            return {
+            const processData = {
                 id_Request: item.id_Request,
                 title: typeMap[item.type] || 'Sin tipo',
-                article: item.article || 'Sin producto',
+                article: item.article,
+                articleName: item.article_obj,
                 currentStatus: item.status || 'solicitud',
                 date: formatDate(item.request_datetime),
                 time: formatTime(item.request_datetime),
@@ -115,7 +152,9 @@ const loadProcesses = async () => {
                 collaborator: collabObj?.id_Collaborator,
                 collaboratorName: collabObj,
                 description: item.description,
-                amount: item.amount,
+                amount: amount,
+                unitPrice: unitPrice,
+                totalValue: totalValue,
                 status: item.status,
                 order_workshop: item.order_workshop,
                 store: item.store,
@@ -125,8 +164,14 @@ const loadProcesses = async () => {
                 supplierCompanyName: supCompanyObj,
                 acceptance: acceptance
             };
+            console.log('ProcessData construido:', {
+                id: processData.id_Request,
+                articleId: processData.article,
+                articleName: processData.articleName
+            });
+
+            return processData;
         });
-        console.log('Procesos cargados:', processes.value);
     } catch (error) {
         console.error('Error al cargar procesos:', error);
     }
@@ -157,7 +202,11 @@ onMounted(() => { loadProcesses() });
                     <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-700">
                             Consumible ({{ Consumable.length }})
+                            <span class="text-sm text-gray-500 font-normal mt-1">
+                                Total: {{ formatCurrency(calculateTotalMoney(Consumable)) }}
+                            </span>
                         </h2>
+
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in Consumable" :key="proc.id_Request" v-bind="proc"
                                 @updateRequest="loadProcesses" />
@@ -170,6 +219,9 @@ onMounted(() => { loadProcesses() });
                     <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-orange-700">
                             Herramienta ({{ Tool.length }})
+                            <span class="text-sm text-gray-500 font-normal mt-1">
+                                Total: {{ formatCurrency(calculateTotalMoney(Tool)) }}
+                            </span>
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in Tool" :key="proc.id_Request" v-bind="proc"
@@ -183,6 +235,9 @@ onMounted(() => { loadProcesses() });
                     <section class="bg-gray-50 overflow-y-auto p-3 rounded-lg min-h-[500px]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-purple-700">
                             ConsumoPersonal ({{ PersonalConsumption.length }})
+                            <span class="text-sm text-gray-500 font-normal mt-1">
+                                Total: {{ formatCurrency(calculateTotalMoney(PersonalConsumption)) }}
+                            </span>
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id_Request" v-bind="proc"

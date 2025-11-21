@@ -32,7 +32,7 @@ export const navMainS = [
                 isActive: true,
             },
             {
-                title: "Surtirdas",
+                title: "Entregadas",
                 routerName: "supply",
                 icon: BookOpenCheck,
                 isActive: true,

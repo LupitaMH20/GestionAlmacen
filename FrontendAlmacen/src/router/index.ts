@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'application', name: 'admin-application', component: () => import('../views/Application.vue') },
       { path: 'authorize', name: 'admin-authorize', component: () => import('../views/Authorize.vue') },
       { path: 'supply', name: 'admin-supply', component: () => import('../views/Supply.vue') },
-      { path: 'finished', name: 'admin-deliveries', component: () => import('../views/Finish.vue') },
+      { path: 'archived', name: "admin-archived", component: () => import ('../views/Archived.vue')},
       { path: 'user', name: 'admin-user', component: () => import('../views/User.vue') },
       { path: 'company', name: 'admin-company', component: () => import('../views/Company.vue') },
       { path: 'collaborator', name: 'admin-collaborator', component: () => import('../views/Collaborator.vue') },
@@ -38,7 +38,6 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'application', name: 'staff-application', component: () => import('../views/Application.vue') },
       { path: 'authorize', name: 'staff-authorize', component: () => import('../views/Authorize.vue') },
       { path: 'supply', name: 'staff-supply', component: () => import('../views/Supply.vue') },
-      { path: 'finished', name: 'staff-deliveries', component: () => import('../views/Finish.vue') },
     ]
   },
   { path: '/', redirect: '/login' },

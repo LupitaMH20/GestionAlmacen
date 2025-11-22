@@ -34,11 +34,11 @@ class RequestActionsSerializer(serializers.ModelSerializer):
     )
 
     user=UserSerializer(read_only = True)
-    supply = SupplySerializer(read_only=True)
+    # supply = SupplySerializer(read_only=True)
 
     class Meta:
         model = RequestActions
-        fields = [ 'id_RequestActions', 'user', 'acceptance', 'action', 'comment', 'requestactions_datetime', 'supply']
+        fields = [ 'id_RequestActions', 'user', 'acceptance', 'action', 'comment', 'requestactions_datetime']
         read_only_fields = ['id_RequestActions', 'user', 'requestactions_datetime']
 
 class AcceptanceSerializer(serializers.ModelSerializer):

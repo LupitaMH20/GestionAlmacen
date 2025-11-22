@@ -182,24 +182,11 @@ class ReturnExchangeViewSet(viewsets.ModelViewSet):
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    
-@api_view(['POST'])
-def finish_request(request, request_id):
-    try:
-        req = Request.objects.get(id_Request=request_id)
-        if req.status != 'supply':
-            return Response({"error": "Debe de entregarse para que se pueda terminar"}, status=status.HTTP_400_BAD_REQUEST)
-        req.status = 'finished'
-        req.save(update_fields=['status'])
-        return Response({"mensaje": "Terminada"}, status=status.HTTP_200_OK)
-    except Request.DoesNotExist:
-        return Response({"error": "Solicitud no econtrada."}, status=status.HTTP_404_NOT_FOUND)
-    
-@api_view(['POST'])
+
 def archive_request(request, request_id):
     try:
         req = Request.objects.get(id_Request=request_id)
-        if req.status not in ['finished']:
+        if req.status not in ['supply']:
             return Response({"error": "Debe de estar terminada para que se pueda archivar"}, status=status.HTTP_400_BAD_REQUEST)
         req.status = 'archived'
         req.save(update_fields=['status'])

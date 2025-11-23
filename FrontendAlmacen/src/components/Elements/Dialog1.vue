@@ -40,7 +40,7 @@ const IconComponent = (icon: LucideIcon) => icon;
                 </div>
             <DialogFooter class="flex justify-self-center gap-20">
                 <Button @click="$emit('cancel')" class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
-                    <Ban class="w-4 h-4 mr-3 " /> Cancelar
+                    <Ban class="w-4 h-4 mr-3 " /> Cerrar
                 </Button>
                 <Button type="submit" @click="$emit('save')" class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
                     <Save class="w-4 h-4 mr-3" /> Guardar

@@ -45,12 +45,12 @@ export const navMainA = [
                 icon: BookmarkCheck,
                 isActive: true,
             },
-            {
-                title: "Devoluciones",
-                routerName: "returns",
-                icon: ArrowLeftRight,
-                isActive: true,
-            },
+            // {
+            //     title: "Devoluciones",
+            //     routerName: "returns",
+            //     icon: ArrowLeftRight,
+            //     isActive: true,
+            // },
         ]
     },
     {

@@ -27,7 +27,7 @@ const emit = defineEmits(['deletePreRequest']);
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel class="bg-whiite text-black hover:bg-black hover:text-white border border-write">
-          <Ban class="w-6 h-6" />Cancel
+          <Ban class="w-6 h-6" />Cerrar
         </AlertDialogCancel>
         <AlertDialogAction class="bg-whiite text-black hover:bg-black hover:text-white border border-write"
           @click="emit('deletePreRequest')">

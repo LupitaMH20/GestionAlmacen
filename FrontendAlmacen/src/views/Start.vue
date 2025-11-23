@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProcessCard from '../components/Elements/Card.vue';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, inject, Ref } from 'vue';
 import axios from 'axios';
 import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest/PreRequest.vue'
 import PreRequestCP from '../components/Forms/Applications/PersonalConsumption/PreRequest/PreRequest.vue'
@@ -12,12 +12,19 @@ interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 interface Article { id_mainarticle: string; name: string };
 
+interface LoggedInUserType {
+    id_user: string;
+    name: string;
+    position: string;
+    admin: boolean;
+}
+
 interface ProcessData {
     id_Request: number | string;
     title: string;
     article: string;
     articleName?: Article;
-    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'finished' | 'archived';
+    currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'archived';
     date: string;
     time: string;
     type?: string;
@@ -70,6 +77,8 @@ const searchQuery = ref('');
 const selectedType = ref('All')
 const displayedProcesses = ref<ProcessData[]>([]);
 const allProcesses = ref<ProcessData[]>([]);
+
+const loggedInUser = inject<Ref<LoggedInUserType | null>>('loggedInUser');
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-MX', {
@@ -234,9 +243,15 @@ const supply = computed(() =>
     displayedProcesses.value.filter(p => p.currentStatus === 'supply')
 );
 
-const archived = computed(() =>
-    displayedProcesses.value.filter(p => p.currentStatus === 'archived')
-);
+const archived = computed(() => {
+    if (!loggedInUser?.value) return [];
+    const position = loggedInUser.value.position.toLowerCase();
+    const rolesPermitidos = ['director', 'counter']; 
+    if (rolesPermitidos.includes(position) || loggedInUser.value.admin) {
+        return displayedProcesses.value.filter(p => p.currentStatus === 'archived');
+    }
+    return [];
+});
 
 const searchProcess = () => {
     const query = searchQuery.value.toLowerCase().trim();
@@ -369,7 +384,8 @@ onMounted(() => {
                         </div>
                     </section>
 
-                    <section class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
+                    <section v-if="archived.length > 0 || (loggedInUser?.position === 'director' || loggedInUser?.position === 'counter')"
+                        class="bg-gray-50 p-3 rounded-lg min-h-[500px] min-w-[28vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-500 whitespace-nowrap">
                             <div class="flex flex-col">
                                 <span>Archivada ({{ archived.length }})</span>
@@ -381,8 +397,10 @@ onMounted(() => {
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in archived" :key="proc.id_Request" v-bind="proc" />
-                            <p v-if="!archived.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
-                                etapa.</p>
+                            
+                            <p v-if="!archived.length" class="text-gray-500 text-sm italic mt-4">
+                                Sin elementos en esta etapa.
+                            </p>
                         </div>
                     </section>
                 </div>

@@ -48,7 +48,7 @@ const disabledUser = async () => {
       <AlertDialogFooter class="flex gap-2">
         <AlertDialogCancel
           class="bg-white text-black hover:bg-black hover:text-white border border-gray-300 px-4 py-2 flex items-center gap-1">
-          <Ban class="w-5 h-5" /> Cancelar
+          <Ban class="w-5 h-5" /> Cerrar
         </AlertDialogCancel>
 
         <AlertDialogAction class="bg-whiite text-black hover:bg-black hover:text-white border border-write"

@@ -11,6 +11,6 @@ router.register(r'supply', SupplyViewSet, basename='supply')
 
 urlpatterns = router.urls
 
-urlpatterns += [
-    path('request/<int:request_id>/archive/', archive_request, name='archive_request'),
-]
+# urlpatterns += [
+#     path('request/<int:request_id>/archive/', archive_request, name='archive_request'),
+# ]

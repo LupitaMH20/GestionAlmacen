@@ -183,13 +183,14 @@ class ReturnExchangeViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-def archive_request(request, request_id):
-    try:
-        req = Request.objects.get(id_Request=request_id)
-        if req.status not in ['supply']:
-            return Response({"error": "Debe de estar terminada para que se pueda archivar"}, status=status.HTTP_400_BAD_REQUEST)
-        req.status = 'archived'
-        req.save(update_fields=['status'])
-        return Response({"mensaje": "Archivada"}, status=status.HTTP_200_OK)
-    except Request.DoesNotExist:
-        return Response({"error": "Solicitud no econtrada."}, status=status.HTTP_404_NOT_FOUND)
+# Se puede hacer manual mente pero ya esta que se haga automaticamente ya es innecesaria
+# def archive_request(request, request_id):
+#     try:
+#         req = Request.objects.get(id_Request=request_id)
+#         if req.status not in ['supply']:
+#             return Response({"error": "Debe de estar terminada para que se pueda archivar"}, status=status.HTTP_400_BAD_REQUEST)
+#         req.status = 'archived'
+#         req.save(update_fields=['status'])
+#         return Response({"mensaje": "Archivada"}, status=status.HTTP_200_OK)
+#     except Request.DoesNotExist:
+#         return Response({"error": "Solicitud no econtrada."}, status=status.HTTP_404_NOT_FOUND)

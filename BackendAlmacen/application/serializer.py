@@ -19,9 +19,10 @@ class ReturnExchangeSerializer(serializers.ModelSerializer):
 
 class SupplySerializer(serializers.ModelSerializer):
     requestActions = serializers.PrimaryKeyRelatedField(queryset=RequestActions.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
+    collaborator = serializers.PrimaryKeyRelatedField(queryset=Collaborators.objects.all())
     user = UserSerializer(read_only=True)
     collaborator = Collaboratorserializers(read_only=True)
-    returnexchange = ReturnExchangeSerializer(read_only=True)
 
     class Meta:
         model = Supply
@@ -34,11 +35,11 @@ class RequestActionsSerializer(serializers.ModelSerializer):
     )
 
     user=UserSerializer(read_only = True)
-    # supply = SupplySerializer(read_only=True)
+    supply = SupplySerializer(read_only=True)
 
     class Meta:
         model = RequestActions
-        fields = [ 'id_RequestActions', 'user', 'acceptance', 'action', 'comment', 'requestactions_datetime']
+        fields = [ 'id_RequestActions', 'user', 'acceptance', 'action', 'comment', 'requestactions_datetime', 'supply']
         read_only_fields = ['id_RequestActions', 'user', 'requestactions_datetime']
 
 class AcceptanceSerializer(serializers.ModelSerializer):

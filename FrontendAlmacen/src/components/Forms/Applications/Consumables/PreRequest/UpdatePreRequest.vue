@@ -87,10 +87,10 @@ watch(isDialogOpen, (newValue) => {
 const handleSave = async () => {
     try {
         const payload = {
-            user_id: data.user,
-            collaborator_id: data.collaborator || null,
-            requestingCompany_id: data.requestingCompany,
-            supplierCompany_id: data.supplierCompany,
+            user: data.user,
+            collaborator: data.collaborator || null,
+            requestingCompany: data.requestingCompany,
+            supplierCompany: data.supplierCompany,
             type: data.type,
             article: data.article,
             description: data.description,
@@ -101,6 +101,7 @@ const handleSave = async () => {
         };
         await axios.patch(`http://127.0.0.1:8000/api/request/${data.id_Request}/`, payload);
         console.log('se actualizo la presolicitud')
+        console.log('Datos guardados:', payload);
         isDialogOpen.value = false
         emit('updatePreRequest')
     } catch (error) {

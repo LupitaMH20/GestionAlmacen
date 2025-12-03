@@ -4,7 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../../ui/textarea';
 import { Label } from '../../ui/label';
 import { Input } from '../../ui/input';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { Eye, X } from 'lucide-vue-next';
 
 interface Collaborator {
     id_Collaborator: string;
@@ -20,18 +21,70 @@ const props = defineProps<{
 const collaboratorId = defineModel<string | null>('collaboratorId');
 const comment = defineModel<string>('comment');
 const selectedFile = defineModel<File | null>('selectedFile');
+
 const showDocumentUpload = computed(() => {
     return props.requestType === 'Tool';
 });
 
+const pdfPreviewUrl = ref<string | null>(null);
+const showPreview = ref(false);
+
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
-        selectedFile.value = target.files[0];
+        const file = target.files[0];
+        
+        // Validate file type
+        if (file.type !== 'application/pdf') {
+            alert('Por favor, seleccione solo archivos PDF');
+            target.value = '';
+            selectedFile.value = null;
+            return;
+        }
+        
+        selectedFile.value = file;
+        
+        // Create preview URL
+        if (pdfPreviewUrl.value) {
+            URL.revokeObjectURL(pdfPreviewUrl.value);
+        }
+        pdfPreviewUrl.value = URL.createObjectURL(file);
     } else {
         selectedFile.value = null;
+        if (pdfPreviewUrl.value) {
+            URL.revokeObjectURL(pdfPreviewUrl.value);
+            pdfPreviewUrl.value = null;
+        }
     }
 };
+
+const togglePreview = () => {
+    showPreview.value = !showPreview.value;
+};
+
+const removeFile = () => {
+    selectedFile.value = null;
+    if (pdfPreviewUrl.value) {
+        URL.revokeObjectURL(pdfPreviewUrl.value);
+        pdfPreviewUrl.value = null;
+    }
+    showPreview.value = false;
+    
+    // Reset file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+        fileInput.value = '';
+    }
+};
+
+// Cleanup on unmount
+watch(() => selectedFile.value, (newVal) => {
+    if (!newVal && pdfPreviewUrl.value) {
+        URL.revokeObjectURL(pdfPreviewUrl.value);
+        pdfPreviewUrl.value = null;
+        showPreview.value = false;
+    }
+});
 </script>
 
 <template>
@@ -57,9 +110,46 @@ const handleFileChange = (event: Event) => {
         </div>
 
         <div v-if="showDocumentUpload" class="flex flex-col gap-3">
-            <Label>Documento (Evidencia)</Label>
-            <Input type="file" @change="handleFileChange"
+            <Label>Documento (Evidencia PDF)</Label>
+            <Input type="file" 
+                accept="application/pdf"
+                @change="handleFileChange"
                 class="file:text-white file:bg-blue-600 file:hover:bg-blue-700 file:rounded-md" />
+            
+            <!-- File info and preview controls -->
+            <div v-if="selectedFile" class="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-gray-700">{{ selectedFile.name }}</span>
+                        <span class="text-xs text-gray-500">({{ (selectedFile.size / 1024).toFixed(2) }} KB)</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button 
+                            type="button"
+                            @click="togglePreview"
+                            class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-1">
+                            <Eye class="w-4 h-4" />
+                            {{ showPreview ? 'Ocultar' : 'Vista Previa' }}
+                        </button>
+                        <button 
+                            type="button"
+                            @click="removeFile"
+                            class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-1">
+                            <X class="w-4 h-4" />
+                            Quitar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- PDF Preview -->
+                <div v-if="showPreview && pdfPreviewUrl" class="mt-3">
+                    <iframe 
+                        :src="pdfPreviewUrl" 
+                        class="w-full h-96 border border-gray-300 rounded"
+                        title="Vista previa del PDF">
+                    </iframe>
+                </div>
+            </div>
         </div>
     </div>
 </template>

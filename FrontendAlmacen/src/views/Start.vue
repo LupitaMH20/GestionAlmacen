@@ -385,7 +385,7 @@ onMounted(() => {
                     </section>
 
                     <section v-if="archived.length > 0 || (loggedInUser?.position === 'director' || loggedInUser?.position === 'counter')"
-                        class="bg-gray-50 p-3 rounded-lg min-h-[500px] min-w-[28vh]">
+                        class="bg-gray-50 p-3 rounded-lg h-full min-w-[34vh]">
                         <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-500 whitespace-nowrap">
                             <div class="flex flex-col">
                                 <span>Archivada ({{ archived.length }})</span>

@@ -39,7 +39,7 @@ const emit = defineEmits(['update'])
         </div>
     </div>
 
-    <!-- Para editar o eliminar la request -->
+    <!-- Para editar o eliminar la request
     <div v-if="props.Request?.status === 'request'" class="flex justify-end gap-2">
         <div v-if="props.Request.type === 'Consumable'" class="flex justify-end gap-2">
             <UpdatePreRequestC :Request="props.Request" @updatePreRequest="emit('update')" />
@@ -55,20 +55,20 @@ const emit = defineEmits(['update'])
         </div>
     </div>
 
-    <!-- Para editar o eliminar la authorization -->
+    Para editar o eliminar la authorization
     <div v-if="props.Request?.status === 'authorization'" class="flex justify-end gap-2">
 
     </div>
-    <!-- Para editar o eliminar la rechazar -->
+    Para editar o eliminar la rechazar
     <div v-if="props.Request?.status === 'decline'" class="flex justify-end gap-2">
 
     </div>
-    <!-- Para editar o eliminar la deliverie -->
+     Para editar o eliminar la deliverie
     <div v-if="props.Request?.status === 'deliverie'" class="flex justify-end gap-2">
 
     </div>
-    <!-- Para editar o eliminar la return_change -->
+    Para editar o eliminar la return_change
     <div v-if="props.Request?.status === 'return_exchange'" class="flex justify-end gap-2">
 
-    </div>
+    </div> -->
 </template>

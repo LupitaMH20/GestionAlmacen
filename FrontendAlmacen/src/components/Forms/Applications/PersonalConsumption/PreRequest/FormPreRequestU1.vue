@@ -1,55 +1,65 @@
 <script setup lang="ts">
-import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '../../../../ui/form';
+import { FormField, FormItem, FormLabel } from '../../../../ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../ui/select'
 
-const props = defineModel('props', { type: Object, required: true })
-const props2 = defineProps<{
-    companies: Array<{ id_Company: string, name: string }>
-    collaborator: Array<{id_Collaborator:string, name:string}>
-}>()
+// Usar defineModel correctamente para v-model bidireccional
+const modelValue = defineModel<{
+    requestingCompany: string | number;
+    supplierCompany: string | number;
+    collaborator: string | number;
+    [key: string]: any;
+}>({ required: true });
+
+const props = defineProps<{
+    companies: Array<{ id_Company: string | number, name: string }>
+    collaborator: Array<{ id_Collaborator: string | number, name: string }>
+}>();
 
 </script>
 <template>
     <form>
-        <FormField name="PersonalConsumptionname1">
+        <FormField name="requestingCompany">
             <FormItem>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa Solicitante *</FormLabel>
-                    <Select v-model="props.requestingCompany">
+                    <Select v-model="modelValue.requestingCompany">
                         <SelectTrigger class="w-50">
-                            <SelectValue v-model="props.requestingCompany" class="text-12 font-sans font-light" />
+                            <SelectValue placeholder="Seleccione empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="company in props2.companies" :key="company.id_Company"
+                            <SelectItem v-for="company in props.companies" :key="company.id_Company"
                                 :value="company.id_Company">
                                 {{ company.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
+                
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Empresa Proveedora *</FormLabel>
-                    <Select v-model="props.supplierCompany">
+                    <Select v-model="modelValue.supplierCompany">
                         <SelectTrigger class="w-50">
-                            <SelectValue v-model="props.supplierCompany" class="text-12 font-sans font-light" />
+                            <SelectValue placeholder="Seleccione empresa" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="company in props2.companies" :key="company.id_Company"
+                            <SelectItem v-for="company in props.companies" :key="company.id_Company"
                                 :value="company.id_Company">
                                 {{ company.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div class="p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold p-1.5">Colaborator *</FormLabel>
-                    <Select v-model="props.collaborator">
+                    <FormLabel class="text-24 font-sans font-bold p-1.5">Colaborador *</FormLabel>
+                    <Select v-model="modelValue.collaborator">
                         <SelectTrigger class="w-50">
-                            <SelectValue v-model="props.collaborator" class="text-12 font-sans font-light" />
+                            <SelectValue placeholder="Seleccione colaborador" class="text-12 font-sans font-light" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="collaborator in props2.collaborator" :key="collaborator.id_Collaborator" :value="collaborator.id_Collaborator">
-                                {{ collaborator.name }}
+                            <SelectItem v-for="collab in props.collaborator" :key="collab.id_Collaborator" 
+                                :value="collab.id_Collaborator">
+                                {{ collab.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>

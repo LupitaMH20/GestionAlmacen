@@ -19,22 +19,21 @@ const loadCategory = async () => {
     try {
         const url =
             filter.value == 'inactive'
-                ? 'http://127.0.0.1:8000/api/article/?inactive=true'
+                ? 'http://127.0.0.1:8000/api/category/?inactive=true'
                 : 'http://127.0.0.1:8000/api/category/'
         const response = await axios.get(url)
         category.value = response.data
         displayedCategory.value = [...category.value]
     } catch (errror) {
-
+        console.log('Error al cargar categorias', errror)
     }
 }
 
 const searchCategory = () => {
     const query = searchQuery.value.toLowerCase()
     displayedCategory.value = category.value.filter(category =>
-        // category.id_Category.toLowerCase().includes(query) ||
-        category.name.toLowerCase().includes(query) ||
-        category.id_Category.toLowerCase().includes(query)
+        String(category.id_Category).toLowerCase().includes(query) ||
+        category.name.toLowerCase().includes(query)
     )
 }
 
@@ -62,7 +61,7 @@ onMounted(() => { loadCategory() })
                 <select v-model="filter" @change="loadCategory"
                     class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
                     <option value="active">Activa</option>
-                    <option value="inactive">Desactiva</option>
+                    <option value="inactive">Desactivada</option>
                 </select>
             </div>
 
@@ -89,8 +88,8 @@ onMounted(() => { loadCategory() })
                         <TableCell>{{ category.name }}</TableCell>
                         <TableCell v-if="category.active" class="text-right">
                             <div class="flex justify-end item-center gap-10">
-                                <UpdateCategory :id_Category="category" @updateCategory="loadCategory" />
-                                <DeleteCategory :id_Category="category" @deleteCategory="handleCategoryDisabled" />
+                                <UpdateCategory :id_Category="category.id_Category" :name="category.name" @updateCategory="loadCategory" />
+                                <DeleteCategory :id_Category="category.id_Category" @disableCategory="handleCategoryDisabled" />
                             </div>
                         </TableCell>
                     </TableRow>

@@ -96,10 +96,10 @@ watch(isDialogOpen, (newVal) => {
 const handleSave = async () => {
     try {
         const payload = {
-            user_id: data.user,
-            collaborator_id: data.collaborator || null,
-            requestingCompany_id: data.requestingCompany,
-            supplierCompany_id: data.supplierCompany,
+            user: data.user,
+            collaborator: data.collaborator || null,
+            requestingCompany: data.requestingCompany,
+            supplierCompany: data.supplierCompany,
             type: data.type,
             article: data.article,
             description: data.description,

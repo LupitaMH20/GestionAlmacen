@@ -16,7 +16,7 @@ interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 interface Article { id_mainarticle: string, name: string }
 
-const props = defineProps<{
+const props = defineProps<{ 
     Request: {
         id_Request: number | string;
         title: string;

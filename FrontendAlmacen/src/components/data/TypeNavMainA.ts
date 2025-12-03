@@ -44,13 +44,7 @@ export const navMainA = [
                 routerName: "archived",
                 icon: BookmarkCheck,
                 isActive: true,
-            },
-            // {
-            //     title: "Devoluciones",
-            //     routerName: "returns",
-            //     icon: ArrowLeftRight,
-            //     isActive: true,
-            // },
+            }
         ]
     },
     {

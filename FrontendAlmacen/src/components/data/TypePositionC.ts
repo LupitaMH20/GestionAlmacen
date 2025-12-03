@@ -12,11 +12,11 @@ export const TypePositionC = [
         label : "Encargado"
     },
     {
-        value : "Storekeeper",
+        value : "storekeeper",
         label : "Almacenista"
     },
     {
-        value : "Counter",
+        value : "display",
         label : "Mostrador"
     }
 ]

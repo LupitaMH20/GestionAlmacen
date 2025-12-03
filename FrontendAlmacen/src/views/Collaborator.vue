@@ -16,6 +16,14 @@ const displayedCollaborator = ref<any[]>([])
 const filter = ref<'active' | 'inactive'>('active')
 const searchQuery = ref('')
 
+const positionMap: Record<string, string> = {
+    "director": "Director",
+    "counter": "Contador",
+    "manager": "Encargado",
+    "storekeeper": "Almacenista",
+    "display": "Mostrador"
+}
+
 const loadCollaborator = async () => {
     const url =
         filter.value === 'inactive'
@@ -68,7 +76,7 @@ onMounted(() => {
         <select v-model="filter" @change="loadCollaborator"
             class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
             <option value="active">Activa</option>
-            <option value="inactive">Desactiva</option>
+            <option value="inactive">Desactivado</option>
         </select>
     </div>
     <Card class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -88,6 +96,8 @@ onMounted(() => {
                         <TableHead>Apellido</TableHead>
                         <TableHead>Puesto</TableHead>
                         <TableHead>Empresa</TableHead>
+                        <TableHead>Dirección</TableHead>
+                        <TableHead>Telefono</TableHead>
                         <TableHead class="text-right"> Opciones </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -96,10 +106,12 @@ onMounted(() => {
                         <TableCell class="font-medium"> {{ collaborator.id_Collaborator }} </TableCell>
                         <TableCell>{{ collaborator.name }}</TableCell>
                         <TableCell>{{ collaborator.last_name }}</TableCell>
-                        <TableCell>{{ collaborator.position }}</TableCell>
+                        <TableCell>{{ positionMap[collaborator.position] || collaborator.position}}</TableCell>
                         <TableCell>{{ collaborator.company_name }}</TableCell>
+                        <TableCell>{{ collaborator.address }}</TableCell>
+                        <TableCell>{{ collaborator.phone }}</TableCell>
                         <TableCell v-if="collaborator.active" class="text-right">
-                            <div class="flex justify-end item-center gap-20">
+                            <div class="flex justify-end item-center gap-4">
                                 <UpdateCollaborator :collaborator="collaborator" :company="company"
                                     @updateCollaborator="loadCollaborator" />
                                 <DeleteCollaborator :id_Collaborator="collaborator.id_Collaborator"

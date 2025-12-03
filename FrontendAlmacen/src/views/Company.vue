@@ -56,7 +56,7 @@ onMounted(() => {
         <select v-model="filter" @change="loadCompanies"
             class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
             <option value="active">Activa</option>
-            <option value="inactive">Desactiva</option>
+            <option value="inactive">Desactivadas</option>
         </select>
     </div>
     <Card class="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">

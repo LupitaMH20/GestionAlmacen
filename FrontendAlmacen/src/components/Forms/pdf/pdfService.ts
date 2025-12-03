@@ -1,0 +1,81 @@
+import axios from 'axios';
+
+export const PdfService = {
+    async downloadEquipmentCheckout(requestId: number | string) {
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error("No token found");
+            }
+            const config = {
+                headers: { 'Authorization': `Bearer ${token}` },
+                responseType: 'blob' as const
+            };
+            const url = `http://127.0.0.1:8000/api/request/${requestId}/checkout-pdf/`
+            const response = await axios.get(url, config)
+
+            // Crear URL del blob
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Resguardo_Equipo_${requestId}.pdf`;
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error('Error descargando PDF:', error);
+            throw error;
+        }
+    },
+
+    async downloadQuotePdf(requestId: number | string) {
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error("No token found");
+            }
+            const config = {
+                headers: { 'Authorization': `Bearer ${token}` },
+                responseType: 'blob' as const
+            };
+            const url = `http://127.0.0.1:8000/api/request/${requestId}/quote-pdf/`
+            const response = await axios.get(url, config)
+
+            // Crear URL del blob
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Cotizacion_${requestId}.pdf`;
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error('Error descargando PDF de cotización:', error);
+            throw error;
+        }
+    },
+
+    async downloadBulkQuotePdf(requestIds: (number | string)[]) {
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error("No token found");
+            }
+            const config = {
+                headers: { 'Authorization': `Bearer ${token}` },
+                responseType: 'blob' as const
+            };
+            const url = `http://127.0.0.1:8000/api/request/bulk-quote-pdf/`
+            const response = await axios.post(url, { request_ids: requestIds }, config)
+
+            // Crear URL del blob
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Reporte_Solicitudes.pdf`;
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error('Error descargando PDF masivo:', error);
+            throw error;
+        }
+    }
+}

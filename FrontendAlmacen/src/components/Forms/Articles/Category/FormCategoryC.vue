@@ -19,8 +19,8 @@ defineExpose({submitForm})
     <form>
         <FormField name="category">
             <FormItem>
-                <div class="flex flex-col gap-2 p-1.5">
-                    <FormLabel class="text-24 font-sans font-bold">Ingerese la nueva categoria</FormLabel>
+                <div class="flex gap-2 p-1.5">
+                    <FormLabel class="text-35 font-sans font-bold">Ingerese la categoria: </FormLabel>
                     <FormControl>
                         <Input v-model="name" class="text-12 font-sans font-light" type="text" placeholder="Ingrese la categoria"></Input>
                     </FormControl>

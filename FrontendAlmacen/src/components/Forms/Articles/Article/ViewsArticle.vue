@@ -27,7 +27,7 @@ const loadArticle = async () => {
         articles.value = response.data
         displayedArticles.value = [...articles.value]
     } catch (errror) {
-
+        console.log('Error al cargar los articulos', errror)
     }
 }
 
@@ -62,13 +62,11 @@ const handleArticleDisabled = (id: string) => {
     articles.value = articles.value.map(u => u.id_mainarticle === id ? { ...u, active: false } : u)
     displayedArticles.value = displayedArticles.value.filter(u => u.id_mainarticle !== id)
 }
-
 onMounted(() => {
     loadArticle(),
-    loadCompany(),
-    loadCategory()
+        loadCompany(),
+        loadCategory()
 })
-
 </script>
 
 <template>
@@ -86,11 +84,9 @@ onMounted(() => {
                 <select v-model="filter" @change="loadArticle"
                     class="border border-gray-300 rounded-md text-base font-normal px-3 py-1 focus:outline-none focus:ring-2 focus:bg-white">
                     <option value="active">Activa</option>
-                    <option value="inactive">Desactiva</option>
+                    <option value="inactive">Desactivados</option>
                 </select>
             </div>
-
-
             <div class="flex justify-between items-center h-full w-full text-black font-sans font-bold text-3xl pt-5">
                 <CardTitle> Articulos </CardTitle>
                 <div class="flex items-center gap-2">
@@ -125,7 +121,7 @@ onMounted(() => {
                         <TableCell>{{ article.category_name }}</TableCell>
                         <TableCell>{{ article.company_name }}</TableCell>
                         <TableCell v-if="article.active" class="text-right">
-                            <div class="flex justify-end item-center gap-10">
+                            <div class="flex justify-end item-center gap-2">
                                 <ArticleUpdate :id_mainarticle="article.id_mainarticle" :companies="companies"
                                     @updateArticle="loadArticle" />
                                 <DeleteArticle :id_mainarticle="article.id_mainarticle"

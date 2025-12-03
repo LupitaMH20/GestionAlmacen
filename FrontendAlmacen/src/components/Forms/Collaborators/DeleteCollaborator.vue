@@ -9,19 +9,16 @@ import { Trash, Trash2, Ban } from 'lucide-vue-next';
 
 const props = defineProps<{ id_Collaborator: string }>()
 const emit = defineEmits(['disableCollaborator'])
-const isLoading = ref(false)
+
 
 const collaboratorDisabled = async (data: any) => {
   try {
-    isLoading.value = true
     await axios.patch(`http://127.0.0.1:8000/api/collaborator/${props.id_Collaborator}/`, {
       active: false
     })
     emit('disableCollaborator', props.id_Collaborator)
   } catch (error) {
     console.log('No se deshabilito el colaborador')
-  } finally {
-    isLoading.value = false
   }
 }
 </script>

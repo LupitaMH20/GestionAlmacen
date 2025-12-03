@@ -2,7 +2,8 @@
 import { defineProps, ref, computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Dialog from './Dialog.vue';
-import { Eye, FileText } from 'lucide-vue-next'
+import { Eye, FileText } from 'lucide-vue-next';
+import axios from 'axios';
 
 interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string; last_name: string };
@@ -56,6 +57,7 @@ const process = defineProps<{
                 collaborator?: string;
                 collaboratorName?: Collaborators;
                 comment?: string;
+                payment_status?: string;
                 date?: string;
                 time?: string;
             } | null
@@ -64,7 +66,9 @@ const process = defineProps<{
 }>();
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['card']);
+const emit = defineEmits(['card', 'updateRequest']);
+
+const paymentStatus = ref(process.acceptance?.requestactions?.supply?.payment_status || 'unpaid');
 
 const displayDateInfo = computed(() => {
     if ((process.currentStatus === 'supply') &&
@@ -96,6 +100,7 @@ const displayDateInfo = computed(() => {
         time: process.time
     };
 });
+
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-MX', {
         style: 'currency',
@@ -103,10 +108,48 @@ const formatCurrency = (value: number) => {
         minimumFractionDigits: 2
     }).format(value);
 };
+
+const showPaymentStatus = computed(() => {
+    return process.type === 'PersonalConsumption' && process.currentStatus === 'supply';
+});
+
+const updatePaymentStatus = async (newStatus: string) => {
+    try {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            alert('Sesión expirada. Por favor, inicie sesión nuevamente.');
+            return;
+        }
+
+        const supplyId = process.acceptance?.requestactions?.supply?.id_supply;
+        if (!supplyId) {
+            alert('Error: No se encontró el ID del suministro.');
+            return;
+        }
+
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await axios.patch(`http://127.0.0.1:8000/api/supply/${supplyId}/`, {
+            payment_status: newStatus
+        }, config);
+
+        paymentStatus.value = newStatus;
+        alert(`Estado de pago actualizado a: ${newStatus === 'paid' ? 'Pagado' : 'No Pagado'}`);
+        emit('updateRequest');
+    } catch (error) {
+        console.error('Error al actualizar estado de pago:', error);
+        alert('Error al actualizar el estado de pago.');
+    }
+};
 </script>
 
 <template>
-    <Card class="flex flex-col h-[40vh] w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card class="flex flex-col h-full w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
             <CardTitle class="text-lg font-semibold">{{ process.title }} (ID: {{ process.id_Request }})</CardTitle>
             <p class="text-sm">Producto: {{ process.article }}</p>
@@ -119,6 +162,26 @@ const formatCurrency = (value: number) => {
                 <span class="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs uppercase">
                     Rechazada
                 </span>
+            </div>
+
+            <!-- Payment Status Badge and Select for PersonalConsumption -->
+            <div v-if="showPaymentStatus" class="mt-2 flex items-center gap-2">
+                <span class="text-sm font-semibold">Estado de Pago:</span>
+                <span v-if="paymentStatus === 'unpaid'" 
+                      class="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs uppercase">
+                    No Pagada
+                </span>
+                <span v-else 
+                      class="font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs uppercase">
+                    Pagada
+                </span>
+                <select 
+                    v-model="paymentStatus"
+                    @change="updatePaymentStatus(paymentStatus)"
+                    class="ml-2 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="unpaid">No Pagada</option>
+                    <option value="paid">Pagada</option>
+                </select>
             </div>
         </CardHeader>
 

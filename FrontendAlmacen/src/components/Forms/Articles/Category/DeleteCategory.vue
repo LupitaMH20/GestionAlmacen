@@ -7,19 +7,20 @@ import {
 } from '../../../ui/alert-dialog'
 import { Trash, Trash2, Ban } from 'lucide-vue-next';
 
-const props = defineProps<{ id_Category: number }>()
-const emit = defineEmits(['disableArticle'])
+const props = defineProps<{ id_Category: string | number }>()
+const emit = defineEmits(['disableCategory'])
 const isLoading = ref(false)
 
 const CategoryDisabled = async (data: any) => {
     try {
         isLoading.value = true
+        console.log('id_Category', props.id_Category)   
         await axios.patch(`http://127.0.0.1:8000/api/category/${props.id_Category}/`, {
             active: false
         })
-        emit('disableArticle', props.id_Category)
+        emit('disableCategory', props.id_Category)
     } catch (error) {
-        console.log('No se deshabilito el colaborador')
+        console.log('No se deshabilito el categoria')
     } finally {
         isLoading.value = false
     }

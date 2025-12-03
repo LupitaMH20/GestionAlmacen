@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch, inject, Ref } from 'vue'
 import Dialog2 from '../../../../Elements/Dialog2.vue';
-import FormPrerequestC1 from './FormPreRequestC1.vue';
-import FormPreRequestC2 from '../PreRequest/FormPreRequestC2.vue';
-import { Building2, Notebook } from 'lucide-vue-next';
+import FormPreRequestU1 from './FormPreRequestU1.vue';
+import FormPreRequestU2 from './FormPreRequestU2.vue';
+import { Building2, Notebook, User2 } from 'lucide-vue-next';
 import axios from 'axios';
-import { User2 } from 'lucide-vue-next';
 
 interface User {
     id_user: string;
@@ -25,7 +24,7 @@ const props = defineProps<{
     Request: {
         id_Request: string | number;
         user?: string;
-        collaborator?: string;
+        collaborator?: any; // Puede ser ID o Objeto
         type?: string;
         article?: string;
         description?: string;
@@ -33,15 +32,15 @@ const props = defineProps<{
         status?: string;
         order_workshop?: string;
         store?: string;
-        requestingCompany?: string;
-        supplierCompany?: string;
+        requestingCompany?: any; // Puede ser ID o Objeto
+        supplierCompany?: any;   // Puede ser ID o Objeto
     }
 }>()
 
 const data = reactive({
-    id_Request: '',
+    id_Request: '' as string | number,
     user: '',
-    collaborator: '',
+    collaborator: '' as string | number,
     type: 'PersonalConsumption',
     article: '',
     description: '',
@@ -49,8 +48,8 @@ const data = reactive({
     status: 'prerequest',
     order_workshop: '',
     store: '',
-    requestingCompany: '',
-    supplierCompany: '',
+    requestingCompany: '' as string | number,
+    supplierCompany: '' as string | number,
 });
 
 const handleCancel = () => {
@@ -75,12 +74,25 @@ const loadCollaboartor = async () => {
     }
 }
 
+// Función auxiliar para extraer ID si es objeto
+const getId = (val: any, key: string = 'id') => {
+    if (val && typeof val === 'object') {
+        return val[key] || val.id || '';
+    }
+    return val;
+}
+
 watch(isDialogOpen, (newVal) => {
     if (newVal) {
+        // Lógica segura para extraer IDs
+        const reqCompanyId = getId(props.Request.requestingCompany, 'id_Company');
+        const supCompanyId = getId(props.Request.supplierCompany, 'id_Company');
+        const collabId = getId(props.Request.collaborator, 'id_Collaborator');
+
         Object.assign(data, {
             id_Request: props.Request.id_Request || '',
             user: props.Request.user || '',
-            collaborator: props.Request.collaborator || '',
+            collaborator: collabId || '',
             type: props.Request.type || '',
             article: props.Request.article || '',
             description: props.Request.description || '',
@@ -88,19 +100,20 @@ watch(isDialogOpen, (newVal) => {
             status: props.Request.status || 'prerequest',
             order_workshop: props.Request.order_workshop || '',
             store: props.Request.store || '',
-            requestingCompany: props.Request.requestingCompany || '',
-            supplierCompany: props.Request.supplierCompany || '',
+            requestingCompany: reqCompanyId || '',
+            supplierCompany: supCompanyId || '',
         });
         console.log("Formulario cargado con datos:", data);
     }
 });
+
 const handleSave = async () => {
     try {
         const payload = {
-            user_id: data.user,
-            collaborator_id: data.collaborator || null,
-            requestingCompany_id: data.requestingCompany,
-            supplierCompany_id: data.supplierCompany,
+            user: loggedInUser?.value?.id_user || null,
+            collaborator: data.collaborator || null,
+            requestingCompany: data.requestingCompany,
+            supplierCompany: data.supplierCompany,
             type: data.type,
             article: data.article,
             description: data.description,
@@ -109,8 +122,10 @@ const handleSave = async () => {
             order_workshop: data.order_workshop,
             store: data.store
         }
+        
         await axios.patch(`http://127.0.0.1:8000/api/request/${data.id_Request}/`, payload)
         console.log('Solicitud actualizada guardada con éxito')
+        console.log('Datos enviados:', payload)
         isDialogOpen.value = false
         emit('updatePreRequest')
     } catch (error) {
@@ -119,7 +134,8 @@ const handleSave = async () => {
 }
 
 onMounted(() => {
-    loadCompanies(), loadCollaboartor()
+    loadCompanies()
+    loadCollaboartor()
 })
 </script>
 
@@ -129,10 +145,10 @@ onMounted(() => {
         @cancel="handleCancel" v-model:open="isDialogOpen">
 
         <template #form1>
-            <FormPrerequestC1 v-model:props="data" :companies="company" :collaborator="collaborator" />
+            <FormPreRequestU1 v-model="data" :companies="company" :collaborator="collaborator" />
         </template>
         <template #form2>
-            <FormPreRequestC2 v-model:props="data" />
+            <FormPreRequestU2 v-model="data" />
         </template>
     </Dialog2>
 </template>

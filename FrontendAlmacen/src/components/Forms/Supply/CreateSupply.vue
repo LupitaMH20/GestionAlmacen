@@ -4,6 +4,7 @@ import FormSupply from '../Supply/FormSupply.vue';
 import { PackageCheck } from 'lucide-vue-next';
 import { ref, inject, Ref, computed, watch } from 'vue';
 import axios from 'axios';
+import { PdfService } from '../pdf/pdfService';
 
 interface Users { id_user: string; name: string; }
 
@@ -174,7 +175,6 @@ const handleSave = async () => {
         emit('supplyCreated');
     } catch (error) {
         console.error('Error completo:', error);
-
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 401) {
                 alert('Sesión expirada. Por favor, inicie sesión nuevamente.');
@@ -195,6 +195,15 @@ const handleCancel = () => {
     comment.value = '';
     selectedFile.value = null;
 };
+
+const handleDownloadPdf = async () => {
+    try {
+        await PdfService.downloadEquipmentCheckout(props.Request.id_Request);
+    } catch (error) {
+        console.error('Error al descargar PDF', error);
+        alert('Error al descargar el PDF.');
+    }
+};
 </script>
 
 <template>
@@ -203,6 +212,14 @@ const handleCancel = () => {
         <template #forms>
             <FormSupply :collaboratorsList="collaboratorsList" :requestType="props.Request.type"
                 v-model:collaboratorId="collaboratorId" v-model:comment="comment" v-model:selectedFile="selectedFile" />
+        </template>
+        <template #actions-extra>
+            <button v-if="props.Request.type === 'Tool' || props.Request.type === 'herramienta'"
+                type="button" 
+                class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" 
+                @click="handleDownloadPdf">
+                Generar PDF
+            </button>
         </template>
     </Dialog1>
 </template>

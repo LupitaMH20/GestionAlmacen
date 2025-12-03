@@ -108,6 +108,7 @@ const loadProcesses = async () => {
                             collaborator: supplyObj.collaborator?.id_Collaborator || supplyObj.collaborator,
                             collaboratorName: supplyObj.collaborator,
                             comment: supplyObj.comment,
+                            payment_status: supplyObj.payment_status || 'unpaid',
                             date: formatDate(supplyObj.supply_datetime),
                             time: formatTime(supplyObj.supply_datetime)
                         };

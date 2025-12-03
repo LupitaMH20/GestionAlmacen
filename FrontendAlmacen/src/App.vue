@@ -1,3 +1,11 @@
+<!-- <script setup lang="ts">
+import User from './views/User.vue';
+</script>
+
+<template>
+<User />
+</template> -->
+
 <script setup lang="ts">
 import { ref, provide, readonly, onMounted } from 'vue'
 

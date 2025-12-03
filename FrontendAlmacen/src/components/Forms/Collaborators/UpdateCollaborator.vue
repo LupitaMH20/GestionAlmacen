@@ -12,6 +12,8 @@ const props = defineProps<{
         last_name: string,
         position: string,
         company: string
+        address: string,
+        phone: string
     },
     company: Array<{
         id_Company: string,
@@ -30,7 +32,7 @@ const handleCancel = () => {
 
 const apiUpdateCollaborator = async (data: any) => {
     try {
-        console.log('Enviando PATCH a la API con datos:', data);
+        console.log('Enviando datos actualizados:', data);
         await axios.patch(`http://127.0.0.1:8000/api/collaborator/${props.collaborator.id_Collaborator}/`, data)
         console.log('colaborador actualizado',data);
         isDialogisOpen.value = false
@@ -46,7 +48,7 @@ const handleSave = () => {
         if (data) {
             apiUpdateCollaborator(data)
         }else {
-            console.log("Basio el formulario");
+            console.log("vacio el formulario");
         }
     } else {
         console.log('No continen nada el formulario')

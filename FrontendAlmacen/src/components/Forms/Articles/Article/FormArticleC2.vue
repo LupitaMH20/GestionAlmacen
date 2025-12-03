@@ -9,7 +9,6 @@ const props2 = defineProps<{
     companies: Array<{ id_Company: string, name: string }>
     category: Array<{ id_Category: string, name: string }>
 }>()
-
 </script>
 
 <template>

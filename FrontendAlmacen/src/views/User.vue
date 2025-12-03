@@ -37,7 +37,7 @@ const loadUsers = async () => {
         users.value = response.data
         displayedUsers.value = [...users.value]
     } catch (eror) {
-
+        console.log('Error al cargar usuarios', eror)
     }
 }
 
@@ -45,8 +45,7 @@ const searchUsers = () => {
     const query = searchQuery.value.toLowerCase()
     displayedUsers.value = users.value.filter(user =>
         user.id_user.toLowerCase().includes(query) ||
-        user.name.toLowerCase().includes(query) ||
-        user.last_name.toLowerCase().includes(query)
+        user.name.toLowerCase().includes(query)
     )
 }
 

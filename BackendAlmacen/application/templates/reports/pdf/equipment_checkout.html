@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Resguardo de Equipo</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 1.5cm;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: auto;
+        }
+
+        .header-title {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .section-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .content-text {
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        .specs-table {
+            margin: 15px 0;
+        }
+
+        .specs-table th,
+        .specs-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+            font-size: 10px;
+        }
+
+        .specs-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .personal-data-table {
+            background-color: #f9f9f9;
+            border-left: 4px solid #d32f2f;
+            margin-top: 15px;
+            padding: 10px;
+        }
+
+        .personal-data-table td {
+            padding: 4px;
+        }
+
+        .label {
+            font-weight: bold;
+            width: 120px;
+        }
+
+        .signatures-table {
+            margin-top: 50px;
+            width: 100%;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            margin: 0 20px;
+            padding-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 9px;
+            color: #999;
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <table class="header-table">
+        <tr>
+            <td width="20%">
+                <img src="{{ logo_path }}" class="logo-img" alt="Logo">
+            </td>
+            <td width="60%">
+                <div class="header-title">RESGUARDO</div>
+                <div class="header-subtitle">CARTA RESPONSIVA RESGUARDO DE EQUIPO</div>
+            </td>
+            <td width="20%" style="text-align: right;">
+                <!-- Espacio para logo empresa si fuera necesario -->
+            </td>
+        </tr>
+    </table>
+
+    <div style="border-bottom: 3px solid #000; margin-bottom: 20px;"></div>
+
+    <!-- Título -->
+    <div class="section-title">CARTA RESPONSIVA RESGUARDO DE EQUIPO</div>
+    <div class="section-subtitle">{{ company.name }}, {{ company.address }} a {{ formatted_date }}</div>
+
+    <!-- Contenido -->
+    <div class="content-text">
+        El que suscribe, <strong>{{ collaborator.name }} {{ collaborator.last_name }}</strong>,
+        de nacionalidad <strong>MEXICANO</strong>, con domicilio en
+        <strong>{{ collaborator.address }}</strong>, por este manifiesto
+        que es mi responsabilidad la salvaguarda del material que se me hace entrega,
+        <strong>{{ article.name }}</strong>, con caracteristicas <strong>{{ article.description }}</strong>
+        de manera enunciativa mas no limitativa.
+    </div>
+
+    <!-- Tabla de Características -->
+    <table class="specs-table">
+        <thead>
+            <tr>
+                <th>CARACTERÍSTICA</th>
+                <th>DETALLE</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for spec in article.specs %}
+            <tr>
+                <td>{{ spec.key }}</td>
+                <td>{{ spec.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Obligaciones -->
+    <div class="content-text">
+        <p>
+            <strong>
+                Declaro estar consciente de que el bien o artículo que se me entrega, así como cualquier accesorio,
+                línea, aplicación vinculada e información que circule por su uso, deberán ser exclusivos para el
+                desempeño de mis funciones dentro del Corporativo Medina. Asimismo, confirmo que me es entregado en
+                condiciones
+                aceptables de uso necesarias para realizar mis actividades, por lo que me comprometo a cuidarlo y
+                mantenerlo en
+                óptimas condiciones durante el tiempo que permanezca bajo mi responsabilidad.
+            </strong>
+        </p>
+
+        <p><strong>En caso de robo o daño, quedo obligado a dar aviso inmediato a las personas indicadas
+                de la empresa para realizar lo conducente. Asumo el compromiso de dar un uso adecuado conforme
+                a las leyes aplicables de la información y comunicación y demás legislaciones relacionadas.</strong></p>
+
+        <p><strong>Cualquier mal uso del mismo tendrá sanciones y en caso de pérdida será mi obligación
+                pagar la reposición del equipo.</strong></p>
+    </div>
+
+    <!-- Datos Personales -->
+    <table class="personal-data-table">
+        <tr>
+            <td class="label">Nombre:</td>
+            <td>{{ collaborator.name }} {{ collaborator.last_name }}</td>
+        </tr>
+        <tr>
+            <td class="label">Posición:</td>
+            <td>{{ collaborator_position }}</td>
+        </tr>
+        <tr>
+            <td class="label">Teléfono:</td>
+            <td>{{ collaborator.phone }}</td>
+        </tr>
+        <tr>
+            <td class="label">Articulo:</td>
+            <td>{{ article.name }}</td>
+        </tr>
+    </table>
+
+    <!-- Firmas -->
+    <table class="signatures-table">
+        <tr>
+            <td width="50%" align="center">
+                <div class="signature-name">_____________________</div>
+                <strong>REPRESENTANTE EMPRESA</strong>
+            </td>
+            <td width="50%" align="center">
+                <div class="signature-name">_____________________</div>
+                <strong>{{ collaborator.name }} {{ collaborator.last_name }}</strong><br>
+                <span style="font-size: 9px; color: #666;">(Colaborador)</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+        Documento generado
+    </div>
+</body>
+
+</html>

@@ -1,11 +1,16 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializer import *
 from django.db import transaction
 from rest_framework import serializers
+from .pdf.pdf_generator import ReportPDFGenerator, PDFGenerator
+from django.contrib.auth.decorators import login_required
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import get_object_or_404
+from article.models import Articles # Import Articles model
 
 class RequestViewSet(viewsets.ModelViewSet):
     queryset = Request.objects.all().order_by('-request_datetime')
@@ -153,7 +158,9 @@ class SupplyViewSet(viewsets.ModelViewSet):
         try:
             serializer.is_valid(raise_exception=True)
         except serializers.ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            print("ERRORES SUPPLY:", serializer.errors)
+            return Response({"error": str(e), "detail": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         self.perform_create(serializer)
         linked_request = serializer.instance.requestActions.acceptance.request
@@ -163,34 +170,324 @@ class SupplyViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class ReturnExchangeViewSet(viewsets.ModelViewSet):
-    queryset = ReturnExchange.objects.all().order_by('-returnE_datetime')
-    serializer_class = ReturnExchangeSerializer
+#Para el pdf
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_equipment_checkout_pdf(request, request_id):
+    """Descarga el PDF de resguardo de equipo"""
+    
+    # Obtener datos
+    checkout_request = get_object_or_404(Request, id_Request=request_id)
+    collaborator = checkout_request.collaborator
+    
+    # Obtener el objeto Article real
+    try:
+        article = Articles.objects.get(id_mainarticle=checkout_request.article)
+    except Articles.DoesNotExist:
+        # Fallback si no existe el artículo (aunque debería)
+        class DummyArticle:
+            name = checkout_request.article
+            description = "Artículo no encontrado"
+            id_mainarticle = checkout_request.article
+        article = DummyArticle()
+
+    company = checkout_request.requestingCompany
+    
+    # Generar PDF
+    pdf = ReportPDFGenerator.generate_equipment_checkout_pdf(
+        checkout_request,
+        collaborator,
+        article,
+        company
+    )
+    
+    if pdf:
+        return FileResponse(
+            pdf,
+            as_attachment=True,
+            filename=f"Resguardo_Equipo_{checkout_request.id_Request}.pdf",
+            content_type="application/pdf"
+        )
+    else:
+        return HttpResponse("Error al generar el PDF", status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_quote_pdf(request, request_id):
+    """Descarga el PDF de cotización"""
+    
+    # Obtener datos
+    quote_request = get_object_or_404(Request, id_Request=request_id)
+    
+    # Obtener el objeto Article real
+    try:
+        article = Articles.objects.get(id_mainarticle=quote_request.article)
+    except Articles.DoesNotExist:
+        class DummyArticle:
+            name = quote_request.article
+            description = "Artículo no encontrado"
+            id_mainarticle = quote_request.article
+        article = DummyArticle()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class AcceptanceViewSet(viewsets.ModelViewSet):
+    queryset = Acceptance.objects.all().order_by('-acceptance_datetime')
+    serializer_class = AcceptanceSerializer
+    permission_classes = [IsAuthenticated]
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-        except serializer.ValidationError as e:
+        except serializers.ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        validated_data = serializer.validated_data
+        pre_request = validated_data.get('request')
+        acceptor = request.user
+
+        if acceptor.position in ['applicant', 'deliberystaff']:
+            return Response(
+                {"error": "No tienes permisos para aceptar solicitudes."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        article_id_mainarticle = pre_request.article
+        requested_amount = pre_request.amount
+
+        try:
+            article_to_supply = Articles.objects.get(id_mainarticle__iexact=article_id_mainarticle)
+        except Articles.DoesNotExist:
+            return Response(
+                {"error": f"Artículo no registrado en el sistema: '{article_id_mainarticle}'. No se puede aceptar."},
+                status=status.HTTP_404_NOT_FOUND 
+            )
+        
+        if article_to_supply.stock < requested_amount:
+            return Response(
+                {"error": f"Stock insuficiente. Solicitados: {requested_amount}, Disponibles: {article_to_supply.stock}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        article_to_supply.stock -= requested_amount
+        article_to_supply.save()
+        pre_request.status = 'request'
+        pre_request.save()
+
+        acceptance_instance = serializer.save(user=acceptor, article=article_to_supply)
+        
+        return Response(
+            {"success": "Solicitud aceptada y stock actualizado.", "data": serializer.data},
+            status=status.HTTP_201_CREATED
+        )
+
+class RequestActionsViewSet(viewsets.ModelViewSet):
+    queryset = RequestActions.objects.all().order_by('-requestactions_datetime')
+    serializer_class = RequestActionsSerializer
+    permission_classes =[IsAuthenticated]
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        acceptance_to_action = serializer.validated_data.get('acceptance')
+        action_taken = serializer.validated_data.get('action')
+        authorizer = request.user
+        comment = serializer.validated_data.get('comment')
+
+        linked_request = acceptance_to_action.request
+        original_requester = linked_request.user
+
+        if authorizer.id_user == original_requester.id_user:
+            return Response({"error": "No puedes autorizar o rechazar tus propias solicitudes."}, status=status.HTTP_403_FORBIDDEN)
+        
+        if authorizer.position in ['applicant', 'deliberystaff']:
+            return Response(
+                {"error": "No tienes permisos para authorizar o rechazar."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # if authorizer.company != linked_request.requestingCompany:
+        #     return Response(
+        #         {"error": "No perteneces a la empresa de esta solicitud."},
+        #         status=status.HTTP_403_FORBIDDEN
+        #     )
+        
+        existing_action = None
+        if hasattr(acceptance_to_action, 'requestactions'):
+            existing_action = acceptance_to_action.requestactions
+        
+        if existing_action:
+            existing_action.action = action_taken
+            existing_action.comment = comment
+            existing_action.user = authorizer
+            existing_action.save()
+            
+            linked_request.status = action_taken
+            linked_request.save(update_fields=['status'])
+            
+            response_serializer = self.get_serializer(existing_action)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        
+        else:
+            linked_request.status = action_taken
+            linked_request.save(update_fields=['status'])
+            serializer.save(user=authorizer)
+            
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class SupplyViewSet(viewsets.ModelViewSet):
+    queryset = Supply.objects.all().order_by('-supply_datetime')
+    serializer_class = SupplySerializer
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            print("ERRORES SUPPLY:", serializer.errors)
+            return Response({"error": str(e), "detail": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         self.perform_create(serializer)
-        linked_request = serializer.instance.supply.requestActions.acceptance.request
-        linked_request.status = 'returnExchange'
+        linked_request = serializer.instance.requestActions.acceptance.request
+        linked_request.status = 'supply'
         linked_request.save(update_fields=['status'])
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+#Para el pdf
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_equipment_checkout_pdf(request, request_id):
+    """Descarga el PDF de resguardo de equipo"""
+    
+    # Obtener datos
+    checkout_request = get_object_or_404(Request, id_Request=request_id)
+    collaborator = checkout_request.collaborator
+    
+    # Obtener el objeto Article real
+    try:
+        article = Articles.objects.get(id_mainarticle=checkout_request.article)
+    except Articles.DoesNotExist:
+        # Fallback si no existe el artículo (aunque debería)
+        class DummyArticle:
+            name = checkout_request.article
+            description = "Artículo no encontrado"
+            id_mainarticle = checkout_request.article
+        article = DummyArticle()
+
+    company = checkout_request.requestingCompany
+    
+    # Generar PDF
+    pdf = ReportPDFGenerator.generate_equipment_checkout_pdf(
+        checkout_request,
+        collaborator,
+        article,
+        company
+    )
+    
+    if pdf:
+        return FileResponse(
+            pdf,
+            as_attachment=True,
+            filename=f"Resguardo_Equipo_{checkout_request.id_Request}.pdf",
+            content_type="application/pdf"
+        )
+    else:
+        return HttpResponse("Error al generar el PDF", status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_quote_pdf(request, request_id):
+    """Descarga el PDF de cotización"""
+    
+    # Obtener datos
+    quote_request = get_object_or_404(Request, id_Request=request_id)
+    
+    # Obtener el objeto Article real
+    try:
+        article = Articles.objects.get(id_mainarticle=quote_request.article)
+    except Articles.DoesNotExist:
+        class DummyArticle:
+            name = quote_request.article
+            description = "Artículo no encontrado"
+            id_mainarticle = quote_request.article
+        article = DummyArticle()
+
+    # Generar PDF
+    pdf = PDFGenerator.generate_quote_pdf(quote_request, article)
+    
+    if pdf:
+        return FileResponse(
+            pdf,
+            as_attachment=True,
+            filename=f"Cotizacion_{quote_request.id_Request}.pdf",
+            content_type="application/pdf"
+        )
+    else:
+        return HttpResponse("Error al generar el PDF de cotización", status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def download_bulk_quote_pdf(request):
+    """Descarga un PDF con múltiples solicitudes (tipo reporte)"""
+    
+    request_ids = request.data.get('request_ids', [])
+    
+    if not request_ids:
+        return Response({"error": "No se proporcionaron IDs de solicitud"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Fetch requests
+    requests_objs = Request.objects.filter(id_Request__in=request_ids).order_by('-request_datetime')
+    
+    if not requests_objs:
+        return Response({"error": "No se encontraron solicitudes"}, status=status.HTTP_404_NOT_FOUND)
+        
+    # Fetch articles for each request
+    articles_map = {}
+    for req in requests_objs:
+        try:
+            article = Articles.objects.get(id_mainarticle=req.article)
+        except Articles.DoesNotExist:
+            class DummyArticle:
+                name = req.article
+                description = "Artículo no encontrado"
+                id_mainarticle = req.article
+            article = DummyArticle()
+        articles_map[req.id_Request] = article
+
+    # Generar PDF
+    pdf = PDFGenerator.generate_bulk_quote_pdf(list(requests_objs), articles_map)
+    
+    if pdf:
+        return FileResponse(
+            pdf,
+            as_attachment=True,
+            filename=f"Reporte_Solicitudes_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+            content_type="application/pdf"
+        )
+    else:
+        return HttpResponse("Error al generar el PDF de reporte", status=400)
+
 # Se puede hacer manual mente pero ya esta que se haga automaticamente ya es innecesaria
-# def archive_request(request, request_id):
-#     try:
-#         req = Request.objects.get(id_Request=request_id)
-#         if req.status not in ['supply']:
-#             return Response({"error": "Debe de estar terminada para que se pueda archivar"}, status=status.HTTP_400_BAD_REQUEST)
-#         req.status = 'archived'
-#         req.save(update_fields=['status'])
-#         return Response({"mensaje": "Archivada"}, status=status.HTTP_200_OK)
-#     except Request.DoesNotExist:
-#         return Response({"error": "Solicitud no econtrada."}, status=status.HTTP_404_NOT_FOUND)
+@api_view(['POST']) # Added decorator for consistency if needed, or keep as is if used differently
+def archive_request(request, request_id):
+    try:
+        req = Request.objects.get(id_Request=request_id)
+        if req.status not in ['supply']:
+            return Response({"error": "Debe de estar terminada para que se pueda archivar"}, status=status.HTTP_400_BAD_REQUEST)
+        req.status = 'archived'
+        req.save(update_fields=['status'])
+        return Response({"mensaje": "Archivada"}, status=status.HTTP_200_OK)
+    except Request.DoesNotExist:
+        return Response({"error": "Solicitud no econtrada."}, status=status.HTTP_404_NOT_FOUND)

@@ -18,11 +18,15 @@ class ReturnExchangeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SupplySerializer(serializers.ModelSerializer):
-    requestActions = serializers.PrimaryKeyRelatedField(queryset=RequestActions.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
-    collaborator = serializers.PrimaryKeyRelatedField(queryset=Collaborators.objects.all())
-    user = UserSerializer(read_only=True)
-    collaborator = Collaboratorserializers(read_only=True)
+    requestActions = serializers.PrimaryKeyRelatedField(
+        queryset=RequestActions.objects.all()
+    )
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=Users.objects.all()
+    )
+    collaborator = serializers.PrimaryKeyRelatedField(
+        queryset=Collaborators.objects.all()
+    )
 
     class Meta:
         model = Supply

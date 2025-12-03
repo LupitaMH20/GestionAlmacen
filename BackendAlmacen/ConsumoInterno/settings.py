@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'article',
     'category',
     'application',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'django_extensions',
 ]
 
 REST_FRAMEWORK = {

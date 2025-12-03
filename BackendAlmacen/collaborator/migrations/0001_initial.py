@@ -20,6 +20,8 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50)),
                 ('last_name', models.CharField(max_length=50)),
                 ('position', models.CharField(max_length=50)),
+                ('home_address', models.CharField(max_length=200)),
+                ('phone', models.CharField(max_length=15)),
                 ('active', models.BooleanField(default=True)),
                 ('create_at', models.DateTimeField(auto_now_add=True)),
             ],

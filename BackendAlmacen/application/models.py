@@ -52,6 +52,17 @@ class Supply(models.Model):
     document = models.FileField(upload_to='supplies/', null=True, blank=True)
     supply_datetime = models.DateTimeField(auto_now_add=True)
     
+    PAYMENT_STATUS_CHOICES = [
+        ('paid', 'Pagado'),
+        ('unpaid', 'No Pagado'),
+    ]
+    payment_status = models.CharField(
+        max_length=10, 
+        choices=PAYMENT_STATUS_CHOICES, 
+        default='unpaid',
+        help_text='Estado de pago para solicitudes de Consumo Personal'
+    )
+    
 class ReturnExchange(models.Model):
     id_returnExchange = models.AutoField(primary_key=True)
     supply = models.OneToOneField(Supply, on_delete=models.SET_NULL, null=True, blank=True)

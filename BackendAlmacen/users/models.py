@@ -34,7 +34,6 @@ class UsersManager(BaseUserManager):
 
 class Users(AbstractBaseUser, PermissionsMixin):
     id_user = models.CharField(primary_key=True, max_length=20) 
-    
     name = models.CharField(max_length=50, unique=True)
     position = models.CharField(max_length=50, blank=True, null=True)
     admin = models.BooleanField(default=False)

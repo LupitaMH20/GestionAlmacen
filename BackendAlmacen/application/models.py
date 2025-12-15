@@ -20,6 +20,7 @@ class Request(models.Model):
     is_paid = models.BooleanField(default=False)
     request_datetime = models.DateTimeField(auto_now_add=True)
     archived_datetime = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id_Request}-{self.status}"

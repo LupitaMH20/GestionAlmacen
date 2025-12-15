@@ -21,7 +21,6 @@ class PDFGenerator:
 
     @staticmethod
     def value_to_text(value):
-        # Placeholder for number to text conversion
         return f"{value} (Monto en texto pendiente)"
 
     @staticmethod
@@ -32,7 +31,6 @@ class PDFGenerator:
             "Naranja": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Naranja-Store-Ferreterias_mppkih.png",
             "JOM": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1760545192/JOM_q0pkvn.png"
         }
-        # Default to JOM if not found, or check for partial matches
         for key, url in logos.items():
             if key.lower() in str(company_name).lower():
                 return url
@@ -40,35 +38,31 @@ class PDFGenerator:
 
     @staticmethod
     def generate_quote_pdf(request, article_obj):
-        # Map Request to Quote context
         return PDFGenerator.generate_bulk_quote_pdf([request], [article_obj])
 
     @staticmethod
     def generate_bulk_quote_pdf(requests, articles_map):
-        # requests: list of Request objects
-        # articles_map: dict mapping request.id_Request to article_obj OR list of article_obj matching requests order
-        
         items = []
         
-        # Determine representative company/user for header
         first_req = requests[0] if requests else None
         
         if not first_req:
             return None
 
-        # Try to find common company
         company_name = first_req.requestingCompany.name
         company_address = first_req.requestingCompany.address
         
-        # Check if all requests are from same company
-        same_company = all(r.requestingCompany.id_Company == first_req.requestingCompany.id_Company for r in requests)
+        same_company = all(
+            r.requestingCompany.id_Company == first_req.requestingCompany.id_Company 
+            for r in requests
+        )
         
         if not same_company:
             company_name = "Varios Clientes"
             company_address = "---"
 
         for i, req in enumerate(requests):
-            # Handle article object retrieval
+            # Obtener artículo
             article_obj = None
             if isinstance(articles_map, dict):
                 article_obj = articles_map.get(req.id_Request)
@@ -77,21 +71,17 @@ class PDFGenerator:
             
             quantity = req.amount
             
-            # Price logic
-            price = 0
-            if hasattr(article_obj, 'price'):
-                 price = article_obj.price
-            elif hasattr(req, 'article_price'):
-                 price = req.article_price
+            # Obtener precio
+            price = Decimal("0.00")
+            if article_obj and hasattr(article_obj, 'price'):
+                try:
+                    price = Decimal(str(article_obj.price))
+                except:
+                    price = Decimal("0.00")
             
-            try:
-                price = Decimal(str(price))
-            except:
-                price = Decimal("0.00")
-                
             subtotal = price * Decimal(str(quantity))
             
-            # Status Label Logic
+            # Mapear status
             status_map = {
                 'archived': 'Archivado',
                 'supply': 'Surtido',
@@ -103,12 +93,17 @@ class PDFGenerator:
             }
             status_label = status_map.get(req.status, req.status)
             
-            # Date Formatting
+            # Formatear fecha
             date_str = req.request_datetime.strftime("%d/%m/%Y") if req.request_datetime else "---"
             time_str = req.request_datetime.strftime("%H:%M") if req.request_datetime else ""
 
-            # Request type
-            req_type = "Herramienta" if req.request_type == 'Tool' else "Consumible"
+            # Tipo de solicitud - CORREGIDO
+            type_map = {
+                'Consumable': 'Consumible',
+                'Tool': 'Herramienta',
+                'PersonalConsumption': 'Consumo Personal'
+            }
+            req_type = type_map.get(req.type, req.type)
 
             items.append({
                 "id": req.id_Request,
@@ -122,7 +117,7 @@ class PDFGenerator:
                 "amount": quantity,
                 "unit_price": PDFGenerator.fmt_decimal(price),
                 "total": PDFGenerator.fmt_decimal(subtotal),
-                "requester": f"{req.user.name} {getattr(req.user, 'last_name', '')}",
+                "requester": f"{req.user.name} {getattr(req.user, 'last_name', '')}".strip(),
                 "company": req.requestingCompany.name if req.requestingCompany else "---"
             })
 
@@ -209,10 +204,7 @@ class ReportPDFGenerator:
     def generate_equipment_checkout_pdf(request, collaborator, article, company):
         """Genera PDF de entrega de equipo (Resguardo)"""
         
-        # Enriquecer objetos con datos faltantes para evitar errores en template
-        # Estos campos no existen en el modelo, se agregan dinámicamente
-        
-        # Request
+        # Datos por defecto
         if not hasattr(request, 'credential_number'):
             request.credential_number = "N/A"
         if not hasattr(request, 'serial_number'):
@@ -220,7 +212,7 @@ class ReportPDFGenerator:
         if not hasattr(request, 'phone_number'):
             request.phone_number = "N/A"
         
-        # Format Date manually to Spanish
+        # Fecha en español
         months = {
             1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 5: "Mayo", 6: "Junio",
             7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
@@ -233,9 +225,8 @@ class ReportPDFGenerator:
             now = datetime.now()
             formatted_date = f"{now.day} de {months.get(now.month, '')} de {now.year}"
             
-        # Article
+        # Especificaciones del artículo
         if not hasattr(article, 'specs'):
-            # Intentar parsear description si tiene formato clave:valor
             specs = []
             if article.description:
                 parts = article.description.split(',')
@@ -247,11 +238,11 @@ class ReportPDFGenerator:
                         specs.append({'key': 'Descripción', 'value': part.strip()})
             
             if not specs:
-                 specs.append({'key': 'Descripción', 'value': article.description or "Sin descripción"})
+                specs.append({'key': 'Descripción', 'value': article.description or "Sin descripción"})
             
             article.specs = specs
 
-        # Translate Position
+        # Traducir posición
         position_map = {
             "applicant": "Solicitante",
             "deliberystaff": "Repartidor",
@@ -260,21 +251,23 @@ class ReportPDFGenerator:
             "warehouse": "Almacenista"
         }
         
-        # Use a temporary attribute for the translated position to avoid saving it to DB
-        collaborator_position_es = position_map.get(str(collaborator.position).lower(), collaborator.position)
+        collaborator_position_es = position_map.get(
+            str(collaborator.position).lower(), 
+            collaborator.position
+        )
 
-        # Get Dynamic Logo
         logo_path = PDFGenerator.get_logo_url(company.name)
 
         context = {
             "request": request,
             "collaborator": collaborator,
-            "collaborator_position": collaborator_position_es, # Pass translated position
+            "collaborator_position": collaborator_position_es,
             "article": article,
             "company": company,
             "formatted_date": formatted_date,
             "logo_path": logo_path,
         }
+        
         return ReportPDFGenerator._generate_pdf(
             "reports/pdf/equipment_checkout.html", context
         )

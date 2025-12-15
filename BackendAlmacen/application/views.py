@@ -126,6 +126,13 @@ class AcceptanceViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND 
             )
         
+
+        # Lógica de reintento: Si la solicitud ya fue aceptada (probablemente rechazada y regenerada),
+        # limpiamos la aceptación previa "stale" para permitir el nuevo flujo.
+        if hasattr(pre_request, 'acceptance'):
+            print(f"Limpiando aceptación previa para solicitud {pre_request.id_Request}")
+            pre_request.acceptance.delete()
+
         # Validar si el artículo está activo
         if not article_to_supply.active:
             return Response(

@@ -20,14 +20,14 @@ interface LoggedInUserType {
 
 interface ProcessData {
     id_Request: number | string;
-    title: string; 
-    article: string; 
-    articleName?: { name: string }; 
-    currentStatus: string; 
-    statusLabel: string; 
+    title: string;
+    article: string;
+    articleName?: { name: string };
+    currentStatus: string;
+    statusLabel: string;
     date: string;
     time: string;
-    type: string; 
+    type: string;
     user?: any;
     userName?: Users;
     collaboratorName?: Collaborators;
@@ -71,12 +71,12 @@ const uniqueCompanies = computed(() => {
 const filteredProcesses = computed(() => {
     // A. SEGURIDAD: Si no hay usuario o no es Contador/Director/Admin, tabla vacía.
     if (!loggedInUser?.value) return [];
-    
+
     const position = loggedInUser.value.position.toLowerCase();
     const rolesPermitidos = ['counter', 'director']; // Ajusta a tus nombres de roles exactos
-    
+
     if (!rolesPermitidos.includes(position) && !loggedInUser.value.admin) {
-        return []; 
+        return [];
     }
 
     // B. FILTROS DE LA INTERFAZ
@@ -89,7 +89,7 @@ const filteredProcesses = computed(() => {
         const matchCompany = filterCompany.value === 'All' || item.requestingCompany == filterCompany.value;
         // 4. Buscador
         const query = searchQuery.value.toLowerCase();
-        const matchSearch = !query || 
+        const matchSearch = !query ||
             item.title.toLowerCase().includes(query) ||
             item.article.toLowerCase().includes(query) ||
             item.id_Request.toString().includes(query) ||
@@ -115,7 +115,7 @@ const loadProcesses = async () => {
             "Tool": 'Herramientas',
             "PersonalConsumption": 'Consumo Personal',
         };
-        
+
         const statusMap: Record<string, string> = {
             'prerequest': 'Pre-Solicitud',
             'request': 'Solicitud',
@@ -130,7 +130,7 @@ const loadProcesses = async () => {
         allProcesses.value = response.data.map((item: any) => {
             const unitPrice = Number(item.article_price) || 0;
             const amount = Number(item.amount) || 0;
-            
+
             // Formato de fecha simple para tabla
             const dateObj = new Date(item.request_datetime);
             const dateStr = dateObj.toLocaleDateString('es-MX');
@@ -143,13 +143,13 @@ const loadProcesses = async () => {
                 article: item.article,
                 // Asegúrate de que tu backend envíe article_obj o article_name
                 articleName: item.article_obj || { name: item.article_name || '---' },
-                
+
                 currentStatus: item.status,
                 statusLabel: statusMap[item.status] || item.status,
 
                 date: dateStr,
                 time: timeStr,
-                
+
                 amount: amount,
                 unitPrice: unitPrice,
                 totalValue: unitPrice * amount,
@@ -175,23 +175,18 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="p-6 space-y-6">
-        
-        <div class="flex items-center gap-2 mb-4">
-            <FileText class="w-8 h-8 text-blue-600"/> 
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Historial de Solicitudes</h1>
-            </div>
-        </div>
-
-        <div class="flex flex-col lg:flex-row justify-between items-stretch w-full gap-4">
-            
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col gap-4 min-w-[280px]">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Historial de Solicitudes</h1>
+    </div>
+    <div class="flex justify-between items-center w-full mb-2">
+        <Card cladss="p-4 space-y-4">
+            <div class="flex flex-col md:flex-row gap-4 p-4 md:gap-8">
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-bold text-gray-500 uppercase">1. Etapa</label>
-                    <select v-model="filterStatus" class="h-10 rounded-md border border-gray-300 px-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                    <select v-model="filterStatus"
+                        class="h-10 rounded-md border border-gray-300 px-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         <option value="All">Todas las etapas</option>
-                        <option value="archived">Archivadas (Default)</option>
+                        <option value="archived">Archivadas</option>
                         <option value="finished">Terminadas</option>
                         <option value="supply">Surtidas</option>
                         <option value="authorized">Autorizadas</option>
@@ -203,7 +198,8 @@ onMounted(() => {
 
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-bold text-gray-500 uppercase">2. Tipo</label>
-                    <select v-model="filterType" class="h-10 rounded-md border border-gray-300 px-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                    <select v-model="filterType"
+                        class="h-10 rounded-md border border-gray-300 px-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         <option value="All">Todos los tipos</option>
                         <option value="Consumable">Consumibles</option>
                         <option value="Tool">Herramientas</option>
@@ -213,7 +209,8 @@ onMounted(() => {
 
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-bold text-gray-500 uppercase">3. Empresa Solicitante</label>
-                    <select v-model="filterCompany" class="h-10 rounded-md border border-gray-300 px-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                    <select v-model="filterCompany"
+                        class="h-10 rounded-md border border-gray-300 px-3 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
                         <option value="All">Todas las empresas</option>
                         <option v-for="comp in uniqueCompanies" :key="comp.id" :value="comp.id">
                             {{ comp.name }}
@@ -221,23 +218,23 @@ onMounted(() => {
                     </select>
                 </div>
             </div>
-
-            <Card class="bg-green-50 border-green-200 shadow-sm min-w-[280px] flex items-center justify-center">
-                <CardContent class="p-6 flex flex-col items-center w-full">
-                    <span class="text-sm font-medium text-green-600 uppercase tracking-wider mb-1">Importe Total</span>
-                    <span class="text-4xl font-bold text-green-700 mb-1">
-                        {{ formatCurrency(totalFilteredMoney) }}
-                    </span>
-                    <span class="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                        {{ filteredProcesses.length }} registros encontrados
-                    </span>
-                </CardContent>
-            </Card>
-        </div>
-
+        </Card>
+        <Card class="bg-green-50 border-green-200 shadow-sm min-w-[280px] flex items-center justify-center">
+            <CardContent class="p-6 flex flex-col items-center w-full">
+                <span class="text-sm font-medium text-green-600 uppercase tracking-wider mb-1">Importe Total</span>
+                <span class="text-4xl font-bold text-green-700 mb-1">
+                    {{ formatCurrency(totalFilteredMoney) }}
+                </span>
+                <span class="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                    {{ filteredProcesses.length }} registros encontrados
+                </span>
+            </CardContent>
+        </Card>
+    </div>
+    <Card>
         <div class="rounded-md border bg-white shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left">
+                <table class="w-full text-sm text-left overflow-y-auto">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b">
                         <tr>
                             <th class="px-4 py-3">ID</th>
@@ -253,10 +250,12 @@ onMounted(() => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="item in filteredProcesses" :key="item.id_Request" class="border-b hover:bg-gray-50 transition-colors">
+                        <tr v-for="item in filteredProcesses" :key="item.id_Request"
+                            class="border-b hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3 font-medium text-gray-900">#{{ item.id_Request }}</td>
                             <td class="px-4 py-3">
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold inline-block min-w-[80px] text-center"
+                                <span
+                                    class="px-2 py-1 rounded-full text-xs font-semibold inline-block min-w-[80px] text-center"
                                     :class="{
                                         'bg-gray-200 text-gray-800': item.currentStatus === 'archived',
                                         'bg-green-100 text-green-800': item.currentStatus === 'supply' || item.currentStatus === 'finished',
@@ -272,12 +271,15 @@ onMounted(() => {
                             </td>
                             <td class="px-4 py-3">{{ item.title }}</td>
                             <td class="px-4 py-3">
-                                <div class="font-medium text-gray-900">{{ item.articleName?.name || item.article }}</div>
+                                <div class="font-medium text-gray-900">{{ item.articleName?.name || item.article }}
+                                </div>
                                 <div v-if="item.articleName" class="text-xs text-gray-400">ID: {{ item.article }}</div>
                             </td>
                             <td class="px-4 py-3 text-right font-medium">{{ item.amount }}</td>
-                            <td class="px-4 py-3 text-right text-gray-500">{{ formatCurrency(item.unitPrice || 0) }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-green-600">{{ formatCurrency(item.totalValue || 0) }}</td>
+                            <td class="px-4 py-3 text-right text-gray-500">{{ formatCurrency(item.unitPrice || 0) }}
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-green-600">{{ formatCurrency(item.totalValue
+                                || 0) }}</td>
                             <td class="px-4 py-3">
                                 <div class="font-medium">{{ item.userName?.name }} {{ item.userName?.last_name }}</div>
                                 <div class="text-xs text-gray-400">{{ item.collaboratorName?.name }}</div>
@@ -289,9 +291,10 @@ onMounted(() => {
                         <tr v-if="filteredProcesses.length === 0">
                             <td colspan="10" class="px-4 py-12 text-center text-gray-500">
                                 <div class="flex flex-col items-center gap-2">
-                                    <Search class="w-8 h-8 text-gray-300"/>
+                                    <Search class="w-8 h-8 text-gray-300" />
                                     <p>No se encontraron registros con los filtros seleccionados.</p>
-                                    <p v-if="!loggedInUser" class="text-xs text-red-400">Verifica que hayas iniciado sesión.</p>
+                                    <p v-if="!loggedInUser" class="text-xs text-red-400">Verifica que hayas iniciado
+                                        sesión.</p>
                                 </div>
                             </td>
                         </tr>
@@ -299,5 +302,5 @@ onMounted(() => {
                 </table>
             </div>
         </div>
-    </div>
+    </Card>
 </template>

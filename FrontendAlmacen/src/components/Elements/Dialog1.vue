@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSlots, defineEmits, defineModel } from 'vue';
+import { useSlots} from 'vue';
 import { Dialog, DialogContent, DialogFooter, DialogTrigger, DialogTitle } from '../ui/dialog';
 import Button from '../ui/button/Button.vue';
 import { LucideIcon } from 'lucide-vue-next';

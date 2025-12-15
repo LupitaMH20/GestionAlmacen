@@ -22,10 +22,6 @@ const collaboratorId = defineModel<string | null>('collaboratorId');
 const comment = defineModel<string>('comment');
 const selectedFile = defineModel<File | null>('selectedFile');
 
-const showDocumentUpload = computed(() => {
-    return props.requestType === 'Tool';
-});
-
 const pdfPreviewUrl = ref<string | null>(null);
 const showPreview = ref(false);
 
@@ -109,7 +105,7 @@ watch(() => selectedFile.value, (newVal) => {
             <Textarea v-model="comment" placeholder="Detalles de la entrega..." class="w-75 font-sans text-12 font-light my-3 h-25" :rows="4" />
         </div>
 
-        <div v-if="showDocumentUpload" class="flex flex-col gap-3">
+        <div class="flex flex-col gap-3">
             <Label>Documento (Evidencia PDF)</Label>
             <Input type="file" 
                 accept="application/pdf"

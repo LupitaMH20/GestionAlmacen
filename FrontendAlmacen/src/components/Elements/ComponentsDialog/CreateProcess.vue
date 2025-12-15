@@ -11,6 +11,9 @@ import Decline from '../../Forms/AuthorizeDeclined/CreateDecline.vue';
 //create de supply
 import CreateSupply from '../../Forms/Supply/CreateSupply.vue';
 
+// Regenerate Request
+import RegenerateRequest from '../../Forms/Applications/RegenerateRequest.vue';
+
 interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string; };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
@@ -83,8 +86,9 @@ const validRequestType = ['Consumable', 'Tool', 'PersonalConsumption'];
             : props.Request.type === 'Tool' ? CreateApplicationT
                 : props.Request.type === 'PersonalConsumption' ? CreateApplicationCP
                     : null" :Request="props.Request" @createRequest="emit('createPrecess')" />
+                    <Decline :Request="props.Request" @createAuthorized="emit('createPrecess')" />
     </div>
-    <div v-else-if="props.Request.status === 'request' || props.Request.status === 'declined'">
+    <div v-else-if="props.Request.status === 'request'">
         <div class="flex justify-center gap-2" v-if="validRequestType.includes(props.Request.type || '')">
             <Authorized :Request="props.Request" @createAuthorized="emit('createPrecess')" />
             <Decline :Request="props.Request" @createAuthorized="emit('createPrecess')" />
@@ -92,5 +96,8 @@ const validRequestType = ['Consumable', 'Tool', 'PersonalConsumption'];
     </div>
     <div v-else-if="props.Request.status === 'authorized'">
         <CreateSupply :Request="props.Request" @supplyCreated="emit('createPrecess')" />
+    </div>
+    <div v-else-if="props.Request.status === 'declined'">
+        <RegenerateRequest :Request="props.Request" @regenerate="emit('createPrecess')" />
     </div>
 </template>

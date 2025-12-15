@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import login from '../components/pages/login.vue';
 import Admin from '../components/pages/Admin.vue';
 import Staff from '../components/pages/Staff.vue';
+import Manager from '../components/pages/Manager.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -40,6 +41,23 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'supply', name: 'staff-supply', component: () => import('../views/Supply.vue') },
     ]
   },
+  {
+    path: '/manager',
+    name: 'manager',
+    component: Manager,
+    meta: { requiresAuth: true },
+    redirect: { name: 'manager-start' },
+    children: [
+      { path: 'start', name: 'manager-start', component: () => import('../views/Start.vue') },
+      { path: 'preApplication', name: 'manager-preApplication', component: () => import("../views/PreApplication.vue") },
+      { path: 'application', name: 'manager-application', component: () => import('../views/Application.vue') },
+      { path: 'authorize', name: 'manager-authorize', component: () => import('../views/Authorize.vue') },
+      { path: 'supply', name: 'manager-supply', component: () => import('../views/Supply.vue') },
+      { path: 'archived', name: "manager-archived", component: () => import('../views/Archived.vue') },
+      { path: 'articles', name: 'manager-articles', component: () => import('../views/Articles.vue') },
+    ]
+  },
+
   { path: '/', redirect: '/login' },
   { path: '/login', name: 'login', component: login, meta: { requiresGuest: true } }
 ];
@@ -60,10 +78,12 @@ router.beforeEach((to, from, next) => {
     const user = JSON.parse(sessionStorage.getItem('user')!);
     const position = user.position?.toLowerCase();
 
-    if (['managerJom', 'managerNs', 'managerPrintek', 'managerHefesto', 'managerBlackWorkshop', 'applicant', 'deliberystaff'].includes(position)) {
+    if (['applicant', 'deliberystaff'].includes(position)) {
       next({ name: 'staff' });
     } else if (['director', 'counter'].includes(position)) {
       next({ name: 'admin' });
+    } else if (['managerjom', 'managerns', 'managerprintek', 'managerhefesto', 'managerblackworkshop', 'managerelektra'].includes(position)) {
+      next({ name: 'manager' });
     } else {
       next();
     }

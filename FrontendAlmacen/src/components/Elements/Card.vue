@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Dialog from './Dialog.vue';
 import { Eye, FileText } from 'lucide-vue-next';
@@ -66,7 +66,7 @@ const process = defineProps<{
 }>();
 
 const isDialogOpen = ref(false)
-const emit = defineEmits(['card', 'updateRequest']);
+const emit = defineEmits(['card', 'update-request']);
 
 const paymentStatus = ref(process.acceptance?.requestactions?.supply?.payment_status || 'unpaid');
 
@@ -110,7 +110,7 @@ const formatCurrency = (value: number) => {
 };
 
 const showPaymentStatus = computed(() => {
-    return process.type === 'PersonalConsumption' && process.currentStatus === 'supply';
+    return (process.type === 'PersonalConsumption' || process.type === 'Tool') && process.currentStatus === 'supply';
 });
 
 const updatePaymentStatus = async (newStatus: string) => {
@@ -140,10 +140,36 @@ const updatePaymentStatus = async (newStatus: string) => {
 
         paymentStatus.value = newStatus;
         alert(`Estado de pago actualizado a: ${newStatus === 'paid' ? 'Pagado' : 'No Pagado'}`);
-        emit('updateRequest');
+        emit('update-request');
     } catch (error) {
         console.error('Error al actualizar estado de pago:', error);
         alert('Error al actualizar el estado de pago.');
+    }
+};
+
+const archiveRequest = async () => {
+    if (!confirm('¿Estás seguro de que deseas archivar esta solicitud manualmente?')) return;
+
+    try {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            alert('Sesión expirada. Por favor, inicie sesión nuevamente.');
+            return;
+        }
+
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        await axios.post(`http://127.0.0.1:8000/api/request/${process.id_Request}/archive/`, {}, config);
+
+        alert('Solicitud archivada exitosamente.');
+        emit('update-request');
+    } catch (error) {
+        console.error('Error al archivar solicitud:', error);
+        alert('Error al archivar la solicitud.');
     }
 };
 </script>
@@ -166,18 +192,14 @@ const updatePaymentStatus = async (newStatus: string) => {
 
             <!-- Payment Status Badge and Select for PersonalConsumption -->
             <div v-if="showPaymentStatus" class="mt-2 flex items-center gap-2">
-                <span class="text-sm font-semibold">Estado de Pago:</span>
-                <span v-if="paymentStatus === 'unpaid'" 
-                      class="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs uppercase">
+                <span v-if="paymentStatus === 'unpaid'"
+                    class="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full text-xs uppercase">
                     No Pagada
                 </span>
-                <span v-else 
-                      class="font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs uppercase">
+                <span v-else class="font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full text-xs uppercase">
                     Pagada
                 </span>
-                <select 
-                    v-model="paymentStatus"
-                    @change="updatePaymentStatus(paymentStatus)"
+                <select v-model="paymentStatus" @change="updatePaymentStatus(paymentStatus)"
                     class="ml-2 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="unpaid">No Pagada</option>
                     <option value="paid">Pagada</option>
@@ -193,7 +215,11 @@ const updatePaymentStatus = async (newStatus: string) => {
             </div>
         </CardContent>
 
-        <CardFooter class="flex justify-end">
+        <CardFooter class="flex justify-end gap-2">
+            <button v-if="process.currentStatus === 'supply'" @click="archiveRequest"
+                class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm font-semibold shadow-sm">
+                Archivar
+            </button>
             <Dialog v-model="isDialogOpen" :title="`Detalles de ${process.title}`" titleButton="Detalles" :iconP="Eye"
                 :iconT="FileText" :Request="process" @dialog="emit('card')" />
         </CardFooter>

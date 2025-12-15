@@ -105,12 +105,6 @@ const handleSave = async () => {
         return;
     }
 
-    if (!props.Request.acceptance || !props.Request.acceptance.id_acceptance) {
-        alert("Error: No se encontró el ID de Aceptación (id_acceptance) en esta solicitud.");
-        console.log(props)
-        return;
-    }
-
     try {
         const token = sessionStorage.getItem('token');
         if (!token) {
@@ -118,19 +112,35 @@ const handleSave = async () => {
             return;
         }
 
-        const payload = {
-            acceptance: props.Request.acceptance.id_acceptance,
-            action: 'declined',
-            comment: comment.value
-        };
-
         const config = {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         }
 
-        await axios.post('http://127.0.0.1:8000/api/requestActions/', payload, config)
+        // Lógica para Pre-Solicitud (No tiene aceptación aún)
+        if (props.Request.status === 'prerequest') {
+            const payload = {
+                reason: comment.value
+            };
+            await axios.post(`http://127.0.0.1:8000/api/request/${props.Request.id_Request}/decline_prerequest/`, payload, config);
+        }
+        // Lógica para Solicitud (Ya tiene aceptación)
+        else {
+            if (!props.Request.acceptance || !props.Request.acceptance.id_acceptance) {
+                alert("Error: No se encontró el ID de Aceptación (id_acceptance) en esta solicitud.");
+                console.log(props)
+                return;
+            }
+
+            const payload = {
+                acceptance: props.Request.acceptance.id_acceptance,
+                action: 'declined',
+                comment: comment.value
+            };
+            await axios.post('http://127.0.0.1:8000/api/requestActions/', payload, config);
+        }
+
         alert('Solicitud Rechazada');
         isDialogOpen.value = false
         emit('createAuthorized');
@@ -139,9 +149,9 @@ const handleSave = async () => {
         console.error('Error al Rechazar:', error);
         if (axios.isAxiosError(error) && error.response) {
             if (error.response.status === 404) {
-                alert("Error 404: No se encontró la URL '/api/requestActions/'. Revisa las URLs de Django.");
+                alert("Error 404: No se encontró la URL. Revisa las URLs de Django.");
             } else {
-                const errorMsg = error.response.data.error || error.response.data.detail || 'No se pudo autorizar.';
+                const errorMsg = error.response.data.error || error.response.data.detail || 'No se pudo rechazar.';
                 alert(`Error: ${errorMsg}`);
             }
         }

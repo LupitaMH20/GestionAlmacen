@@ -75,6 +75,33 @@ const loadCollaboartor = async () => {
 }
 
 const handleSave = async () => {
+    // Validaciones
+    if (!preRequest.requestingCompany) {
+        alert('Por favor, selecciona la empresa solicitante.')
+        return
+    }
+    if (!preRequest.supplierCompany) {
+        alert('Por favor, selecciona la empresa proveedora.')
+        return
+    }
+    if (!preRequest.collaborator) {
+        alert('Por favor, selecciona un colaborador.')
+        return
+    }
+    if (!preRequest.article) {
+        alert('Por favor, ingresa el ID del producto.')
+        return
+    }
+    const amountVal = Number(preRequest.amount)
+    if (!preRequest.amount || isNaN(amountVal) || amountVal <= 0) {
+        alert('Por favor, ingresa una cantidad válida mayor a 0.')
+        return
+    }
+    if (!preRequest.order_workshop) {
+        alert('Por favor, ingresa la orden de taller.')
+        return
+    }
+
     try {
         console.log('Datos a guardar:', preRequest)
         const payload = {
@@ -86,10 +113,12 @@ const handleSave = async () => {
         }
         await axios.post('http://127.0.0.1:8000/api/request/', payload)
         console.log('Se registró la presolicitud correctamente')
+        alert('PreSolicitud registrada con éxito')
         isDialogOpen.value = false
         emit('createPreRequest')
     } catch (error) {
         console.error('No se guardó la solicitud:', error)
+        alert('Error al guardar la solicitud. Verifica los datos o intenta más tarde.')
     }
 }
 

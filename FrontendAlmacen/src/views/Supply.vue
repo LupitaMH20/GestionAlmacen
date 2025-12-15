@@ -210,7 +210,7 @@ onMounted(() => { loadProcesses() });
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in Consumable" :key="proc.id_Request" v-bind="proc"
-                                @updateRequest="loadProcesses" />
+                                @update-request="loadProcesses" />
                             <p v-if="!Consumable.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Consumible.
                             </p>
@@ -226,7 +226,7 @@ onMounted(() => { loadProcesses() });
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in Tool" :key="proc.id_Request" v-bind="proc"
-                                @updateRequest="loadProcesses" />
+                                @update-request="loadProcesses" />
                             <p v-if="!Tool.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de Herramienta.
                             </p>
@@ -242,7 +242,7 @@ onMounted(() => { loadProcesses() });
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in PersonalConsumption" :key="proc.id_Request" v-bind="proc"
-                                @updateRequest="loadProcesses" />
+                                @update-request="loadProcesses" />
                             <p v-if="!PersonalConsumption.length" class="text-gray-500 text-sm italic mt-4">
                                 No hay solicitudes de ConsumoPersonal.
                             </p>

@@ -13,14 +13,14 @@ const props = defineModel('props', { type: Object, required: true })
                 <div class="p-1.5">
                     <Label class="text-24 font-sans font-bold p-1.5">ID del producto*</Label>
                     <FormControl>
-                        <Input v-model="props.article" type="text" placeholder="ID de producto"
+                        <Input v-model="props.article" type="text" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]+$" minlength="3" maxlength="50" placeholder="ID de producto"
                             class="w-50 font-sans text-12 font-light" />
                     </FormControl>
                 </div>
                 <div class="p-1.5">
                     <FormLabel class="text-24 font-sans font-bold p-1.5">Cantidad *</FormLabel>
                     <FormControl>
-                        <Input v-model="props.amount" type="number" placeholder="Ingrese la cantidad"
+                        <Input v-model="props.amount" type="number"  placeholder="Ingrese la cantidad"
                             class="w-50 font-sans text-12 font-light" />
                     </FormControl>
                 </div>

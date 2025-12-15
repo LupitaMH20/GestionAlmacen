@@ -44,10 +44,12 @@ const handleLogin = async () => {
         }
 
         const position = user.position?.toLowerCase()
-        if (['managerjom', 'managerns', 'managerprintek', 'managerhefesto', 'managerblackworkshop', 'applicant', 'deliberystaff'].includes(position)) {
+        if (['applicant', 'deliberystaff'].includes(position)) {
             router.push('/staff')
         } else if (['director', 'counter'].includes(position)) {
             router.push('/admin')
+        } else if (['managerjom', 'managerns', 'managerprintek', 'managerhefesto', 'managerblackworkshop', 'managerelektra'].includes(position)) {
+            router.push('/manager')
         } else {
             router.push('/home')
         }

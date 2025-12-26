@@ -1,0 +1,36 @@
+# Byte-code compilado y cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Entorno virtual
+venv/
+.venv/
+
+# Base de datos
+db.sqlite3
+db.sqlite3-journal
+
+# Archivos estáticos y de media
+media/
+staticfiles/
+
+# Variables de entorno y secretos
+.env
+*.env
+*.env.*
+
+# Archivos de registro (logs)
+*.log
+logs/
+
+# Reportes de tests y cobertura
+.coverage
+htmlcov/
+
+# Directorios de IDEs
+.idea/
+.vscode/
+
+# Archivos de sistema operativo
+.DS_Store

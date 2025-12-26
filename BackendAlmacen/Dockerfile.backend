@@ -1,0 +1,72 @@
+# Etapa 1: Builder - Instala dependencias de forma aislada
+FROM python:3.12-slim-bookworm AS builder
+
+# Instala dependencias de sistema para construir paquetes de Python.
+# Estas no estarán en la imagen final de producción.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev pkg-config libcairo2-dev && \
+    pip install --upgrade pip
+
+WORKDIR /app
+COPY requirements.txt .
+
+# Instala las dependencias de Python en el directorio de usuario
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# ---
+
+# Etapa 2: Development - Para el servidor de desarrollo con hot-reload
+FROM python:3.12-slim AS development
+WORKDIR /app
+
+# Copia las dependencias pre-instaladas desde el builder
+COPY --from=builder /root/.local /root/.local
+# Asegúrate de que los ejecutables de pip estén en el PATH
+ENV PATH=/root/.local/bin:$PATH
+
+# Copia el código de la aplicación (respeta .dockerignore)
+COPY . .
+
+
+# Expone el puerto 8000
+EXPOSE 8000
+# Comando por defecto para desarrollo (se pasa al entrypoint)
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000", "--noreload"]
+
+# ---
+
+# Etapa 3: Production - Imagen final optimizada y segura
+FROM python:3.12-slim AS production
+WORKDIR /app
+
+# Instala solo las dependencias de sistema necesarias para RUNTIME (ej. para postgres)
+# y luego limpia la caché de apt para reducir el tamaño de la imagen.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 libcairo2 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Crea un usuario y grupo no-root para mayor seguridad
+RUN addgroup --system appgroup && adduser --system --group appuser
+
+# Copia las dependencias instaladas del builder al home del nuevo usuario
+COPY --from=builder /root/.local /home/appuser/.local
+
+# Copia el código de la aplicación (aún como root)
+COPY . .
+
+# Cambia la propiedad de todos los archivos de la app al nuevo usuario
+RUN chown -R appuser:appgroup /app
+
+# Cambia al usuario no-root
+USER appuser
+
+# Añade los binarios del usuario al PATH. No es necesario PYTHONPATH.
+ENV PATH=/home/appuser/.local/bin:$PATH
+
+# Expone el puerto 8000
+EXPOSE 8000
+
+# Define el entrypoint que se ejecutará al iniciar el contenedor
+# Comando para producción usando Gunicorn (se pasa al entrypoint)
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "ConsumoInterno.wsgi:application"]

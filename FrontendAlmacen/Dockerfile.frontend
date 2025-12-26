@@ -1,0 +1,49 @@
+# Etapa 1: Builder - Construye los artefactos de producción
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY package.json .pnpmrc ./
+RUN corepack enable pnpm && pnpm install
+
+# Copia el resto del código fuente
+COPY . .
+
+# Pasa el ARG de build-time para la URL de la API
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
+# Construye la aplicación
+RUN pnpm run build
+
+# ---
+
+# Etapa 2: Development - Para correr el servidor de desarrollo
+FROM node:20-alpine AS development
+WORKDIR /app
+RUN apk --no-cache add curl
+
+# Instala TODAS las dependencias (incluidas las de desarrollo)
+# Copiamos .npmrc también, ya que puede afectar la instalación de paquetes
+COPY package.json .pnpmrc ./
+RUN corepack enable pnpm && pnpm install
+
+# Copia el código fuente
+COPY . .
+
+# Expone el puerto de Vite y ejecuta el servidor de desarrollo
+EXPOSE 5173
+CMD ["sh", "-c", "corepack enable pnpm && pnpm run dev --host"]
+
+# ---
+
+# Etapa 3: Production - Sirve los archivos estáticos con Nginx
+FROM nginx:1.25-alpine AS production
+# Copia los archivos construidos desde la etapa 'builder'
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copia la configuración personalizada de Nginx para soportar SPA
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expone el puerto 80 y arranca Nginx
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

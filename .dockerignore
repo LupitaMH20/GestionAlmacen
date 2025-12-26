@@ -1,0 +1,35 @@
+#git
+.git/
+.gitignore
+
+#Archivos de entorno
+.env
+.env.*
+
+#IDE
+.idea/
+.vscode/
+
+#Python
+env/
+venv/
+BackendAlmacen/env/
+BackendAlmacen/venv/
+__pycache__/
+*.__pycache__
+
+#Node
+node_modules/
+FrontendAlmacen/node_modules/
+
+#frontend build
+dist/
+build/
+
+#Docker
+docker-compose*.yml
+.dockerignore
+
+#OS
+.DS_Store
+Thumbs.db

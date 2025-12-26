@@ -394,3 +394,11 @@ def archive_request(request, request_id):
             {"error": "Solicitud no encontrada."}, 
             status=status.HTTP_404_NOT_FOUND
         )
+
+@api_view(['GET'])
+@permission_classes([])  # No se necesita autenticación
+def health_check(request):
+    """
+    Verificación de estado simple para Docker.
+    """
+    return Response({"status": "ok", "message": "Backend is healthy."}, status=status.HTTP_200_OK)

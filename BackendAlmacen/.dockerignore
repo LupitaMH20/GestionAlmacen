@@ -1,0 +1,27 @@
+# Git and sensitive files
+.git/
+.gitignore
+.env
+
+# Docker
+.dockerignore
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Local database
+*.sqlite3

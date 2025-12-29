@@ -32,6 +32,12 @@ class SupplySerializer(serializers.ModelSerializer):
         model = Supply
         fields = '__all__'
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        representation['collaborator'] = Collaboratorserializers(instance.collaborator).data
+        return representation
+
 class RequestActionsSerializer(serializers.ModelSerializer):
     acceptance = serializers.PrimaryKeyRelatedField(
         queryset=Acceptance.objects.filter(request__status__in=['request', 'declined']),

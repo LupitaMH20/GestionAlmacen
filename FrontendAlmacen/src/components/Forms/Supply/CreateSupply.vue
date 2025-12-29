@@ -216,7 +216,7 @@ const handleDownloadPdf = async () => {
         <template #actions-extra>
             <button v-if="props.Request.type === 'Tool' || props.Request.type === 'herramienta'"
                 type="button" 
-                class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" 
+                class="px-3 py-1 text-sm border rounded text-black hover:bg-black hover:text-white transition-colors" 
                 @click="handleDownloadPdf">
                 Generar PDF
             </button>

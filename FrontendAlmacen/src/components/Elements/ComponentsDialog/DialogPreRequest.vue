@@ -36,7 +36,7 @@ const formatStatus = (status: string) => {
     const lower = status.toLowerCase();
     if (lower.includes('prerequest')) return 'PreSolicitud';
     if (lower.includes('request')) return 'Solicitud';
-    if (lower.includes('authorized')) return 'Atorizar';
+    if (lower.includes('authorized')) return 'Autorizar';
     if (lower.includes('decline')) return 'Rechazar';
     if (lower.includes('supply')) return 'Surtir';
     if (lower.includes('return_exchange')) return 'Devoluciones o Cambios';

@@ -97,10 +97,6 @@ const handleSave = async () => {
         alert('Por favor, ingresa una cantidad válida mayor a 0.')
         return
     }
-    if (!preRequest.order_workshop) {
-        alert('Por favor, ingresa la orden de taller.')
-        return
-    }
 
     try {
         console.log('Datos a guardar:', preRequest)

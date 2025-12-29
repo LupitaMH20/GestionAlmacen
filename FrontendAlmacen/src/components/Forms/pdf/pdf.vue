@@ -38,7 +38,7 @@ const handleDownloadPdf = async () => {
     <Dialog1 title="Generar PDF" titleButton="Generar PDF" :iconP="FilePlus2" :iconT="FilePlus2" @cancel="handleCancel"
         v-model:open="isDialogOpen" @save="handleDownloadPdf">
         <template #actions-extra>
-            <button type="button" class="px-3 py-1 text-sm bg-blue-600 text-white rounded" @click="handleDownloadPdf">
+            <button type="button" class="px-3 py-1 text-sm bg-orange-50 text-white rounded" @click="handleDownloadPdf">
                 Generar PDF de resguardo
             </button>
         </template>

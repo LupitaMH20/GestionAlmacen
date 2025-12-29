@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, inject, Ref } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Dialog from './Dialog.vue';
 import { Eye, FileText } from 'lucide-vue-next';
@@ -9,6 +9,13 @@ interface Companies { id_Company: string; name: string };
 interface Users { id_user: string; name: string; last_name: string };
 interface Collaborators { id_Collaborator: string; name: string; last_name: string };
 interface Article { id_mainarticle: string; name: string };
+
+interface LoggedInUserType {
+    id_user: string;
+    name: string;
+    position: string;
+    admin: boolean;
+}
 
 const process = defineProps<{
     id_Request: number | string;
@@ -68,7 +75,16 @@ const process = defineProps<{
 const isDialogOpen = ref(false)
 const emit = defineEmits(['card', 'update-request']);
 
+const loggedInUser = inject<Ref<LoggedInUserType | null>>('loggedInUser');
+
 const paymentStatus = ref(process.acceptance?.requestactions?.supply?.payment_status || 'unpaid');
+
+const canPerformActions = computed(() => {
+    if (!loggedInUser?.value) return false;
+    const position = loggedInUser.value.position.toLowerCase();
+    // 'applicant' and 'deliberystaff' cannot perform these actions
+    return position !== 'applicant' && position !== 'deliberystaff';
+});
 
 const displayDateInfo = computed(() => {
     if ((process.currentStatus === 'supply') &&
@@ -200,6 +216,7 @@ const archiveRequest = async () => {
                     Pagada
                 </span>
                 <select v-model="paymentStatus" @change="updatePaymentStatus(paymentStatus)"
+                    :disabled="!canPerformActions"
                     class="ml-2 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="unpaid">No Pagada</option>
                     <option value="paid">Pagada</option>
@@ -216,12 +233,12 @@ const archiveRequest = async () => {
         </CardContent>
 
         <CardFooter class="flex justify-end gap-2">
-            <button v-if="process.currentStatus === 'supply'" @click="archiveRequest"
+            <button v-if="canPerformActions && process.currentStatus === 'supply'" @click="archiveRequest"
                 class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm font-semibold shadow-sm">
                 Archivar
             </button>
             <Dialog v-model="isDialogOpen" :title="`Detalles de ${process.title}`" titleButton="Detalles" :iconP="Eye"
-                :iconT="FileText" :Request="process" @dialog="emit('card')" />
+                :iconT="FileText" :Request="process" @dialog="emit('update-request')" />
         </CardFooter>
     </Card>
 </template>

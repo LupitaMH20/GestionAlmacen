@@ -18,7 +18,7 @@ const props = defineProps<{
 
 <template>
     <div v-if="props.supply" class="pt-4 space-y-2 text-sm border-t">
-        <h4 class="flex justify-center text-[24px] font-bold">Surtido</h4>
+        <h4 class="flex justify-center text-[24px] font-bold">Entregado</h4>
         <div><strong>Persona que entrego:</strong> {{ props.supply.userName?.name || props.supply.userName?.name || '—' }} </div>
         <div><strong>Persona que recibe:</strong> {{ props.supply.collaboratorName?.name || '—' }} {{ props.supply.collaboratorName?.last_name || '' }} </div>
         <div><strong>Comentario:</strong> {{ props.supply.comment || '—' }}</div>

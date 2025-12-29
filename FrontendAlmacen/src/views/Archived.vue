@@ -195,7 +195,7 @@ const filteredProcesses = computed(() => {
 });
 
 const filterByTypeAndStatus = (type: ProcessData['type']) =>
-    filteredProcesses.value.filter(p => (p.currentStatus === 'archived' || p.currentStatus === 'supply') && p.type === type);
+    filteredProcesses.value.filter(p => p.currentStatus === 'archived' && p.type === type);
 
 const Consumable = computed(() => filterByTypeAndStatus('Consumable'));
 const Tool = computed(() => filterByTypeAndStatus('Tool'));

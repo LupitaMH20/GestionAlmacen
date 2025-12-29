@@ -327,7 +327,7 @@ onMounted(() => {
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in prerequestDeclined" :key="proc.id_Request" v-bind="proc"
-                                @card="loadProcesses" />
+                                @update-request="loadProcesses" />
                             <p v-if="!prerequestDeclined.length" class="text-gray-500 text-sm italic mt-4">Sin elementos
                                 en esta etapa.</p>
                         </div>
@@ -344,7 +344,7 @@ onMounted(() => {
                         </h2>
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in request" :key="proc.id_Request" v-bind="proc"
-                                @card="loadProcesses" />
+                                @update-request="loadProcesses" />
                             <p v-if="!request.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -361,7 +361,7 @@ onMounted(() => {
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in authorized" :key="proc.id_Request" v-bind="proc" />
+                            <ProcessCard v-for="proc in authorized" :key="proc.id_Request" v-bind="proc" @update-request="loadProcesses"/>
                             <p v-if="!authorized.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -378,7 +378,7 @@ onMounted(() => {
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in supply" :key="proc.id_Request" v-bind="proc" />
+                            <ProcessCard v-for="proc in supply" :key="proc.id_Request" v-bind="proc" @update-request="loadProcesses"/>
                             <p v-if="!supply.length" class="text-gray-500 text-sm italic mt-4">Sin elementos en esta
                                 etapa.</p>
                         </div>
@@ -396,7 +396,7 @@ onMounted(() => {
                         </h2>
 
                         <div class="flex flex-col space-y-3">
-                            <ProcessCard v-for="proc in archived" :key="proc.id_Request" v-bind="proc" />
+                            <ProcessCard v-for="proc in archived" :key="proc.id_Request" v-bind="proc" @update-request="loadProcesses"/>
                             
                             <p v-if="!archived.length" class="text-gray-500 text-sm italic mt-4">
                                 Sin elementos en esta etapa.

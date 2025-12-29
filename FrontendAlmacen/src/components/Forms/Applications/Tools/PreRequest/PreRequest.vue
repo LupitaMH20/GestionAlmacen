@@ -96,6 +96,10 @@ const handleSave = async () => {
         alert('Por favor, ingresa una cantidad válida mayor a 0.')
         return
     }
+    if (!preRequest.store) {
+        alert('Por favor, ingresa el almacen.')
+        return
+    }
 
     try {
         console.log('Datos a guardar:', preRequest)

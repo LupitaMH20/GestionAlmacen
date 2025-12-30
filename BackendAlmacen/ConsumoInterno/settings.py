@@ -39,11 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #Provee la API rest
-    'rest_framework', 
-    #Permite la conección entre varis puertos 
+    # Provee la API rest
+    'rest_framework',
+    # Permite la conexión entre varios puertos
     'corsheaders',
-    #app del backend
+    # app del backend
     'users',
     'collaborator',
     'company',
@@ -162,5 +162,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ✅ SUPABASE STORAGE 
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
+SUPABASE_BUCKET_DOCUMENTS = os.environ.get('SUPABASE_BUCKET_DOCUMENTS', default='Domestic-Consumption')
 
 AUTH_USER_MODEL = 'users.Users'

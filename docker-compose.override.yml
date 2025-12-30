@@ -33,6 +33,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
+      
 volumes:
   pip_cache:
   frontend_node_modules:

@@ -1,18 +1,13 @@
-import axios from 'axios';
+import apiClient from '@/lib/axios';
 
 export const PdfService = {
     async downloadEquipmentCheckout(requestId: number | string) {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                throw new Error("No token found");
-            }
             const config = {
-                headers: { 'Authorization': `Bearer ${token}` },
                 responseType: 'blob' as const
             };
-            const url = `http://127.0.0.1:8000/api/request/${requestId}/checkout-pdf/`
-            const response = await axios.get(url, config)
+            const url = `request/${requestId}/checkout-pdf/`
+            const response = await apiClient.get(url, config)
 
             // Crear URL del blob
             const blob = new Blob([response.data], { type: 'application/pdf' });
@@ -29,16 +24,11 @@ export const PdfService = {
 
     async downloadQuotePdf(requestId: number | string) {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                throw new Error("No token found");
-            }
             const config = {
-                headers: { 'Authorization': `Bearer ${token}` },
                 responseType: 'blob' as const
             };
-            const url = `http://127.0.0.1:8000/api/request/${requestId}/quote-pdf/`
-            const response = await axios.get(url, config)
+            const url = `request/${requestId}/quote-pdf/`
+            const response = await apiClient.get(url, config)
 
             // Crear URL del blob
             const blob = new Blob([response.data], { type: 'application/pdf' });
@@ -55,16 +45,11 @@ export const PdfService = {
 
     async downloadBulkQuotePdf(requestIds: (number | string)[]) {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                throw new Error("No token found");
-            }
             const config = {
-                headers: { 'Authorization': `Bearer ${token}` },
                 responseType: 'blob' as const
             };
-            const url = `http://127.0.0.1:8000/api/request/bulk-quote-pdf/`
-            const response = await axios.post(url, { request_ids: requestIds }, config)
+            const url = `request/bulk-quote-pdf/`
+            const response = await apiClient.post(url, { request_ids: requestIds }, config)
 
             // Crear URL del blob
             const blob = new Blob([response.data], { type: 'application/pdf' });

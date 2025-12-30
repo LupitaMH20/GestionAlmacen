@@ -12,6 +12,10 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from article.models import Articles
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class RequestViewSet(viewsets.ModelViewSet):
     queryset = Request.objects.all().order_by('-request_datetime')
@@ -373,7 +377,7 @@ def archive_request(request, request_id):
                 # Navegar a través de las relaciones: Request -> Acceptance -> RequestActions -> Supply
                 supply = req.acceptance.requestactions.supply
                 if supply.payment_status != 'paid':
-                     return Response(
+                    return Response(
                         {"error": "Las solicitudes de Herramienta deben estar pagadas para poder archivarse."}, 
                         status=status.HTTP_400_BAD_REQUEST
                     )
@@ -382,8 +386,8 @@ def archive_request(request, request_id):
                 print(f"Error verificando pago para request {req.id_Request}: {str(e)}")
                 # Decisión: Si no se encuentra el suministro o hay error, bloqueamos por seguridad
                 return Response(
-                     {"error": "No se pudo verificar el estado de pago. Contacte a soporte."},
-                     status=status.HTTP_400_BAD_REQUEST
+                    {"error": "No se pudo verificar el estado de pago. Contacte a soporte."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
         req.status = 'archived'
@@ -402,3 +406,37 @@ def health_check(request):
     Verificación de estado simple para Docker.
     """
     return Response({"status": "ok", "message": "Backend is healthy."}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def upload_pdf_view(request):
+    """
+    Endpoint para subir PDFs a Supabase Storage.
+    """
+    from .supabase_storage import supabase_storage
+    if 'file' not in request.FILES:
+        return Response(
+            {"error": "No se proporcionó ningún archivo"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    pdf_file = request.FILES['file']
+
+    # Validar que sea PDF
+    if not pdf_file.name.endswith('.pdf'):
+        return Response(
+            {"error": "Solo se permiten archivos PDF"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Generar ruta única
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = f"solicitudes/{timestamp}_{pdf_file.name}"
+
+    # Subir a Supabase
+    result = supabase_storage.upload_pdf(pdf_file, path)
+
+    if result["success"]:
+        return Response(result, status=status.HTTP_201_CREATED)
+    else:
+        return Response(result, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

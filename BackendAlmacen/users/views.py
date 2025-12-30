@@ -50,3 +50,5 @@ class UserViewSets(viewsets.ModelViewSet):
             }, status=status.HTTP_200_OK)
         except Users.DoesNotExist:
             return Response({'error': 'No existe el usuario'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -87,7 +87,7 @@ const selectedFile = ref<File | null>(null);
 
 const canSupply = computed(() => {
     if (!loggedInUser?.value) return false;
-    return loggedInUser.value.position === 'deliberystaff' || loggedInUser.value.admin;
+    return loggedInUser.value.position !== 'applicant' ;
 })
 
 const loadCollaborators = async () => {

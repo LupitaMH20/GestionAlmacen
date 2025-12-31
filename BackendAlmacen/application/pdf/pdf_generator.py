@@ -25,16 +25,40 @@ class PDFGenerator:
 
     @staticmethod
     def get_logo_url(company_name):
-        logos = {
-            "Printek": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Printek_l2fhcv.png",
-            "Insumos": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Logo-Insumos-Mineros-Soluciones-Integrales_ls5tjx.png",
-            "Naranja": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Naranja-Store-Ferreterias_mppkih.png",
-            "JOM": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1760545192/JOM_q0pkvn.png"
+        """
+        Retorna la URL del logo según el nombre de la empresa.
+        Busca coincidencias parciales (case-insensitive) en el nombre.
+        """
+        if not company_name:
+            # Logo por defecto si no hay empresa
+            return "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1760545192/JOM_q0pkvn.png"
+        
+        # Normalizar el nombre de la empresa para comparación
+        company_lower = str(company_name).lower().strip()
+        
+        # Mapeo de empresas a logos (orden de prioridad)
+        logos_map = {
+            "printek": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Printek_l2fhcv.png",
+            "insumos": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Logo-Insumos-Mineros-Soluciones-Integrales_ls5tjx.png",
+            "naranja": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1764646153/Naranja-Store-Ferreterias_mppkih.png",
+            "jom": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1760545192/JOM_q0pkvn.png",
         }
-        for key, url in logos.items():
-            if key.lower() in str(company_name).lower():
-                return url
-        return logos["JOM"]
+        
+        # Buscar coincidencia exacta primero
+        if company_lower in logos_map:
+            print(f"✅ Logo encontrado (exacto): {company_name} -> {logos_map[company_lower]}")
+            return logos_map[company_lower]
+        
+        # Buscar coincidencia parcial
+        for key, logo_url in logos_map.items():
+            if key in company_lower or company_lower in key:
+                print(f"✅ Logo encontrado (parcial): {company_name} contiene '{key}' -> {logo_url}")
+                return logo_url
+        
+        # Si no se encuentra, usar JOM por defecto
+        print(f"⚠️ Logo no encontrado para '{company_name}', usando JOM por defecto")
+        return logos_map["jom"]
+
 
     @staticmethod
     def generate_quote_pdf(request, article_obj):
@@ -43,6 +67,7 @@ class PDFGenerator:
     @staticmethod
     def generate_bulk_quote_pdf(requests, articles_map):
         items = []
+        grand_total = Decimal("0.00")
         
         first_req = requests[0] if requests else None
         
@@ -80,6 +105,7 @@ class PDFGenerator:
                     price = Decimal("0.00")
             
             subtotal = price * Decimal(str(quantity))
+            grand_total += subtotal
             
             # Mapear status
             status_map = {
@@ -131,6 +157,7 @@ class PDFGenerator:
                 "direccion": company_address,
             },
             "items": items,
+            "grand_total": PDFGenerator.fmt_decimal(grand_total),
         }
 
         html_string = render_to_string("application/pdf/quote_pdf.html", context)

@@ -3,10 +3,16 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Reportes</title>
+    <title>Reporte de Solicitudes</title>
     <style>
         @page {
-            margin: 20mm 15mm;
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                bottom: 15mm;
+                left: 15mm;
+                right: 15mm;
+                height: 40mm;
+            }
         }
 
         * {
@@ -48,24 +54,35 @@
         }
 
         .company-name {
-            font-size: 12pt;
+            font-size: 14pt;
             font-weight: bold;
-            color: #27ae60;
+            color: #1f2937;
+            margin-bottom: 3px;
         }
 
         .company-details {
-            font-size: 7.5pt;
-            color: #555;
+            font-size: 8pt;
+            color: #6b7280;
         }
 
         /* Document title */
         .document-title {
             text-align: center;
-            font-size: 22pt;
+            font-size: 24pt;
             font-weight: bold;
-            color: #27ae60;
-            margin: 10px 0 15px;
+            color: #000;
+            margin: 15px 0 20px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 3px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 9pt;
+            color: #6b7280;
+            margin-bottom: 15px;
         }
 
         /* Items table */
@@ -77,22 +94,26 @@
         }
 
         .items-table th {
-            background-color: #27ae60;
+            background-color: #1f2937;
             color: #fff;
             font-weight: bold;
-            padding: 5px 4px;
-            border: 1px solid #27ae60;
+            padding: 6px 4px;
+            border: 1px solid #1f2937;
             text-align: center;
         }
 
         .items-table td {
-            border: 1px solid #ddd;
-            padding: 4px;
+            border: 1px solid #e5e7eb;
+            padding: 5px 4px;
             font-size: 7.5pt;
         }
 
         .items-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f9fafb;
+        }
+
+        .items-table tbody tr:hover {
+            background-color: #f3f4f6;
         }
 
         .text-right {
@@ -137,30 +158,89 @@
             background-color: #fef9c3;
             color: #854d0e;
         }
+
+        /* Totals section */
+        .totals-section {
+            /* margin-top: 20px; */ /* No longer needed */
+            padding: 15px;
+            background-color: #f9fafb;
+            border: 2px solid #1f2937;
+            border-radius: 5px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 10pt;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .total-row:last-child {
+            border-bottom: none;
+        }
+
+        .total-label {
+            font-weight: normal;
+            color: #4b5563;
+        }
+
+        .total-value {
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .grand-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0 0 0;
+            margin-top: 10px;
+            border-top: 3px solid #000;
+            font-size: 14pt;
+        }
+
+        .grand-total-label {
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        .grand-total-value {
+            font-weight: bold;
+            color: #000;
+            font-size: 16pt;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <!-- Título del documento -->
         <div class="document-title">{{ title }}</div>
+        <div class="subtitle">
+            Generado el {% now "d/m/Y" %}
+        </div>
 
-        <table style="width: 100%; margin-bottom: 10px;">
+        <!-- Header con logo y empresa -->
+        <table style="width: 100%; margin-bottom: 15px; border: none;">
             <tr>
-                <td style="width: 20%; border: none;">
+                <td style="width: 20%; border: none; vertical-align: middle;">
                     <div class="header-logo">
                         {% if company_info.logo_url %}
                         <img src="{{ company_info.logo_url }}" alt="Logo" />
                         {% endif %}
                     </div>
                 </td>
-                <td style="width: 80%; border: none;">
+                <td style="width: 80%; border: none; vertical-align: middle;">
                     <div class="header-info">
+                        <div class="company-name">{{ company_info.razon_social }}</div>
                         <div class="company-details">{{ company_info.direccion }}</div>
                     </div>
                 </td>
             </tr>
         </table>
 
+        <!-- Tabla de solicitudes -->
         <table class="items-table">
             <thead>
                 <tr>
@@ -196,7 +276,7 @@
                     </td>
                     <td class="text-right">{{ item.amount }}</td>
                     <td class="text-right">${{ item.unit_price }}</td>
-                    <td class="text-right" style="font-weight: bold; color: #F97316;">${{ item.total }}</td>
+                    <td class="text-right" style="font-weight: bold;">${{ item.total }}</td>
                     <td>{{ item.requester }}</td>
                     <td>{{ item.company }}</td>
                 </tr>
@@ -210,6 +290,19 @@
             </tbody>
         </table>
     </div>
-</body>
 
+    <!-- Contenido del footer para xhtml2pdf -->
+    <div id="footer_content">
+        <div class="totals-section">
+            <div class="total-row">
+                <span class="total-label">Total de solicitudes:</span>
+                <span class="total-value">{{ items|length }}</span>
+            </div>
+            <div class="grand-total-row">
+                <span class="grand-total-label">Total General:</span>
+                <span class="grand-total-value">${{ grand_total }}</span>
+            </div>
+        </div>
+    </div>
+</body>
 </html>

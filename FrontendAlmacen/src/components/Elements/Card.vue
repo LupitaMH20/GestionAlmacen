@@ -126,7 +126,7 @@ const formatCurrency = (value: number) => {
 };
 
 const showPaymentStatus = computed(() => {
-    return (process.type === 'PersonalConsumption' || process.type === 'Tool') && process.currentStatus === 'supply';
+    return (process.type === 'PersonalConsumption') && process.currentStatus === 'supply';
 });
 
 const updatePaymentStatus = async (newStatus: string) => {

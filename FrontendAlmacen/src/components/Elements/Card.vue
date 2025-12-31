@@ -185,7 +185,7 @@ const archiveRequest = async () => {
         emit('update-request');
     } catch (error) {
         console.error('Error al archivar solicitud:', error);
-        alert('Error al archivar la solicitud.');
+        alert('Error al archivar la solicitud, falta el pago.');
     }
 };
 </script>

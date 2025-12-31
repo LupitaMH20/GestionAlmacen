@@ -434,7 +434,7 @@ def archive_request(request, request_id):
             )
         
         # Validar pago para Herramientas
-        if req.type == 'Tool':
+        if req.type == 'PersonalConsumption':
             try:
                 # Navegar a través de las relaciones: Request -> Acceptance -> RequestActions -> Supply
                 supply = req.acceptance.requestactions.supply

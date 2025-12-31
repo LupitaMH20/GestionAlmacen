@@ -76,44 +76,48 @@ const handleLogin = async () => {
 </script>
 
 <template>
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-orange-700 to-orange-950">
+    <div
+        class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-orange-700 to-orange-950">
         <h1 class="text-white text-6xl font-bold mb-8 text-center">CONSUMO INTERNO</h1>
         <div>
             <Card
-            class="w-[750px] h-[550px] bg-amber-50/5 backdrop-blur-lg text text-amber-50 rounded-2xl shadow-xl border border-stone-100">
-            <CardHeader class="text-center pt-8">
-                <CardTitle class="flex flex-col items-center justify-center text-4xl font-bold mb-2">
-                    <div class="bg-amber-50 rounded-full p-4 mb-4">
-                        <User class="w-25 h-25 text-stone-500" />
-                    </div>
-                    Iniciar Sesión
-                </CardTitle>
-            </CardHeader>
+                class="w-[550] h-[420] bg-amber-50/5 backdrop-blur-lg text text-amber-50 rounded-2xl shadow-xl border border-stone-100">
+                <CardHeader class="text-center pt-8">
+                    <CardTitle class="flex flex-col items-center justify-center text-2xl font-bold mb-2">
+                        <div class="bg-amber-50 rounded-full p-4 mb-4">
+                            <User class="w-10 h-10 text-stone-500" />
+                        </div>
+                        Iniciar Sesión
+                    </CardTitle>
+                </CardHeader>
 
-            <CardContent class="space-y-6 px-20 mt-2">
-                <div class="relative h-10">
-                    <User class="absolute left-3 top-3 text-black-50 w-10 h-10" />
-                    <Input v-model="name" placeholder="Usuario"
-                        class="pl-15 text-3xl border-amber-50 text-black-50 placeholder-white focus:ring-black h-15" />
-                </div>
-                <div class="relative h-10 pt-2">
-                    <Lock class="absolute left-3 top-3 text-black-50 w-10 h-10" />
-                    <Input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Contraseña"
-                        class="pl-15 pr-10 bg-transparent border-amber-50 text-black-50 placeholder-white focus:ring-black h-15 text-3xl" />
-                    <div class="absolute right-3 top-3 cursor-pointer" @click="toggleShowPassword">
-                        <Eye v-if="!showPassword" class="pt-2 text-black-50 w-10 h-10" />
-                        <EyeOff v-else class="text-black-50 w-10 h-10" />
+                <CardContent class="space-y-6 px-20 mt-2">
+                    <!-- Campo Usuario -->
+                    <div class="relative h-10">
+                        <User class="absolute left-3 top-3 text-white w-5 h-5" />
+                        <Input v-model="name" placeholder="Usuario"
+                            class="pl-15 text-3xl border-amber-50 !placeholder-white focus:ring-amber-500 h-10 bg-transparent" />
                     </div>
-                </div>
-            </CardContent>
 
-            <CardFooter class="flex justify-end pt-8 ">
-                <Button @click="handleLogin"
-                    class="w-35 h-15 bg-transparent border border-white text-amber-50 font-bold rounded-lg transition-all">
-                    Iniciar sesión
-                </Button>
-            </CardFooter>
-        </Card>
+                    <!-- Campo Contraseña -->
+                    <div class="relative h-10 pt-1">
+                        <Lock class="absolute left-3 top-3 text-white w-5 h-5" />
+                        <Input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Contraseña"
+                            class="pl-15 pr-10 text-3xl bg-transparent border-amber-50 !placeholder-white focus:ring-amber-500 h-10" />
+                        <div class="absolute right-3 top-3 cursor-pointer" @click="toggleShowPassword">
+                            <Eye v-if="!showPassword" class="text-white w-6 h-6" />
+                            <EyeOff v-else class="text-white w-6 h-6" />
+                        </div>
+                    </div>
+                </CardContent>
+
+                <CardFooter class="flex justify-end pt-1 ">
+                    <Button @click="handleLogin"
+                        class="w-35 h-10 bg-transparent border border-white text-amber-50 font-bold rounded-lg transition-all">
+                        Iniciar sesión
+                    </Button>
+                </CardFooter>
+            </Card>
         </div>
     </div>
 </template>

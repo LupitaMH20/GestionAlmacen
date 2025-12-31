@@ -12,10 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+# from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# # ✅ Cargar .env desde la raíz del proyecto
+# ENV_PATH = BASE_DIR.parent / '.env'
+# load_dotenv(dotenv_path=ENV_PATH)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -163,8 +167,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ✅ SUPABASE STORAGE 
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
-SUPABASE_BUCKET_DOCUMENTS = os.environ.get('SUPABASE_BUCKET_DOCUMENTS', default='Domestic-Consumption')
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_KEY')
+SUPABASE_BUCKET_DOCUMENTS = os.getenv('SUPABASE_BUCKET_DOCUMENTS', 'Domestic-Consumption')
 
 AUTH_USER_MODEL = 'users.Users'

@@ -28,4 +28,5 @@ urlpatterns = [
     path('request/bulk-quote-pdf/', 
         views.download_bulk_quote_pdf, 
         name='download_bulk_quote_pdf'),
+        path('upload-pdf/', upload_pdf_view, name='upload-pdf')
 ] + router.urls

@@ -18,25 +18,44 @@ class ReturnExchangeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SupplySerializer(serializers.ModelSerializer):
-    requestActions = serializers.PrimaryKeyRelatedField(
-        queryset=RequestActions.objects.all()
-    )
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=Users.objects.all()
-    )
-    collaborator = serializers.PrimaryKeyRelatedField(
-        queryset=Collaborators.objects.all()
-    )
+    # ✅ Campo para recibir el archivo (no se guarda en BD, solo para upload)
+    document = serializers.FileField(write_only=True, required=False, allow_null=True)
+    
+    # ✅ Campos de solo lectura para mostrar la info del PDF
+    document_url = serializers.URLField(read_only=True)
+    document_path = serializers.CharField(read_only=True)
+    
+    userName = UserSerializer(source='user', read_only=True)
+    collaboratorName = Collaboratorserializers(source='collaborator', read_only=True)
+    time = serializers.SerializerMethodField()
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Supply
-        fields = '__all__'
+        fields = [
+            'id_supply',
+            'requestActions',
+            'user',
+            'userName',
+            'collaborator',
+            'collaboratorName',
+            'comment',
+            'supply_datetime',
+            'time',
+            'date',
+            'payment_status',
+            'document',  # ✅ Campo temporal para recibir archivo
+            'document_url',  # ✅ URL del PDF en Supabase
+            'document_path'  # ✅ Path en Supabase
+        ]
+        read_only_fields = ['id_supply', 'supply_datetime', 'document_url', 'document_path']
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data
-        representation['collaborator'] = Collaboratorserializers(instance.collaborator).data
-        return representation
+    def get_time(self, obj):
+        return obj.supply_datetime.strftime("%I:%M %p")
+
+    def get_date(self, obj):
+        return obj.supply_datetime.strftime("%d/%m/%Y")
+
 
 class RequestActionsSerializer(serializers.ModelSerializer):
     acceptance = serializers.PrimaryKeyRelatedField(

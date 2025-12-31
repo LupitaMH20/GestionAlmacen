@@ -63,7 +63,7 @@ services:
       target: ${BUILD_TARGET:-development} # Clave para multi-stage
     container_name: almacen_frontend
     restart: always
-    env_file: .env
+    env_file: ./.env
     depends_on:
       - backend
     networks:

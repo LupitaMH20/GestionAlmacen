@@ -14,16 +14,23 @@ logger = logging.getLogger(__name__)
 class SupabaseStoragePDF:
     """Cliente para interactuar con Supabase Storage - Solo PDFs."""
 
-    def __init__(self):
+    def __init__(self, jwt_token: Optional[str] = None):
         self.url = settings.SUPABASE_URL
         self.key = settings.SUPABASE_KEY
+        self.service_key = settings.SUPABASE_SERVICE_KEY
         self.bucket = settings.SUPABASE_BUCKET_DOCUMENTS
 
-        if not self.url or not self.key:
-            raise ValueError("SUPABASE_URL y SUPABASE_KEY deben estar configurados")
+        if not self.url or not (self.key or self.service_key):
+            raise ValueError("SUPABASE_URL y SUPABASE_KEY o SUPABASE_SERVICE_KEY deben estar configurados")
 
         logger.info(f"✅ SupabaseStorage inicializado: {self.url}")
-        self.client: Client = create_client(self.url, self.key)
+        if jwt_token:
+            self.client: Client = create_client(self.url, self.key, options={"headers": {"Authorization": f"Bearer {jwt_token}"}})
+            logger.info("  🔑 Cliente Supabase inicializado con JWT")
+        else:
+            # Use service key for server-side operations
+            self.client: Client = create_client(self.url, self.service_key or self.key)
+            logger.info("  🔓 Cliente Supabase inicializado con service key (server-side)")
 
     def upload_pdf(
         self,

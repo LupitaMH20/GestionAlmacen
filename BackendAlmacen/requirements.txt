@@ -42,4 +42,5 @@ python-dotenv
 psycopg2-binary
 python-decouple==3.8
 supabase
+websockets
 PyPDF2==3.0.1

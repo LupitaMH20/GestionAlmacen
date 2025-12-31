@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from article.models import Articles
 from datetime import datetime
 import logging
+from .supabase_storage import supabase_storage
 
 logger = logging.getLogger(__name__)
 
@@ -226,14 +227,75 @@ class SupplyViewSet(viewsets.ModelViewSet):
         try:
             serializer.is_valid(raise_exception=True)
         except serializers.ValidationError as e:
-            print("ERRORES SUPPLY:", serializer.errors)
-            return Response({"error": str(e), "detail": serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"ERRORES SUPPLY: {serializer.errors}")
+            return Response(
+                {"error": str(e), "detail": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        self.perform_create(serializer)
-        linked_request = serializer.instance.requestActions.acceptance.request
+        # ✅ Obtener el archivo PDF si existe
+        document_file = request.FILES.get('document')
+        document_url = None
+        document_path = None
+
+        if document_file:
+            # Extraer el JWT del encabezado Authorization
+            jwt_token = None
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                jwt_token = auth_header.split(' ')[1]
+            
+            logger.info(f"JWT recibido en SupplyViewSet: {jwt_token if jwt_token else 'Ninguno'}")
+
+            # Inicializar un cliente Supabase con el JWT del usuario
+            # Importamos la clase directamente para poder crear una instancia nueva
+            from .supabase_storage import SupabaseStoragePDF
+            authenticated_supabase_storage = SupabaseStoragePDF(jwt_token=jwt_token)
+
+            logger.info("=" * 60)
+            logger.info(f"📄 Archivo recibido: {document_file.name}")
+            logger.info(f"📏 Tamaño: {document_file.size} bytes")
+            logger.info("=" * 60)
+
+            # ✅ Validar que sea PDF
+            if not document_file.name.endswith('.pdf'):
+                return Response(
+                    {"error": "Solo se permiten archivos PDF"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # ✅ Generar ruta única en Supabase
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            request_id = serializer.validated_data.get('requestActions').acceptance.request.id_Request
+            path = f"Domestic-Consumption/{request_id}/{timestamp}_{document_file.name}"
+
+            # ✅ Subir a Supabase usando el cliente autenticado
+            logger.info(f"🚀 Subiendo a Supabase: {path}")
+            upload_result = authenticated_supabase_storage.upload_pdf(document_file, path)
+
+            if upload_result["success"]:
+                document_url = upload_result["url"]
+                document_path = upload_result["path"]
+                logger.info(f"✅ PDF subido exitosamente: {document_url}")
+            else:
+                logger.error(f"❌ Error subiendo PDF: {upload_result['error']}")
+                return Response(
+                    {"error": f"Error al subir documento: {upload_result['error']}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+        # ✅ Guardar Supply con URLs de Supabase
+        supply_instance = serializer.save(
+            document_url=document_url,
+            document_path=document_path
+        )
+
+        # Actualizar estado de la solicitud
+        linked_request = supply_instance.requestActions.acceptance.request
         linked_request.status = 'supply'
         linked_request.save(update_fields=['status'])
+
+        logger.info(f"✅ Supply creado con ID: {supply_instance.id_supply}")
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -412,7 +474,6 @@ def upload_pdf_view(request):
     """
     Endpoint para subir PDFs a Supabase Storage.
     """
-    from .supabase_storage import supabase_storage
     if 'file' not in request.FILES:
         return Response(
             {"error": "No se proporcionó ningún archivo"},

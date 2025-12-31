@@ -63,6 +63,13 @@ class Supply(models.Model):
         default='unpaid',
         help_text='Estado de pago para solicitudes de Consumo Personal'
     )
+
+    # ✅ NUEVOS CAMPOS PARA SUPABASE
+    document_url = models.URLField(max_length=500, blank=True, null=True)  # URL pública del PDF
+    document_path = models.CharField(max_length=300, blank=True, null=True)  # Ruta en Supabase
+
+    def __str__(self):
+        return f"Supply-{self.id_supply}"
     
 class ReturnExchange(models.Model):
     id_returnExchange = models.AutoField(primary_key=True)

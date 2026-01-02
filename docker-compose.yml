@@ -17,7 +17,7 @@ services:
       retries: 10
       start_period: 10s
     networks:
-        - db-network
+        - db_network
     logging:
       driver: "json-file"
       options:
@@ -40,8 +40,8 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - app-network
-      - db-network
+      - app_network
+      - db_network
     expose:
       - "8002"
     healthcheck:  # ← NUEVA SECCIÓN
@@ -69,7 +69,7 @@ services:
     depends_on:
       - backend
     networks:
-      - app-network
+      - app_network
     expose:
       - "80"
     healthcheck:
@@ -106,8 +106,8 @@ services:
       frontend:
         condition: service_started
     networks:
-      - app-network
-      - public-network
+      - app_network
+      - public_network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
       interval: 30s

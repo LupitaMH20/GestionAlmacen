@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProcessCard from '../components/Elements/Card.vue';
-import { ref, computed, onMounted, inject, Ref } from 'vue';
+import { ref, computed, onMounted, inject, type Ref } from 'vue';
 import axios from 'axios';
 import PreRequestC from '../components/Forms/Applications/Consumables/PreRequest/PreRequest.vue'
 import PreRequestCP from '../components/Forms/Applications/PersonalConsumption/PreRequest/PreRequest.vue'

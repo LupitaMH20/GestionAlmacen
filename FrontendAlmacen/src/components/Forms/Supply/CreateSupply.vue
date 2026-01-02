@@ -2,7 +2,7 @@
 import Dialog1 from '../../Elements/Dialog1.vue';
 import FormSupply from '../Supply/FormSupply.vue';
 import { PackageCheck } from 'lucide-vue-next';
-import { ref, inject, Ref, computed, watch } from 'vue';
+import { ref, inject, type Ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { PdfService } from '../pdf/pdfService';
 

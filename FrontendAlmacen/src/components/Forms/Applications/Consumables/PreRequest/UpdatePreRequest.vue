@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch, inject, Ref } from 'vue'
+import { ref, onMounted, reactive, watch, inject, type Ref } from 'vue'
 import Dialog2 from '../../../../Elements/Dialog2.vue';
 import FormPreRequestU1 from './FormPreRequestU1.vue';
 import FormPreRequestU2 from './FormPreRequestU2.vue';

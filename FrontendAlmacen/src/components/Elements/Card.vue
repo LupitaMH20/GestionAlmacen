@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, inject, Ref } from 'vue';
+import { ref, computed, inject, type Ref } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../ui/card';
 import Dialog from './Dialog.vue';
 import { Eye, FileText } from 'lucide-vue-next';

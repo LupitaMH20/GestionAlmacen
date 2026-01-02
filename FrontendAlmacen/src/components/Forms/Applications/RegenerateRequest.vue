@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, Ref } from 'vue';
+import { ref, inject, type Ref } from 'vue';
 import axios from 'axios';
 import Button from '../../ui/button/Button.vue';
 import { RefreshCw } from 'lucide-vue-next';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ref, inject, Ref, computed } from 'vue'
+import { ref, inject, type Ref, computed } from 'vue'
 import Dialog1 from '../../../../Elements/Dialog1.vue';
 import { Building2, Hammer, Notebook} from 'lucide-vue-next';
 

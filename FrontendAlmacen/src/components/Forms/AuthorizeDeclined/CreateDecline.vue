@@ -2,7 +2,7 @@
 import Dialog1 from '../../Elements/Dialog1.vue';
 import FormDecline from './FormAuthorizeDeclined.vue';
 import { BookCheck } from 'lucide-vue-next';
-import { ref, inject, Ref, computed } from 'vue';
+import { ref, inject, type Ref, computed } from 'vue';
 import axios from 'axios';
 
 interface Companies { id_Company: string; name: string };

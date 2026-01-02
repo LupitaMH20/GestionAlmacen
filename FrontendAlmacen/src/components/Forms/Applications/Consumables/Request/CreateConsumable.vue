@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, Ref, computed } from 'vue'
+import { ref, inject, type Ref, computed } from 'vue'
 import axios from 'axios'
 import Dialog1 from '../../../../Elements/Dialog1.vue'
 import { FilePlus2, Building2, Notebook } from 'lucide-vue-next'

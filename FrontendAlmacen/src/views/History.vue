@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, inject, Ref } from 'vue';
+import { ref, computed, onMounted, inject, type Ref } from 'vue';
 import axios from 'axios';
 import { Card, CardContent } from '../components/ui/card';
 import { Search, FileText } from 'lucide-vue-next';

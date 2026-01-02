@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, Ref } from 'vue'
+import { ref, inject, type Ref } from 'vue'
 import Dialog1 from '../../Elements/Dialog1.vue'
 import { FilePlus2, Building2, Notebook } from 'lucide-vue-next'
 import { PdfService } from './pdfService'

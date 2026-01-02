@@ -26,6 +26,7 @@ interface ProcessData {
     articleName?: Article;
     currentStatus: 'prerequest' | 'request' | 'authorized' | 'declined' | 'supply' | 'archived';
     date: string;
+    rawDate: Date;
     time: string;
     type?: string;
     user?: string;
@@ -76,6 +77,7 @@ interface ProcessData {
 const searchQuery = ref('');
 const selectedType = ref('All')
 const displayedProcesses = ref<ProcessData[]>([]);
+const selectedDateFilter = ref('all');
 const allProcesses = ref<ProcessData[]>([]);
 
 const loggedInUser = inject<Ref<LoggedInUserType | null>>('loggedInUser');
@@ -189,6 +191,7 @@ const loadProcesses = async () => {
                 articleName: item.article_obj,
                 currentStatus: item.status || 'solicitud',
                 date: formatDate(item.request_datetime),
+                rawDate: new Date(item.request_datetime),
                 time: formatTime(item.request_datetime),
                 type: item.type,
                 user: userObj,
@@ -246,9 +249,37 @@ const supply = computed(() =>
 const archived = computed(() => {
     if (!loggedInUser?.value) return [];
     const position = loggedInUser.value.position.toLowerCase();
-    const rolesPermitidos = ['director', 'counter']; 
+    const rolesPermitidos = ['director', 'counter'];
     if (rolesPermitidos.includes(position) || loggedInUser.value.admin) {
-        return displayedProcesses.value.filter(p => p.currentStatus === 'archived');
+        const archivedProcesses = displayedProcesses.value.filter(p => p.currentStatus === 'archived');
+        const now = new Date();
+
+        switch (selectedDateFilter.value) {
+            case 'all':
+                return archivedProcesses;
+            case 'month': {
+                const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfPreviousMonth = new Date(startOfCurrentMonth.getTime() - 1);
+                const startOfPreviousMonth = new Date(endOfPreviousMonth.getFullYear(), endOfPreviousMonth.getMonth(), 1);
+                return archivedProcesses.filter(p => p.rawDate >= startOfPreviousMonth && p.rawDate <= endOfPreviousMonth);
+            }
+            case 'year': {
+                const startOfCurrentYear = new Date(now.getFullYear(), 0, 1);
+                const endOfPreviousYear = new Date(startOfCurrentYear.getTime() - 1);
+                const startOfPreviousYear = new Date(endOfPreviousYear.getFullYear(), 0, 1);
+                return archivedProcesses.filter(p => p.rawDate >= startOfPreviousYear && p.rawDate <= endOfPreviousYear);
+            }
+            case 'current_month': {
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                return archivedProcesses.filter(p => p.rawDate >= startOfMonth);
+            }
+            case 'current_year': {
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                return archivedProcesses.filter(p => p.rawDate >= startOfYear);
+            }
+            default:
+                return archivedProcesses;
+        }
     }
     return [];
 });
@@ -394,6 +425,20 @@ onMounted(() => {
                                 </span>
                             </div>
                         </h2>
+
+                        <div class="flex items-center gap-3 justify-end mb-2">
+                            <label class="text-sm font-medium text-gray-700">Buscar por:</label>
+                            <select 
+                                v-model="selectedDateFilter"
+                                class="border border-gray-300 rounded-md text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-write-500 focus:border-transparent bg-white shadow-sm"
+                            >
+                                <option value="all">Todas</option>
+                                <option value="current_month">Mes en curso</option>
+                                <option value="current_year">Año en curso</option>
+                                <option value="month">Último Mes</option>
+                                <option value="year">Último Año</option>
+                            </select>
+                        </div>
 
                         <div class="flex flex-col space-y-3">
                             <ProcessCard v-for="proc in archived" :key="proc.id_Request" v-bind="proc" @update-request="loadProcesses"/>

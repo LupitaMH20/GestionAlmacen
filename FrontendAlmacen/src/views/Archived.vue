@@ -181,17 +181,34 @@ const loadProcesses = async () => {
 };
 
 const filteredProcesses = computed(() => {
-    if (selectedDateFilter.value === 'all') return processes.value;
-
     const now = new Date();
-    const cutoffDate = new Date();
 
-    if (selectedDateFilter.value === 'month') {
-        cutoffDate.setMonth(now.getMonth() - 1);
-    } else if (selectedDateFilter.value === 'year') {
-        cutoffDate.setFullYear(now.getFullYear() - 1);
+    switch (selectedDateFilter.value) {
+        case 'all':
+            return processes.value;
+        case 'month': {
+            const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfPreviousMonth = new Date(startOfCurrentMonth.getTime() - 1);
+            const startOfPreviousMonth = new Date(endOfPreviousMonth.getFullYear(), endOfPreviousMonth.getMonth(), 1);
+            return processes.value.filter(p => p.rawDate >= startOfPreviousMonth && p.rawDate <= endOfPreviousMonth);
+        }
+        case 'year': {
+            const startOfCurrentYear = new Date(now.getFullYear(), 0, 1);
+            const endOfPreviousYear = new Date(startOfCurrentYear.getTime() - 1);
+            const startOfPreviousYear = new Date(endOfPreviousYear.getFullYear(), 0, 1);
+            return processes.value.filter(p => p.rawDate >= startOfPreviousYear && p.rawDate <= endOfPreviousYear);
+        }
+        case 'current_month': {
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            return processes.value.filter(p => p.rawDate >= startOfMonth);
+        }
+        case 'current_year': {
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            return processes.value.filter(p => p.rawDate >= startOfYear);
+        }
+        default:
+            return processes.value;
     }
-    return processes.value.filter(p => p.rawDate >= cutoffDate);
 });
 
 const filterByTypeAndStatus = (type: ProcessData['type']) =>
@@ -219,6 +236,8 @@ onMounted(() => { loadProcesses() });
                         class="border border-gray-300 rounded-md text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-write-500 focus:border-transparent bg-white shadow-sm"
                     >
                         <option value="all">Todas</option>
+                        <option value="current_month">Mes en curso</option>
+                        <option value="current_year">Año en curso</option>
                         <option value="month">Último Mes</option>
                         <option value="year">Último Año</option>
                     </select>

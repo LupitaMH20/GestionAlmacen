@@ -64,6 +64,8 @@ services:
     container_name: almacen_frontend
     restart: always
     env_file: ./.env
+    volumes:
+      - frontend_dist:/usr/share/nginx/html
     depends_on:
       - backend
     networks:
@@ -144,6 +146,8 @@ volumes:
   media_volume:
     driver: local
   logs_volume:
+    driver: local
+  frontend_dist:
     driver: local
 
 networks:

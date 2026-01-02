@@ -12,8 +12,6 @@ services:
   backend:
     build:
       target: production
-    entrypoint: /docker-entrypoint.sh
-    command: "gunicorn almacen.wsgi:application --bind 0.0.0.0:8000 "
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/ || exit 1"]
       interval: 30s
@@ -40,6 +38,7 @@ services:
       - ./certbot/www:/var/www/certbot:ro
       - static_volume:/var/www/static:ro
       - media_volume:/var/www/media:ro
+      - frontend_dist:/usr/share/nginx/html:ro
     depends_on:
       - backend
       - frontend
